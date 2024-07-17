@@ -78,3 +78,6 @@ PASSWORDIDLE=365
 
 # telemetry
 TELEMETRYENABLED=yes
+
+# orthanc
+ORTHANCBASEURL=http://localhost:8042
