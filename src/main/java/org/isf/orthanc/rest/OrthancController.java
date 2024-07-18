@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -166,6 +167,13 @@ public class OrthancController {
 		}
     	return ResponseEntity.ok().body(orthancConfigMapper.map2DTO(orthancConfig));
 	}
+	
+	@GetMapping("/patients/{id}")
+    public ResponseEntity<Object> getPatientById(@PathVariable String id) throws OHServiceException {
+		LOGGER.info("Get Patient by id: {}", id);
+		String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(orthancManager.getPatientById(id, currentUser));
+    }
 	
 	@GetMapping("/studies")
     public ResponseEntity<String> getStudies() {
