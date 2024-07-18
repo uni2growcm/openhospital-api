@@ -21,13 +21,13 @@
  */
 package org.isf.orthanc.rest;
 
-import org.isf.orthanc.dto.OrthancConfigDTO;
 import org.isf.orthanc.dto.OrthancPatientDTO;
+import org.isf.orthanc.dto.OrthancUserDTO;
 import org.isf.orthanc.manager.OrthancBrowserManager;
-import org.isf.orthanc.mapper.OrthancConfigMapper;
 import org.isf.orthanc.mapper.OrthancPatientMapper;
-import org.isf.orthanc.model.OrthancConfig;
+import org.isf.orthanc.mapper.OrthancUserMapper;
 import org.isf.orthanc.model.OrthancPatient;
+import org.isf.orthanc.model.OrthancUser;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
 import org.isf.patient.rest.PatientController;
@@ -52,7 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "Orthanc")
-@RequestMapping("/orthanc")
+@RequestMapping("/orthancs")
 public class OrthancController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PatientController.class);
@@ -61,7 +61,7 @@ public class OrthancController {
     private OrthancBrowserManager orthancManager;
     
     @Autowired
-    private OrthancConfigMapper orthancConfigMapper;
+    private OrthancUserMapper orthancUserMapper;
     
     @Autowired
     private OrthancPatientMapper orthancPatientMapper;
@@ -69,26 +69,26 @@ public class OrthancController {
     @Autowired
 	protected PatientBrowserManager patientManager;
     
-    public OrthancController(OrthancBrowserManager orthancManager, OrthancConfigMapper orthancConfigMapper,
+    public OrthancController(OrthancBrowserManager orthancManager, OrthancUserMapper orthancUserMapper,
 			OrthancPatientMapper orthancPatientMapper, PatientBrowserManager patientManager) {
 		this.orthancManager = orthancManager;
-		this.orthancConfigMapper = orthancConfigMapper;
+		this.orthancUserMapper = orthancUserMapper;
 		this.orthancPatientMapper = orthancPatientMapper;
 		this.patientManager = patientManager;
 	}
 
-	@PostMapping(value="/config", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OrthancConfigDTO> newOrthancConfig(@RequestBody OrthancConfigDTO orthancConfigDTO) throws OHServiceException {
-    	LOGGER.info("Create orthanc config");
-    	OrthancConfig orthancConf = orthancConfigMapper.map2Model(orthancConfigDTO);
-    	orthancConf = orthancManager.newOrthancConfig(orthancConf);
-    	if (orthancConf == null) {
-			throw new OHAPIException(new OHExceptionMessage("Orthanc config not created."));
+	@PostMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OrthancUserDTO> newOrthancUser(@RequestBody OrthancUserDTO orthancUserDTO) throws OHServiceException {
+    	LOGGER.info("Create orthanc user");
+    	OrthancUser orthancUser = orthancUserMapper.map2Model(orthancUserDTO);
+    	orthancUser = orthancManager.newOrthancUser(orthancUser);
+    	if (orthancUser == null) {
+			throw new OHAPIException(new OHExceptionMessage("Orthanc user not created."));
 		}
-    	return ResponseEntity.status(HttpStatus.CREATED).body(orthancConfigMapper.map2DTO(orthancConf));
+    	return ResponseEntity.status(HttpStatus.CREATED).body(orthancUserMapper.map2DTO(orthancUser));
     }
 	
-	@PostMapping(value="/patient", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value="/patients", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancPatientDTO> newOrthancPatient(@RequestBody OrthancPatientDTO orthancPatientDTO) throws OHServiceException {
     	LOGGER.info("Create orthanc patient");
     	int code = orthancPatientDTO.getOhPatienId();
@@ -104,24 +104,24 @@ public class OrthancController {
     	return ResponseEntity.status(HttpStatus.CREATED).body(orthancPatientMapper.map2DTO(orthancPat));
     }
 
-	@PutMapping(value="/config/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OrthancConfigDTO> updateOrthancConfig(@PathVariable int id, @RequestBody OrthancConfigDTO orthancConfigDTO) throws OHServiceException {
-    	LOGGER.info("update orthanc config");
-    	if (orthancConfigDTO.getId() != id) {
-			throw new OHAPIException(new OHExceptionMessage("Orthanc config id mismatch."));
+	@PutMapping(value="/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OrthancUserDTO> updateOrthancUser(@PathVariable int id, @RequestBody OrthancUserDTO orthancUserDTO) throws OHServiceException {
+    	LOGGER.info("update orthanc user by id : {}", id);
+    	if (orthancUserDTO.getId() != id) {
+			throw new OHAPIException(new OHExceptionMessage("Orthanc user id mismatch."));
 		}
-    	String user = orthancConfigDTO.getUserName();
-    	OrthancConfig orthconfig = orthancManager.getOrtancConfigByUserName(user);
-    	if (orthconfig == null || orthconfig.getId() != id) {
-			throw new OHAPIException(new OHExceptionMessage("Orthanc config not found."));
+    	String userId = orthancUserDTO.getOhUserId();
+    	OrthancUser orthUser = orthancManager.getOrtancUserByOhUserId(userId);
+    	if (orthUser == null || orthUser.getId() != id) {
+			throw new OHAPIException(new OHExceptionMessage("Orthanc user not found."));
 		}
-    	OrthancConfig orthancConf = orthancConfigMapper.map2Model(orthancConfigDTO);
-    	orthancConf = orthancManager.updateOrthancConfig(orthancConf);
-    	if (orthancConf == null) {
-			throw new OHAPIException(new OHExceptionMessage("Orthanc config not updated."));
+    	OrthancUser orthancUser = orthancUserMapper.map2Model(orthancUserDTO);
+    	orthancUser = orthancManager.updateOrthancConfig(orthancUser);
+    	if (orthancUser == null) {
+			throw new OHAPIException(new OHExceptionMessage("Orthanc user not updated."));
 		}
     	
-    	return ResponseEntity.ok().body(orthancConfigMapper.map2DTO(orthancConf));
+    	return ResponseEntity.ok().body(orthancUserMapper.map2DTO(orthancUser));
     }
 	
 	@PutMapping(value="/patient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -157,14 +157,14 @@ public class OrthancController {
     	return ResponseEntity.ok().body(orthancPatientMapper.map2DTO(orthancPat));
 	}
 	
-	@GetMapping(value="/config/{userName}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OrthancConfigDTO> getOrthancConfigByUserName(@PathVariable String userName) throws OHServiceException {
-		LOGGER.info("Get orthanc config by user name: {}", userName);
-		OrthancConfig orthancConfig = orthancManager.getOrtancConfigByUserName(userName);
-    	if (orthancConfig == null) {
+	@GetMapping(value="/user/{userName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OrthancUserDTO> getOrthancUserByUserName(@PathVariable String ohUserId) throws OHServiceException {
+		LOGGER.info("Get orthanc user by oh user Id: {}", ohUserId);
+		OrthancUser orthancUser = orthancManager.getOrtancUserByOhUserId(ohUserId);
+    	if (orthancUser == null) {
 			throw new OHAPIException(new OHExceptionMessage("Orthanc patient not found."));
 		}
-    	return ResponseEntity.ok().body(orthancConfigMapper.map2DTO(orthancConfig));
+    	return ResponseEntity.ok().body(orthancUserMapper.map2DTO(orthancUser));
 	}
 	
 	@GetMapping("/studies")

@@ -24,14 +24,14 @@ package org.isf.orthanc.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-public class OrthancConfigDTO {
+public class OrthancUserDTO {
 	
 	@Schema(description = "The orthanc config id")
 	private Integer id; 
 	
 	@NotNull
 	@Schema(description = "The oh user name", example = "admin")
-	private String userName;
+	private String ohUserId;
 	
 	@NotNull
 	@Schema(description = "The orthanc config user name", example = "u2g")
@@ -41,17 +41,17 @@ public class OrthancConfigDTO {
 	@Schema(description = "The orthanc config password", example = "u2g123")
 	private String orthancPassword;
 
-	public OrthancConfigDTO() {}
+	public OrthancUserDTO() {}
 
-	public OrthancConfigDTO(String userName, String orthancUserName, String orthancPassword) {
-		this.userName = userName;
+	public OrthancUserDTO(String ohUserId, String orthancUserName, String orthancPassword) {
+		this.ohUserId = ohUserId;
 		this.orthancUserName = orthancUserName;
 		this.orthancPassword = orthancPassword;
 	}
 	
-	public OrthancConfigDTO(Integer id, String userName, String orthancUserName, String orthancPassword) {
+	public OrthancUserDTO(Integer id, String ohUserId, String orthancUserName, String orthancPassword) {
 		this.id = id;
-		this.userName = userName;
+		this.ohUserId = ohUserId;
 		this.orthancUserName = orthancUserName;
 		this.orthancPassword = orthancPassword;
 	}
@@ -64,12 +64,12 @@ public class OrthancConfigDTO {
 		this.id = id;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getOhUserId() {
+		return ohUserId;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setOhUserId(String ohUserId) {
+		this.ohUserId = ohUserId;
 	}
 
 	public String getOrthancUserName() {

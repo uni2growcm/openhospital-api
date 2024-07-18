@@ -21,14 +21,14 @@
  */
 package org.isf.orthanc.mapper;
 
-import org.isf.orthanc.dto.OrthancConfigDTO;
-import org.isf.orthanc.model.OrthancConfig;
+import org.isf.orthanc.dto.OrthancUserDTO;
+import org.isf.orthanc.model.OrthancUser;
 import org.isf.shared.GenericMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrthancConfigMapper extends GenericMapper<OrthancConfig, OrthancConfigDTO> {
-	public OrthancConfigMapper() {
-		super(OrthancConfig.class, OrthancConfigDTO.class);
+public class OrthancUserMapper extends GenericMapper<OrthancUser, OrthancUserDTO> {
+	public OrthancUserMapper() {
+		super(OrthancUser.class, OrthancUserDTO.class);
 	}
 }
