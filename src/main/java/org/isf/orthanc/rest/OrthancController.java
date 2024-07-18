@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,9 +78,21 @@ public class OrthancController {
 		this.patientManager = patientManager;
 	}
 
+    /**
+	 * Create new OrthancUser.
+	 * 
+	 * @param orthancUserDTO - the {@link OrthancUserDTO} to insert
+	 * @return the {@link OrthancUserDTO} that has been inserted, {@code null} otherwise.
+	 * @throws OHServiceException 
+	 */
 	@PostMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancUserDTO> newOrthancUser(@RequestBody OrthancUserDTO orthancUserDTO) throws OHServiceException {
     	LOGGER.info("Create orthanc user");
+    	String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+    	String ohUserId = orthancUserDTO.getOhUserId();
+    	if (!currentUser.equals(ohUserId)) {
+    		throw new OHAPIException(new OHExceptionMessage("User not found."));
+    	}
     	OrthancUser orthancUser = orthancUserMapper.map2Model(orthancUserDTO);
     	orthancUser = orthancManager.newOrthancUser(orthancUser);
     	if (orthancUser == null) {
@@ -88,6 +101,13 @@ public class OrthancController {
     	return ResponseEntity.status(HttpStatus.CREATED).body(orthancUserMapper.map2DTO(orthancUser));
     }
 	
+	/**
+	 * Create an OrthancPatient.
+	 * 
+	 * @param orthancPatientDTO - the {@link OrthancPatientDTO} to insert
+	 * @return the {@link OrthancPatientDTO} that has been created, {@code null} otherwise.
+	 * @throws OHServiceException 
+	 */
 	@PostMapping(value="/patients", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancPatientDTO> newOrthancPatient(@RequestBody OrthancPatientDTO orthancPatientDTO) throws OHServiceException {
     	LOGGER.info("Create orthanc patient");
@@ -104,14 +124,26 @@ public class OrthancController {
     	return ResponseEntity.status(HttpStatus.CREATED).body(orthancPatientMapper.map2DTO(orthancPat));
     }
 
+	/**
+	 * Update an OrthancUser.
+	 * 
+	 * @param id - the id of orthanc user
+	 * @param orthancUserDTO - the {@link OrthancUserDTO} to update
+	 * @return the {@link OrthancUserDTO} that has been updated, {@code null} otherwise.
+	 * @throws OHServiceException 
+	 */
 	@PutMapping(value="/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancUserDTO> updateOrthancUser(@PathVariable int id, @RequestBody OrthancUserDTO orthancUserDTO) throws OHServiceException {
     	LOGGER.info("update orthanc user by id : {}", id);
     	if (orthancUserDTO.getId() != id) {
 			throw new OHAPIException(new OHExceptionMessage("Orthanc user id mismatch."));
 		}
-    	String userId = orthancUserDTO.getOhUserId();
-    	OrthancUser orthUser = orthancManager.getOrtancUserByOhUserId(userId);
+    	String ohUserId = orthancUserDTO.getOhUserId();
+    	String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+    	if (!currentUser.equals(ohUserId)) {
+    		throw new OHAPIException(new OHExceptionMessage("User not found."));
+    	}
+    	OrthancUser orthUser = orthancManager.getOrtancUserByOhUserId(ohUserId);
     	if (orthUser == null || orthUser.getId() != id) {
 			throw new OHAPIException(new OHExceptionMessage("Orthanc user not found."));
 		}
@@ -124,6 +156,14 @@ public class OrthancController {
     	return ResponseEntity.ok().body(orthancUserMapper.map2DTO(orthancUser));
     }
 	
+	/**
+	 * Update an OrthancPatient.
+	 * 
+	 * @param id - the orthan patient id
+	 * @param orthancPatientDTO - the {@link OrthancPatientDTO} to update
+	 * @return {@link OrthancPatientDTO}. It could be {@code null}.
+	 * @throws OHServiceException 
+	 */
 	@PutMapping(value="/patient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancPatientDTO> updateOrthancPatient(@PathVariable int id, @RequestBody OrthancPatientDTO orthancPatientDTO) throws OHServiceException {
     	LOGGER.info("Update orthanc patient by id: {}", id);
@@ -147,6 +187,13 @@ public class OrthancController {
     	return ResponseEntity.ok().body(orthancPatientMapper.map2DTO(orthancPat));
     }
 	
+	/**
+	 * Return {@link OrthancPatientDTO}
+	 * 
+	 * @param patId - the patient id
+	 * @return {@link OrthancPatientDTO}. It could be {@code null}.
+	 * @throws OHServiceException 
+	 */
 	@GetMapping(value="/patient/{patId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancPatientDTO> getOrthancPatientByPatientId(@PathVariable int patId) throws OHServiceException {
 		LOGGER.info("Get orthanc patient by patId: {}", patId);
@@ -157,10 +204,18 @@ public class OrthancController {
     	return ResponseEntity.ok().body(orthancPatientMapper.map2DTO(orthancPat));
 	}
 	
-	@GetMapping(value="/user/{userName}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OrthancUserDTO> getOrthancUserByUserName(@PathVariable String ohUserId) throws OHServiceException {
-		LOGGER.info("Get orthanc user by oh user Id: {}", ohUserId);
-		OrthancUser orthancUser = orthancManager.getOrtancUserByOhUserId(ohUserId);
+	/**
+	 * Return {@link OrthancUserDTO}
+	 * 
+	 * @param ohUserId - the oh user name
+	 * @return {@link OrthancUser}. It could be {@code null}.
+	 * @throws OHServiceException 
+	 */
+	@GetMapping(value="/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OrthancUserDTO> getOrthancUser() throws OHServiceException {
+		LOGGER.info("Get orthanc user");
+		String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+		OrthancUser orthancUser = orthancManager.getOrtancUserByOhUserId(currentUser);
     	if (orthancUser == null) {
 			throw new OHAPIException(new OHExceptionMessage("Orthanc patient not found."));
 		}
