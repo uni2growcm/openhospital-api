@@ -26,7 +26,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class OrthancUserDTO {
 	
-	@Schema(description = "The orthanc config id")
+	@Schema(description = "The orthanc user id")
 	private Integer id; 
 	
 	@NotNull
@@ -34,11 +34,11 @@ public class OrthancUserDTO {
 	private String ohUserId;
 	
 	@NotNull
-	@Schema(description = "The orthanc config user name", example = "u2g")
+	@Schema(description = "The orthanc user name", example = "u2g")
 	private String orthancUserName;
 	
 	@NotNull
-	@Schema(description = "The orthanc config password", example = "u2g123")
+	@Schema(description = "The orthanc password", example = "u2g123")
 	private String orthancPassword;
 
 	public OrthancUserDTO() {}

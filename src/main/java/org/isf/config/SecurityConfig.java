@@ -235,8 +235,11 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.DELETE, "/operationtypes/**").hasAuthority("operationtypes.delete")
 						// orthanc
 						.requestMatchers(HttpMethod.POST, "/orthanc/**").hasAuthority("orthanc.create")
+						.requestMatchers(HttpMethod.POST, "/orthanc/**").hasAuthority("users.create")
 						.requestMatchers(HttpMethod.GET, "/orthanc/**").hasAuthority("orthanc.read")
+						.requestMatchers(HttpMethod.GET, "/orthanc/**").hasAuthority("users.read")
 						.requestMatchers(HttpMethod.PUT, "/orthanc/**").hasAuthority("orthanc.update")
+						.requestMatchers(HttpMethod.PUT, "/orthanc/**").hasAuthority("users.update")
 						// patientconsensus
 						.requestMatchers(HttpMethod.POST, "/patientconsensus/**").hasAuthority("patientconsensus.create")
 						.requestMatchers(HttpMethod.GET, "/patientconsensus/**").hasAuthority("patientconsensus.read")

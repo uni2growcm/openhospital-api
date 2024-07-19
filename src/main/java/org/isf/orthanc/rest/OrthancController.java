@@ -21,6 +21,9 @@
  */
 package org.isf.orthanc.rest;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.isf.orthanc.dto.OrthancPatientDTO;
 import org.isf.orthanc.dto.OrthancUserDTO;
 import org.isf.orthanc.manager.OrthancBrowserManager;
@@ -31,6 +34,8 @@ import org.isf.orthanc.model.OrthancUser;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
 import org.isf.patient.rest.PatientController;
+import org.isf.permissions.manager.PermissionManager;
+import org.isf.permissions.model.Permission;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
@@ -68,14 +73,17 @@ public class OrthancController {
     private OrthancPatientMapper orthancPatientMapper;
     
     @Autowired
-	protected PatientBrowserManager patientManager;
+	private PatientBrowserManager patientManager;
+    
+    private PermissionManager permissionManager;
     
     public OrthancController(OrthancBrowserManager orthancManager, OrthancUserMapper orthancUserMapper,
-			OrthancPatientMapper orthancPatientMapper, PatientBrowserManager patientManager) {
+			OrthancPatientMapper orthancPatientMapper, PatientBrowserManager patientManager, PermissionManager permissionManager) {
 		this.orthancManager = orthancManager;
 		this.orthancUserMapper = orthancUserMapper;
 		this.orthancPatientMapper = orthancPatientMapper;
 		this.patientManager = patientManager;
+		this.permissionManager = permissionManager;
 	}
 
     /**
@@ -88,14 +96,17 @@ public class OrthancController {
 	@PostMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancUserDTO> newOrthancUser(@RequestBody OrthancUserDTO orthancUserDTO) throws OHServiceException {
     	LOGGER.info("Create orthanc user");
-    	String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
     	String ohUserId = orthancUserDTO.getOhUserId();
-    	if (!currentUser.equals(ohUserId)) {
+    	String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+    	List<Permission> permissions = permissionManager.retrievePermissionsByUsername(currentUser).stream().filter(p -> p.getName().equals("users.create")).collect(Collectors.toList());
+    	if (!currentUser.equals(ohUserId) && permissions.size() == 0) {
+    		LOGGER.info("User not found");
     		throw new OHAPIException(new OHExceptionMessage("User not found."));
     	}
     	OrthancUser orthancUser = orthancUserMapper.map2Model(orthancUserDTO);
     	orthancUser = orthancManager.newOrthancUser(orthancUser);
     	if (orthancUser == null) {
+    		LOGGER.info("Orthanc user not created");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc user not created."));
 		}
     	return ResponseEntity.status(HttpStatus.CREATED).body(orthancUserMapper.map2DTO(orthancUser));
@@ -114,11 +125,13 @@ public class OrthancController {
     	int code = orthancPatientDTO.getOhPatienId();
     	Patient patientRead = patientManager.getPatientById(code);
 		if (patientRead == null) {
+			LOGGER.info("Patient not found");
 			throw new OHAPIException(new OHExceptionMessage("Patient not found."));
 		}
     	OrthancPatient orthancPat = orthancPatientMapper.map2Model(orthancPatientDTO);
     	orthancPat = orthancManager.newOrthancPatient(orthancPat);
     	if (orthancPat == null) {
+    		LOGGER.info("Orthanc patient not created");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc patient not created."));
 		}
     	return ResponseEntity.status(HttpStatus.CREATED).body(orthancPatientMapper.map2DTO(orthancPat));
@@ -136,20 +149,25 @@ public class OrthancController {
     public ResponseEntity<OrthancUserDTO> updateOrthancUser(@PathVariable int id, @RequestBody OrthancUserDTO orthancUserDTO) throws OHServiceException {
     	LOGGER.info("update orthanc user by id : {}", id);
     	if (orthancUserDTO.getId() != id) {
+    		LOGGER.info("Orthanc user id mismatch");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc user id mismatch."));
 		}
     	String ohUserId = orthancUserDTO.getOhUserId();
     	String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-    	if (!currentUser.equals(ohUserId)) {
+    	List<Permission> permissions = permissionManager.retrievePermissionsByUsername(currentUser).stream().filter(p -> p.getName().equals("users.update")).collect(Collectors.toList());
+    	if (!currentUser.equals(ohUserId) && permissions.size() == 0) {
+    		LOGGER.info("User not found");
     		throw new OHAPIException(new OHExceptionMessage("User not found."));
     	}
     	OrthancUser orthUser = orthancManager.getOrtancUserByOhUserId(ohUserId);
     	if (orthUser == null || orthUser.getId() != id) {
+    		LOGGER.info("Orthanc user not found");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc user not found."));
 		}
     	OrthancUser orthancUser = orthancUserMapper.map2Model(orthancUserDTO);
     	orthancUser = orthancManager.updateOrthancConfig(orthancUser);
     	if (orthancUser == null) {
+    		LOGGER.info("Orthanc user not updated");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc user not updated."));
 		}
     	
@@ -164,24 +182,28 @@ public class OrthancController {
 	 * @return {@link OrthancPatientDTO}. It could be {@code null}.
 	 * @throws OHServiceException 
 	 */
-	@PutMapping(value="/patient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value="/patients/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancPatientDTO> updateOrthancPatient(@PathVariable int id, @RequestBody OrthancPatientDTO orthancPatientDTO) throws OHServiceException {
     	LOGGER.info("Update orthanc patient by id: {}", id);
     	if (orthancPatientDTO.getId() != id) {
+    		LOGGER.info("Orthanc patient id mismatch");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc patient id mismatch."));
 		}
     	OrthancPatient orthancPatient = orthancManager.getOrthancPatientById(id);
     	if (orthancPatient == null) {
+    		LOGGER.info("Orthanc patient not found");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc patient not found."));
 		}
     	int code = orthancPatientDTO.getOhPatienId();
     	Patient patientRead = patientManager.getPatientById(code);
 		if (patientRead == null) {
+			LOGGER.info("Patient not found");
 			throw new OHAPIException(new OHExceptionMessage("Patient not found."));
 		}
     	OrthancPatient orthancPat = orthancPatientMapper.map2Model(orthancPatientDTO);
     	orthancPat = orthancManager.updateOrthancPatient(orthancPat);
     	if (orthancPat == null) {
+    		LOGGER.info("Orthanc patient not updated");
 			throw new OHAPIException(new OHExceptionMessage("Orthanc patient not updated."));
 		}
     	return ResponseEntity.ok().body(orthancPatientMapper.map2DTO(orthancPat));
@@ -194,12 +216,13 @@ public class OrthancController {
 	 * @return {@link OrthancPatientDTO}. It could be {@code null}.
 	 * @throws OHServiceException 
 	 */
-	@GetMapping(value="/patient/{patId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value="/patients/{patId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancPatientDTO> getOrthancPatientByPatientId(@PathVariable int patId) throws OHServiceException {
-		LOGGER.info("Get orthanc patient by patId: {}", patId);
+		LOGGER.info("Get orthanc patient by patId: {}.", patId);
 		OrthancPatient orthancPat = orthancManager.getOrthancPatientByPatientId(patId);
     	if (orthancPat == null) {
-			throw new OHAPIException(new OHExceptionMessage("Orthanc patient not found."));
+    		LOGGER.info("No orthanc patient with id: {}.", patId);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 		}
     	return ResponseEntity.ok().body(orthancPatientMapper.map2DTO(orthancPat));
 	}
@@ -211,13 +234,15 @@ public class OrthancController {
 	 * @return {@link OrthancUser}. It could be {@code null}.
 	 * @throws OHServiceException 
 	 */
-	@GetMapping(value="/user", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrthancUserDTO> getOrthancUser() throws OHServiceException {
 		LOGGER.info("Get orthanc user");
 		String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
 		OrthancUser orthancUser = orthancManager.getOrtancUserByOhUserId(currentUser);
-    	if (orthancUser == null) {
-			throw new OHAPIException(new OHExceptionMessage("Orthanc patient not found."));
+		List<Permission> permissions = permissionManager.retrievePermissionsByUsername(currentUser).stream().filter(p -> p.getName().equals("users.read")).collect(Collectors.toList());
+    	if (orthancUser == null && permissions.size() == 0) {
+    		LOGGER.info("No orthanc user for this user");
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 		}
     	return ResponseEntity.ok().body(orthancUserMapper.map2DTO(orthancUser));
 	}
