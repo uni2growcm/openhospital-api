@@ -100,8 +100,8 @@ public class OrthancController {
     	String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
     	List<Permission> permissions = permissionManager.retrievePermissionsByUsername(currentUser).stream().filter(p -> p.getName().equals("users.create")).collect(Collectors.toList());
     	if (!currentUser.equals(ohUserId) && permissions.size() == 0) {
-    		LOGGER.info("User not found");
-    		throw new OHAPIException(new OHExceptionMessage("User not found."));
+    		LOGGER.info("Not authorize");
+    		throw new OHAPIException(new OHExceptionMessage("Not Authorize."), HttpStatus.FORBIDDEN);
     	}
     	OrthancUser orthancUser = orthancUserMapper.map2Model(orthancUserDTO);
     	orthancUser = orthancManager.newOrthancUser(orthancUser);
@@ -156,8 +156,8 @@ public class OrthancController {
     	String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
     	List<Permission> permissions = permissionManager.retrievePermissionsByUsername(currentUser).stream().filter(p -> p.getName().equals("users.update")).collect(Collectors.toList());
     	if (!currentUser.equals(ohUserId) && permissions.size() == 0) {
-    		LOGGER.info("User not found");
-    		throw new OHAPIException(new OHExceptionMessage("User not found."));
+    		LOGGER.info("Not Authorize");
+    		throw new OHAPIException(new OHExceptionMessage("Not Authorize."), HttpStatus.FORBIDDEN);
     	}
     	OrthancUser orthUser = orthancManager.getOrtancUserByOhUserId(ohUserId);
     	if (orthUser == null || orthUser.getId() != id) {
@@ -241,8 +241,8 @@ public class OrthancController {
 		OrthancUser orthancUser = orthancManager.getOrtancUserByOhUserId(currentUser);
 		List<Permission> permissions = permissionManager.retrievePermissionsByUsername(currentUser).stream().filter(p -> p.getName().equals("users.read")).collect(Collectors.toList());
     	if (orthancUser == null && permissions.size() == 0) {
-    		LOGGER.info("No orthanc user for this user");
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    		LOGGER.info("Not Authorize");
+    		throw new OHAPIException(new OHExceptionMessage("Not Authorize."), HttpStatus.FORBIDDEN);
 		}
     	return ResponseEntity.ok().body(orthancUserMapper.map2DTO(orthancUser));
 	}
