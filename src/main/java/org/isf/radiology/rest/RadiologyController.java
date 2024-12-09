@@ -21,6 +21,7 @@
  */
 package org.isf.radiology.rest;
 
+import java.util.Base64;
 import java.util.List;
 
 import org.isf.orthanc.model.InstanceResponse;
@@ -131,9 +132,9 @@ public class RadiologyController {
 	 * @throws OHServiceException When failed to connect with ORTHANC server
 	 */
 	@GetMapping(value = "/radiology/instances/{id}/preview", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public Resource getInstancePreview(@PathVariable("id") String instanceId) throws OHServiceException {
+	public String getInstancePreview(@PathVariable("id") String instanceId) throws OHServiceException {
 		LOGGER.info("Downloading preview for instance with ID {}", instanceId);
 
-		return new ByteArrayResource(orthancAPIClientService.getInstancePreview(instanceId));
+		return Base64.getEncoder().encodeToString(orthancAPIClientService.getInstancePreview(instanceId));
 	}
 }
