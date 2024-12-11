@@ -30,6 +30,7 @@ import org.isf.orthanc.model.StudyResponse;
 import org.isf.orthanc.service.OrthancAPIClientService;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
+import org.isf.radiology.dto.InstancePreviewDTO;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHInternalServerException;
 import org.isf.utils.exception.OHNotFoundException;
@@ -37,8 +38,6 @@ import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,7 +70,6 @@ public class RadiologyController {
 
 	/**
 	 * Get patient studies
-	 *
 	 * @return the list of studies related to the given patient.
 	 * @throws OHServiceException When failed to connect with ORTHANC server
 	 */
@@ -89,7 +87,6 @@ public class RadiologyController {
 
 	/**
 	 * Get study's series
-	 *
 	 * @return the list of series related to the given study.
 	 * @throws OHServiceException When failed to connect with ORTHANC server
 	 */
@@ -100,7 +97,7 @@ public class RadiologyController {
 		try {
 			return orthancAPIClientService.getStudySeries(studyId);
 		} catch (OHNotFoundException e) {
-			throw new OHAPIException(new OHExceptionMessage("Study with ID " +studyId+ " not found."), HttpStatus.NOT_FOUND);
+			throw new OHAPIException(new OHExceptionMessage("Study with ID " + studyId + " not found."), HttpStatus.NOT_FOUND);
 		} catch (OHInternalServerException e) {
 			throw new OHAPIException(new OHExceptionMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -108,7 +105,6 @@ public class RadiologyController {
 
 	/**
 	 * Get series' instances
-	 *
 	 * @return the list of instances related to the given series.
 	 * @throws OHServiceException When failed to connect with ORTHANC server
 	 */
@@ -119,7 +115,7 @@ public class RadiologyController {
 		try {
 			return orthancAPIClientService.getSeriesInstances(seriesId);
 		} catch (OHNotFoundException e) {
-			throw new OHAPIException(new OHExceptionMessage("Series with ID " +seriesId+ " not found."), HttpStatus.NOT_FOUND);
+			throw new OHAPIException(new OHExceptionMessage("Series with ID " + seriesId + " not found."), HttpStatus.NOT_FOUND);
 		} catch (OHInternalServerException e) {
 			throw new OHAPIException(new OHExceptionMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -127,14 +123,13 @@ public class RadiologyController {
 
 	/**
 	 * Get instance preview
-	 *
-	 * @return a PNG image representing the instance preview
+	 * @return a Base64 PNG image representing the instance preview
 	 * @throws OHServiceException When failed to connect with ORTHANC server
 	 */
-	@GetMapping(value = "/radiology/instances/{id}/preview", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public String getInstancePreview(@PathVariable("id") String instanceId) throws OHServiceException {
+	@GetMapping(value = "/radiology/instances/{id}/preview")
+	public InstancePreviewDTO getInstancePreview(@PathVariable("id") String instanceId) throws OHServiceException {
 		LOGGER.info("Downloading preview for instance with ID {}", instanceId);
 
-		return Base64.getEncoder().encodeToString(orthancAPIClientService.getInstancePreview(instanceId));
+		return new InstancePreviewDTO(Base64.getEncoder().encodeToString(orthancAPIClientService.getInstancePreview(instanceId)));
 	}
 }
