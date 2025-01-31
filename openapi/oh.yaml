@@ -3815,18 +3815,18 @@ paths:
                   type: string
                   format: byte
       security:
-        - bearerAuth: [ ]
+      - bearerAuth: []
   /radiology/studies/{id}/series:
     get:
       tags:
-        - Radiology
+      - Radiology
       operationId: getStudySeriesById
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -3837,18 +3837,18 @@ paths:
                 items:
                   $ref: "#/components/schemas/SeriesResponse"
       security:
-        - bearerAuth: [ ]
+      - bearerAuth: []
   /radiology/series/{id}/instances:
     get:
       tags:
-        - Radiology
+      - Radiology
       operationId: getSeriesInstancesById
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -3859,18 +3859,18 @@ paths:
                 items:
                   $ref: "#/components/schemas/InstanceResponse"
       security:
-        - bearerAuth: [ ]
+      - bearerAuth: []
   /radiology/patients/{id}/studies:
     get:
       tags:
-        - Radiology
+      - Radiology
       operationId: getPatientStudiesById
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -3881,18 +3881,18 @@ paths:
                 items:
                   $ref: "#/components/schemas/StudyResponse"
       security:
-        - bearerAuth: [ ]
+      - bearerAuth: []
   /radiology/instances/{id}/preview:
     get:
       tags:
-        - Radiology
+      - Radiology
       operationId: getInstancePreview
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -3901,7 +3901,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/InstancePreviewDTO"
       security:
-        - bearerAuth: [ ]
       - bearerAuth: []
   /pricelists/prices:
     get:
@@ -6350,13 +6349,13 @@ components:
           description: lock
           format: int32
           example: 0
-        opd:
+        pharmacy:
           type: boolean
         male:
           type: boolean
         female:
           type: boolean
-        pharmacy:
+        opd:
           type: boolean
     PatientDTO:
       required:
