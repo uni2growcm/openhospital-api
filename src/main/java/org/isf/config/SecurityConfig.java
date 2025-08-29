@@ -147,6 +147,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/deliverytypes/**").hasAnyAuthority("deliverytypes.read")
 				.requestMatchers(HttpMethod.PUT, "/deliverytypes/**").hasAuthority("deliverytypes.update")
 				.requestMatchers(HttpMethod.DELETE, "/deliverytypes/**").hasAuthority("deliverytypes.delete")
+				// encounters
+				.requestMatchers(HttpMethod.POST, "/encounters/**").hasAuthority("encounters.create")
+				.requestMatchers(HttpMethod.GET, "/encounters/**").hasAnyAuthority("encounters.read")
+				.requestMatchers(HttpMethod.PATCH, "/encounters/**").hasAuthority("encounters.update")
+				.requestMatchers(HttpMethod.DELETE, "/encounters/**").hasAuthority("encounters.delete")
 				// exams
 				.requestMatchers(HttpMethod.POST, "/exams/**").hasAuthority("exams.create")
 				.requestMatchers(HttpMethod.GET, "/exams/**").hasAnyAuthority("exams.read")
