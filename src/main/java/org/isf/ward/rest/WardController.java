@@ -73,8 +73,11 @@ public class WardController {
     @GetMapping(value = "/wards")
     public List<WardDTO> getWards() throws OHServiceException {
         LOGGER.info("Get wards");
-
-        return mapper.map2DTOList(wardManager.getWards());
+		List<Ward> wards = wardManager.getWards();
+		if (wards == null) {
+			throw new OHAPIException(new OHExceptionMessage("No ward found."));
+		}
+        return mapper.map2DTOList(wards);
     }
 
     /**
@@ -86,8 +89,11 @@ public class WardController {
     @GetMapping(value = "/wardsNoMaternity")
     public List<WardDTO> getWardsNoMaternity() throws OHServiceException {
         LOGGER.info("Get wards no maternity");
-
-        return mapper.map2DTOList(wardManager.getWardsNoMaternity());
+		List<Ward> wards = wardManager.getWardsNoMaternity();
+		if (wards == null) {
+			throw new OHAPIException(new OHExceptionMessage("No ward found."));
+		}
+        return mapper.map2DTOList(wards);
     }
 
     /**

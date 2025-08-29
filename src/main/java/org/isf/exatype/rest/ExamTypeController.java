@@ -67,7 +67,12 @@ public class ExamTypeController {
 	@PostMapping("/examtypes")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ExamTypeDTO newExamType(@RequestBody ExamTypeDTO newExamType) throws OHServiceException {
-		return examTypeMapper.map2DTO(examTypeBrowserManager.newExamType(examTypeMapper.map2Model(newExamType)));
+		ExamType examType = examTypeBrowserManager.newExamType(examTypeMapper.map2Model(newExamType));
+
+		if (examType == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to create exam type."));
+		}
+		return examTypeMapper.map2DTO(examType);
 	}
 
 	@PutMapping("/examtypes/{code:.+}")
@@ -80,8 +85,11 @@ public class ExamTypeController {
 		if (!examTypeBrowserManager.isCodePresent(code)) {
 			throw new OHAPIException(new OHExceptionMessage("Exam Type not found."), HttpStatus.NOT_FOUND);
 		}
-
-		return examTypeMapper.map2DTO(examTypeBrowserManager.updateExamType(examTypeMapper.map2Model(updateExamType)));
+		ExamType examType = examTypeBrowserManager.updateExamType(examTypeMapper.map2Model(updateExamType));
+		if (examType == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to create exam type."));
+		}
+		return examTypeMapper.map2DTO(examType);
 	}
 
 	@GetMapping("/examtypes")

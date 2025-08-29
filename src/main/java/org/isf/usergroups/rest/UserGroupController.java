@@ -100,6 +100,9 @@ public class UserGroupController {
 	public List<UserGroupDTO> getUserGroups() throws OHServiceException {
 		LOGGER.info("Attempting to fetch the list of user groups.");
 		List<UserGroup> groups = userManager.getUserGroup();
+		if (groups == null) {
+			throw new OHAPIException(new OHExceptionMessage("No group found."));
+		}
 		List<UserGroupDTO> mappedGroups = userGroupMapper.map2DTOList(groups);
 		LOGGER.info("Found {} group(s).", mappedGroups.size());
 		return mappedGroups;

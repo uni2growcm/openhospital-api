@@ -94,19 +94,34 @@ public class ExamRowController {
 
     @GetMapping("/examrows")
     public List<ExamRowDTO> getExamRows() throws OHServiceException {
-        return examRowMapper.map2DTOList(examRowBrowsingManager.getExamRow());
+		List<ExamRow> examRows = examRowBrowsingManager.getExamRow();
+
+		if (examRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Exam Rows found."));
+		}
+        return examRowMapper.map2DTOList(examRows);
     }
 
     @GetMapping("/examrows/{code:.+}")
     public List<ExamRowDTO> getExamRowsByCode(@PathVariable Integer code) throws OHServiceException {
-        return examRowMapper.map2DTOList(examRowBrowsingManager.getExamRow(code));
+		List<ExamRow> examRows = examRowBrowsingManager.getExamRow(code);
+
+		if (examRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Exam Rows found."));
+		}
+		return examRowMapper.map2DTOList(examRows);
     }
 
     @GetMapping("/examrows/search")
     public List<ExamRowDTO> getExamRowsByCodeAndDescription(
         @RequestParam Integer code, @RequestParam String description
     ) throws OHServiceException {
-        return examRowMapper.map2DTOList(examRowBrowsingManager.getExamRow(code, description));
+		List<ExamRow> examRows = examRowBrowsingManager.getExamRow(code, description);
+
+		if (examRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Exam Rows found."));
+		}
+        return examRowMapper.map2DTOList(examRows);
     }
 
     @DeleteMapping("/examrows/{code:.+}")
@@ -130,6 +145,11 @@ public class ExamRowController {
 
     @GetMapping("/examrows/byExamCode/{examCode:.+}")
     public List<ExamRowDTO> getExamRowsByExamCode(@PathVariable String examCode) throws OHServiceException {
-        return examRowMapper.map2DTOList(examRowBrowsingManager.getExamRowByExamCode(examCode));
+		List<ExamRow> examRows = examRowBrowsingManager.getExamRowByExamCode(examCode);
+
+		if (examRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Exam Rows found."));
+		}
+		return examRowMapper.map2DTOList(examRows);
     }
 }

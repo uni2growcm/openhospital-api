@@ -97,6 +97,9 @@ public class MedicalStockWardController {
 		// FIXME: provide provision for boolean ,false?
 		List<MedicalWard> medWards = movWardBrowserManager.getMedicalsWard(wardId, true);
 
+		if (medWards == null) {
+			throw new OHAPIException(new OHExceptionMessage("No medical ward found."));
+		}
 		return medicalWardMapper.map2DTOList(medWards);
 	}
 
@@ -151,7 +154,12 @@ public class MedicalStockWardController {
 			dateToTime = dateTo.atStartOfDay();
 		}
 
-		return movementWardMapper.map2DTOList(movWardBrowserManager.getMovementWard(wardId, dateFromTime, dateToTime));
+		List<MovementWard> movementWards = movWardBrowserManager.getMovementWard(wardId, dateFromTime, dateToTime);
+
+		if (movementWards == null) {
+			throw new OHAPIException(new OHExceptionMessage("No movement ward found."));
+		}
+		return movementWardMapper.map2DTOList(movementWards);
 	}
 
 	/**
@@ -169,7 +177,12 @@ public class MedicalStockWardController {
 		@RequestParam("from") LocalDateTime dateFrom,
 		@RequestParam("to") LocalDateTime dateTo
 	) throws OHServiceException {
-		return movementWardMapper.map2DTOList(movWardBrowserManager.getWardMovementsToWard(idWardTo, dateFrom, dateTo));
+		List<MovementWard> movementWards = movWardBrowserManager.getWardMovementsToWard(idWardTo, dateFrom, dateTo);
+
+		if (movementWards == null) {
+			throw new OHAPIException(new OHExceptionMessage("No movement ward found."));
+		}
+		return movementWardMapper.map2DTOList(movementWards);
 	}
 
 	/**

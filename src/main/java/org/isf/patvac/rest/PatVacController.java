@@ -120,7 +120,12 @@ public class PatVacController {
 			oneWeek = false;
 		}
 
-		return mapper.map2DTOList(patVacManager.getPatientVaccine(oneWeek));
+		List<PatientVaccine> patientVaccines = patVacManager.getPatientVaccine(oneWeek);
+
+		if (patientVaccines == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Patient vaccine found."));
+		}
+		return mapper.map2DTOList(patientVaccines);
 	}
 
 	/**
@@ -139,10 +144,14 @@ public class PatVacController {
 		@RequestParam int ageTo
 	) throws OHServiceException {
 		LOGGER.info("filter patient vaccine by dates ranges");
-
-		return mapper.map2DTOList(patVacManager.getPatientVaccine(
+		List<PatientVaccine> patientVaccines = patVacManager.getPatientVaccine(
 			vaccineTypeCode, vaccineCode, dateFrom.atStartOfDay(), dateTo.atStartOfDay(), sex, ageFrom, ageTo
-		));
+		);
+
+		if (patientVaccines == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Patient vaccine found."));
+		}
+		return mapper.map2DTOList(patientVaccines);
 	}
 
 	/**

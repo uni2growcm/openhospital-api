@@ -164,6 +164,11 @@ public class OperationController {
 	public List<OperationDTO> getOperations() throws OHServiceException {
 		LOGGER.info("Get all operations.");
 
+		List<Operation> operations = operationManager.getOperation();
+
+		if (operations == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Operation found."));
+		}
 		return mapper.map2DTOList(operationManager.getOperation());
 	}
 
@@ -197,7 +202,12 @@ public class OperationController {
 	) throws OHServiceException {
 		LOGGER.info("Get operations for provided type description: {}.", typeDescription);
 
-		return mapper.map2DTOList(operationManager.getOperationByTypeDescription(typeDescription));
+		List<Operation> operations = operationManager.getOperationByTypeDescription(typeDescription);
+
+		if (operations == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Operation found."));
+		}
+		return mapper.map2DTOList(operations);
 	}
 
 	/**
@@ -303,7 +313,12 @@ public class OperationController {
 		LOGGER.info("Get operations row for provided admission.");
 		Admission adm = admissionManager.getAdmission(id);
 
-		return opRowMapper.map2DTOList(operationRowManager.getOperationRowByAdmission(adm));
+		List<OperationRow> operationRows = operationRowManager.getOperationRowByAdmission(adm);
+
+		if (operationRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Operation Row found."));
+		}
+		return opRowMapper.map2DTOList(operationRows);
 	}
 
 	/**
@@ -316,8 +331,12 @@ public class OperationController {
 	public List<OperationRowDTO> getOperationRowsByPatient(@RequestParam int patientCode) throws OHServiceException {
 		LOGGER.info("Get operations row for provided patient.");
 		Patient patient = patientBrowserManager.getPatientById(patientCode);
+		List<OperationRow> operationRows = operationRowManager.getOperationRowByPatientCode(patient);
 
-		return opRowMapper.map2DTOList(operationRowManager.getOperationRowByPatientCode(patient));
+		if (operationRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Operation Row found."));
+		}
+		return opRowMapper.map2DTOList(operationRows);
 	}
 
 	/**
@@ -330,7 +349,12 @@ public class OperationController {
 	public List<OperationRowDTO> getOperationRowsByOpd(@RequestBody OpdDTO opdDTO) throws OHServiceException {
 		LOGGER.info("Get operations row for provided opd.");
 
-		return opRowMapper.map2DTOList(operationRowManager.getOperationRowByOpd(opdMapper.map2Model(opdDTO)));
+		List<OperationRow> operationRows = operationRowManager.getOperationRowByOpd(opdMapper.map2Model(opdDTO));
+
+		if (operationRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Operation Row found."));
+		}
+		return opRowMapper.map2DTOList(operationRows);
 	}
 
 	/**

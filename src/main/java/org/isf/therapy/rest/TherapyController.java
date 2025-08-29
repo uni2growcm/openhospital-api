@@ -28,12 +28,14 @@ import jakarta.validation.Valid;
 
 import org.isf.medical.dto.MedicalDTO;
 import org.isf.medical.mapper.MedicalMapper;
+import org.isf.medicals.model.Medical;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.therapy.dto.TherapyDTO;
 import org.isf.therapy.dto.TherapyRowDTO;
 import org.isf.therapy.manager.TherapyManager;
 import org.isf.therapy.mapper.TherapyMapper;
 import org.isf.therapy.mapper.TherapyRowMapper;
+import org.isf.therapy.model.Therapy;
 import org.isf.therapy.model.TherapyRow;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
@@ -90,7 +92,12 @@ public class TherapyController {
 			throw new OHAPIException(new OHExceptionMessage("Patient not found."), HttpStatus.NOT_FOUND);
 		}
 
-		return therapyRowMapper.map2DTO(manager.newTherapy(therapyRowMapper.map2Model(thRowDTO)));
+		TherapyRow therapyRow = manager.newTherapy(therapyRowMapper.map2Model(thRowDTO));
+
+		if (therapyRow == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to create therapy row."));
+		}
+		return therapyRowMapper.map2DTO(therapyRow);
 	}
 
 	/**
@@ -106,7 +113,12 @@ public class TherapyController {
 	) throws OHServiceException {
 		ArrayList<TherapyRow> therapies = (ArrayList<TherapyRow>)therapyRowMapper.map2ModelList(thRowDTOs);
 
-		return therapyRowMapper.map2DTO(manager.newTherapy(therapies.get(0)));
+		TherapyRow therapyRow = manager.newTherapy(manager.newTherapy(therapies.get(0)));
+
+		if (therapyRow == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to create therapy row."));
+		}
+		return therapyRowMapper.map2DTO(therapyRow);
 	}
 
 	/**
@@ -135,7 +147,12 @@ public class TherapyController {
 	public List<MedicalDTO> getMedicalsOutOfStock(
 		@RequestBody List<TherapyDTO> therapyDTOs
 	) throws OHServiceException {
-		return medicalMapper.map2DTOList(manager.getMedicalsOutOfStock(therapyMapper.map2ModelList(therapyDTOs)));
+		List<Medical> therapies = manager.getMedicalsOutOfStock(therapyMapper.map2ModelList(therapyDTOs));
+
+		if (therapies == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Medical found."));
+		}
+		return medicalMapper.map2DTOList(therapies);
 	}
 
 	/**
@@ -148,7 +165,12 @@ public class TherapyController {
 	public List<TherapyRowDTO> getTherapyRows
 	(@PathVariable("code_patient") Integer patientID
 	) throws OHServiceException {
-		return therapyRowMapper.map2DTOList(manager.getTherapyRows(patientID));
+		List<TherapyRow> therapyRows = manager.getTherapyRows(patientID);
+
+		if (therapyRows == null) {
+			throw new OHAPIException(new OHExceptionMessage("No therapy row found."));
+		}
+		return therapyRowMapper.map2DTOList(therapyRows);
 	}
 
 	/**
@@ -161,7 +183,12 @@ public class TherapyController {
 	public List<TherapyDTO> getTherapies(
 		@RequestBody @Valid List<TherapyRowDTO> thRowDTOs
 	) throws OHServiceException {
-		return therapyMapper.map2DTOList(manager.getTherapies(therapyRowMapper.map2ModelList(thRowDTOs)));
+		List<Therapy> therapies = manager.getTherapies(therapyRowMapper.map2ModelList(thRowDTOs));
+
+		if (therapies == null) {
+			throw new OHAPIException(new OHExceptionMessage("No therapy found."));
+		}
+		return therapyMapper.map2DTOList(therapies);
 	}
 
 	/**
@@ -172,6 +199,11 @@ public class TherapyController {
 	 */
 	@PostMapping("/therapies/from-row")
 	public TherapyDTO getTherapy(@RequestBody @Valid TherapyRowDTO thRowDTO) throws OHServiceException {
-		return therapyMapper.map2DTO(manager.createTherapy(therapyRowMapper.map2Model(thRowDTO)));
+		Therapy therapy = manager.createTherapy(therapyRowMapper.map2Model(thRowDTO));
+
+		if (therapy == null) {
+			throw new OHAPIException(new OHExceptionMessage("Therapy not found."));
+		}
+		return therapyMapper.map2DTO(therapy);
 	}
 }

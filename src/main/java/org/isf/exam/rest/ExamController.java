@@ -100,6 +100,10 @@ public class ExamController {
 		} catch (OHServiceException serviceException) {
 			throw new OHAPIException(new OHExceptionMessage("Exam not created."));
 		}
+
+		if (exam == null) {
+			throw new OHAPIException(new OHExceptionMessage("Exam not created."));
+		}
 		return examMapper.map2DTO(exam);
 	}
 
@@ -141,12 +145,21 @@ public class ExamController {
 
 	@GetMapping(value = "/exams/description/{description:.+}")
 	public List<ExamDTO> getExams(@PathVariable String description) throws OHServiceException {
-		return examMapper.map2DTOList(examManager.getExams(description));
+		List<Exam> exams = examManager.getExams(description);
+
+		if (exams == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Exam found."));
+		}
+		return examMapper.map2DTOList(exams);
 	}
 
 	@GetMapping(value = "/exams")
 	public List<ExamDTO> getExams() throws OHServiceException {
-		return examMapper.map2DTOList(examManager.getExams());
+		List<Exam> exams = examManager.getExams();
+		if (exams == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Exam found."));
+		}
+		return examMapper.map2DTOList(exams);
 	}
 
 	@DeleteMapping(value = "/exams/{code:.+}")

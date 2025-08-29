@@ -74,8 +74,11 @@ public class VisitsController {
 	@GetMapping("/visits/patient/{patID}")
 	public List<VisitDTO> getVisit(@PathVariable("patID") int patID) throws OHServiceException {
 		LOGGER.info("Get visit related to patId: {}", patID);
-
-		return mapper.map2DTOList(visitManager.getVisits(patID));
+		List<Visit> visits = visitManager.getVisits(patID);
+		if (visits == null) {
+			throw new OHAPIException(new OHExceptionMessage("No visit found."));
+		}
+		return mapper.map2DTOList(visits);
 	}
 
 	/**
@@ -89,7 +92,11 @@ public class VisitsController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public VisitDTO newVisit(@RequestBody VisitDTO newVisit) throws OHServiceException {
 		LOGGER.info("Create Visit: {}", newVisit);
-		return mapper.map2DTO(visitManager.newVisit(mapper.map2Model(newVisit)));
+		Visit visit = visitManager.newVisit(mapper.map2Model(newVisit));
+		if (visit == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to create visit."));
+		}
+		return mapper.map2DTO(visit);
 	}
 
 	/**

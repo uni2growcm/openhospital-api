@@ -78,8 +78,12 @@ public class DeliveryResultTypeController {
 		@RequestBody DeliveryResultTypeDTO deliveryResultTypeDTO
 	) throws OHServiceException {
 		LOGGER.info("Create Delivery Result Type {}", deliveryResultTypeDTO.getCode());
+		DeliveryResultType deliveryResultType = deliveryResultTypeManager.newDeliveryResultType(mapper.map2Model(deliveryResultTypeDTO));
 
-		return mapper.map2DTO(deliveryResultTypeManager.newDeliveryResultType(mapper.map2Model(deliveryResultTypeDTO)));
+		if (deliveryResultType == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to create delivery result type."), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return mapper.map2DTO(deliveryResultType);
 	}
 
 	/**
@@ -115,7 +119,11 @@ public class DeliveryResultTypeController {
 	@GetMapping(value = "/deliveryresulttypes")
 	public List<DeliveryResultTypeDTO> getDeliveryResultTypes() throws OHServiceException {
 		LOGGER.info("Get all Delivery Result Types.");
-		return mapper.map2DTOList(deliveryResultTypeManager.getDeliveryResultType());
+		List<DeliveryResultType> deliveryResultTypes = deliveryResultTypeManager.getDeliveryResultType();
+		if (deliveryResultTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Delivery Result Type found."));
+		}
+		return mapper.map2DTOList(deliveryResultTypes);
 	}
 
 	/**

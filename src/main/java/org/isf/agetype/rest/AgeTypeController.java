@@ -75,8 +75,12 @@ public class AgeTypeController {
 	@GetMapping(value = "/agetypes")
 	public List<AgeTypeDTO> getAllAgeTypes() throws OHServiceException {
 		LOGGER.info("Get age types");
+		List<AgeType> ageTypes = ageTypeManager.getAgeType();
 
-		return mapper.map2DTOList(ageTypeManager.getAgeType());
+		if (ageTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No age types found."));
+		}
+		return mapper.map2DTOList(ageTypes);
 	}
 
 	/**

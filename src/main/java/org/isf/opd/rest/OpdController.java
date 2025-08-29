@@ -280,6 +280,11 @@ public class OpdController {
 			oneWeek = false;
 		}
 
+		List<Opd> opds = opdManager.getOpd(oneWeek);
+
+		if (opds == null) {
+			throw new OHAPIException(new OHExceptionMessage("No opd found."));
+		}
 		return mapper.map2DTOList(opdManager.getOpd(oneWeek));
 	}
 
@@ -420,7 +425,7 @@ public class OpdController {
 	 */
 	@GetMapping("/opds/last/{patientCode}")
 	public OpdDTO getLastOpd(@PathVariable("patientCode") int patientCode) throws OHServiceException {
-		LOGGER.info("Get the last opp for patient code: {}", patientCode);
+		LOGGER.info("Get the last opd for patient code: {}", patientCode);
 		Opd lastOpd = opdManager.getLastOpd(patientCode);
 
 		if (lastOpd == null) {

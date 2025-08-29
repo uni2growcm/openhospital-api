@@ -133,7 +133,12 @@ public class StockMovementController {
 	 */
 	@GetMapping("/stockmovements")
 	public List<MovementDTO> getMovements() throws OHServiceException {
-		return movMapper.map2DTOList(movManager.getMovements());
+		List<Movement> movements = movManager.getMovements();
+
+		if (movements == null) {
+			throw new OHAPIException(new OHExceptionMessage("No movement found."));
+		}
+		return movMapper.map2DTOList(movements);
 	}
 
 	/**
@@ -151,6 +156,11 @@ public class StockMovementController {
 		@RequestParam("from") LocalDateTime dateFrom,
 		@RequestParam("to") LocalDateTime dateTo
 	) throws OHServiceException {
+		List<Movement> movements = movManager.getMovements(wardId, dateFrom, dateTo);
+
+		if (movements == null) {
+			throw new OHAPIException(new OHExceptionMessage("No movement found."));
+		}
 		return movMapper.map2DTOList(movManager.getMovements(wardId, dateFrom, dateTo));
 	}
 
@@ -162,6 +172,11 @@ public class StockMovementController {
 	 */
 	@GetMapping("/stockmovements/{ref}")
 	public List<MovementDTO> getMovements(@PathVariable("ref") String refNo) throws OHServiceException {
+		List<Movement> movements = movManager.getMovementsByReference(refNo);
+
+		if (movements == null) {
+			throw new OHAPIException(new OHExceptionMessage("No movement found."));
+		}
 		return movMapper.map2DTOList(movManager.getMovementsByReference(refNo));
 	}
 
@@ -193,11 +208,14 @@ public class StockMovementController {
 		@RequestParam(name="lot_due_from", required=false) LocalDateTime lotDueFrom,
 		@RequestParam(name="lot_due_to", required=false) LocalDateTime lotDueTo
 	) throws OHServiceException {
-		return movMapper.map2DTOList(
-			movManager.getMovements(
-				medicalCode, medicalType, wardId, movType, movFrom, movTo, lotPrepFrom, lotPrepTo, lotDueFrom, lotDueTo
-			)
+		List<Movement> movements = movManager.getMovements(
+			medicalCode, medicalType, wardId, movType, movFrom, movTo, lotPrepFrom, lotPrepTo, lotDueFrom, lotDueTo
 		);
+
+		if (movements == null) {
+			throw new OHAPIException(new OHExceptionMessage("No movement found."));
+		}
+		return movMapper.map2DTOList(movements);
 	}
 
 	/**
@@ -213,7 +231,12 @@ public class StockMovementController {
 			throw new OHAPIException(new OHExceptionMessage("Medical not found."));
 		}
 
-		return lotMapper.map2DTOList(movInsertingManager.getLotByMedical(med));
+		List<Lot> lots = movInsertingManager.getLotByMedical(med);
+
+		if (lots == null) {
+			throw new OHAPIException(new OHExceptionMessage("No lots found."));
+		}
+		return lotMapper.map2DTOList(lots);
 	}
 
 	/**

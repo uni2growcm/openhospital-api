@@ -75,7 +75,12 @@ public class MedStockMovementTypeController {
 	@GetMapping(value = "/medstockmovementtypes")
 	public List<MovementTypeDTO> getMedicalDsrStockMovementType() throws OHServiceException {
 		LOGGER.info("Retrieving all the movement types ...");
-		return mapper.map2DTOList(manager.getMedicalDsrStockMovementType());
+		List<MovementType> movementTypes = manager.getMedicalDsrStockMovementType();
+
+		if (movementTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No movement type found."));
+		}
+		return mapper.map2DTOList(movementTypes);
 	}
 
 	/**

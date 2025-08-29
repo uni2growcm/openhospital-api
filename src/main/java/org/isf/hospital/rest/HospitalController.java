@@ -70,7 +70,11 @@ public class HospitalController {
         Hospital hospital = hospitalMapper.map2Model(hospitalDTO);
         hospital.setLock(hospitalDTO.getLock());
 
-        return hospitalMapper.map2DTO(hospitalBrowsingManager.updateHospital(hospital));
+		Hospital hospitalUpdated = hospitalBrowsingManager.updateHospital(hospital);
+		if (hospitalUpdated == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to update hospital."));
+		}
+        return hospitalMapper.map2DTO(hospitalUpdated);
     }
 
     @GetMapping("/hospitals")
