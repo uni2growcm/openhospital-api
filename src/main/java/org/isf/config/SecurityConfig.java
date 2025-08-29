@@ -196,6 +196,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/medicals/**").hasAuthority("medicals.read")
 				.requestMatchers(HttpMethod.PUT, "/medicals/**").hasAuthority("medicals.update")
 				.requestMatchers(HttpMethod.DELETE, "/medicals/**").hasAuthority("medicals.delete")
+				// medicalhistories
+				.requestMatchers(HttpMethod.POST, "/medicalhistories/**").hasAuthority("medicalhistories.create")
+				.requestMatchers(HttpMethod.GET, "/medicalhistories/**").hasAuthority("medicalhistories.read")
+				.requestMatchers(HttpMethod.PUT, "/medicalhistories/**").hasAuthority("medicalhistories.update")
+				.requestMatchers(HttpMethod.DELETE, "/medicalhistories/**").hasAuthority("medicalhistories.delete")
 				// medicalstock
 				.requestMatchers(HttpMethod.POST, "/medicalstockmovements/**").hasAuthority("medicalstockmovements.create")
 				.requestMatchers(HttpMethod.GET, "/medicalstockmovements/**").hasAuthority("medicalstockmovements.read")
