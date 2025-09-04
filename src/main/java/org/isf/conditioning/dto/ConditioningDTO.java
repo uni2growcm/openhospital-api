@@ -60,7 +60,6 @@ public class ConditioningDTO {
 	@Schema(description = "Conditioning others", example = "others")
 	private String others;
 
-
 	@NotNull
 	@Schema(description = "patient", example = "22")
 	private PatientDTO patient;

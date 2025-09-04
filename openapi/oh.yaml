@@ -6119,6 +6119,27 @@ paths:
                   $ref: "#/components/schemas/ConditioningDTO"
       security:
       - bearerAuth: []
+  /conditionings/current/{patientCode}:
+    get:
+      tags:
+      - Conditionings
+      operationId: getLastConditioningByPatientCode
+      parameters:
+      - name: patientCode
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConditioningDTO"
+      security:
+      - bearerAuth: []
   /bills/pending:
     get:
       tags:
@@ -6776,11 +6797,11 @@ components:
           format: int32
           description: lock
           example: 0
+        male:
+          type: boolean
         female:
           type: boolean
         pharmacy:
-          type: boolean
-        male:
           type: boolean
         opd:
           type: boolean
@@ -9014,7 +9035,7 @@ components:
         patient:
           $ref: "#/components/schemas/PatientDTO"
           description: Patient
-        performAt:
+        date:
           type: string
           format: date-time
           description: Created date

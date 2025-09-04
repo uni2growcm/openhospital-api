@@ -22,6 +22,7 @@
 package org.isf.conditioning.rest;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.isf.conditioning.dto.ConditioningDTO;
 import org.isf.conditioning.manager.ConditioningBrowserManager;
@@ -127,28 +128,49 @@ public class ConditioningController {
 	public ResponseEntity<ConditioningDTO> updateConditioning(@PathVariable("id") int id, @RequestBody @Valid ConditioningDTO updateConditioningDTO)
 		throws OHServiceException {
 		LOGGER.info("Update conditioning with id : {}", id);
-		if (id != updateConditioningDTO.getId()) {
-			throw new OHAPIException(new OHExceptionMessage("Conditioning does not match."), HttpStatus.BAD_REQUEST);
-		}
 		Conditioning old = conditioningBrowserManager.getConditioningById(id);
 		if (old == null) {
 			throw new OHAPIException(new OHExceptionMessage("Conditioning not found with id "+ id), HttpStatus.NOT_FOUND);
 		}
 
-		if (updateConditioningDTO.getPatient() != null) {
-			Patient patient = conditioningBrowserManager.getConditioningById(updateConditioningDTO.getId()).getPatient();
-			if (patient == null) {
-				throw new OHAPIException(new OHExceptionMessage("Patient not found."), HttpStatus.NOT_FOUND);
-			}
-		} else {
-			throw new OHAPIException(new OHExceptionMessage("Patient is required."), HttpStatus.BAD_REQUEST);
+		if (updateConditioningDTO == null) {
+			throw new OHAPIException(new OHExceptionMessage("Conditioning to update must not be null."), HttpStatus.BAD_REQUEST);
 		}
-		Conditioning updateConditioning = conditioningMapper.map2Model(updateConditioningDTO);
-		Conditioning updatedConditioning = conditioningBrowserManager.updateConditioning(updateConditioning);
+
+		if (!Objects.equals(old.getPatient().getCode(), updateConditioningDTO.getPatient().getCode())) {
+			throw new OHAPIException(new OHExceptionMessage("Conditioning does not match."), HttpStatus.BAD_REQUEST);
+		}
+
+
+		old.setVentilationDuree(updateConditioningDTO.getVentilationDuree());
+		old.setCpap(updateConditioningDTO.getCpap());
+		old.setAspiration(updateConditioningDTO.getAspiration());
+		old.setDate(updateConditioningDTO.getDate());
+		old.setBolusSsVolume(updateConditioningDTO.getBolusSsVolume());
+		old.setMceDuree(updateConditioningDTO.getMceDuree());
+		old.setOthers(updateConditioningDTO.getOthers());
+		old.setDiazepamDose(updateConditioningDTO.getDiazepamDose());
+		old.setSgVolume(updateConditioningDTO.getSgVolume());
+		old.setOxygeneDebit(updateConditioningDTO.getOxygeneDebit());
+		old.setSngNumero(updateConditioningDTO.getSngNumero());
+		Conditioning updatedConditioning = conditioningBrowserManager.updateConditioning(old);
 		if (updatedConditioning == null) {
 			throw new OHAPIException(new OHExceptionMessage("Conditioning not updated."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		return ResponseEntity.ok(conditioningMapper.map2DTO(updatedConditioning));
+	}
+
+	@GetMapping("/conditionings/current/{patientCode}")
+	public ResponseEntity<ConditioningDTO> getLastConditioningByPatientCode(@PathVariable("patientCode") int patientCode) throws OHServiceException {
+		LOGGER.info("get current conditioning by patient code : {}", patientCode);
+
+		List<Conditioning> conditioningList = conditioningBrowserManager.getConditioningByPatientCode(patientCode);
+
+		if (conditioningList == null || conditioningList.isEmpty()) {
+			throw new OHAPIException(new OHExceptionMessage("No conditioning found with patient code: " + patientCode), HttpStatus.NOT_FOUND);
+		}
+
+		return ResponseEntity.ok(conditioningMapper.map2DTO(conditioningList.get(conditioningList.size() - 1)));
 	}
 }
