@@ -141,17 +141,17 @@ public class ConditioningController {
 			throw new OHAPIException(new OHExceptionMessage("Conditioning does not match."), HttpStatus.BAD_REQUEST);
 		}
 
-		old.setVentilationDuree(updateConditioningDTO.getVentilation());
+		old.setVentilation(updateConditioningDTO.getVentilation());
 		old.setCpap(updateConditioningDTO.getCpap());
 		old.setAspiration(updateConditioningDTO.getAspiration());
-		old.setDate(updateConditioningDTO.getPerformedAt());
+		old.setPerformedAt(updateConditioningDTO.getPerformedAt());
 		old.setBolusSsVolume(updateConditioningDTO.getBolusSsVolume());
-		old.setMceDuree(updateConditioningDTO.getMce());
+		old.setMce(updateConditioningDTO.getMce());
 		old.setOthers(updateConditioningDTO.getOthers());
 		old.setDiazepamDose(updateConditioningDTO.getDiazepamDose());
 		old.setSgVolume(updateConditioningDTO.getSgVolume());
-		old.setOxygeneDebit(updateConditioningDTO.getOxygenDebit());
-		old.setSngNumero(updateConditioningDTO.getSngNumber());
+		old.setOxygenDebit(updateConditioningDTO.getOxygenDebit());
+		old.setSngNumber(updateConditioningDTO.getSngNumber());
 		Conditioning updatedConditioning = conditioningBrowserManager.updateConditioning(old);
 		if (updatedConditioning == null) {
 			throw new OHAPIException(new OHExceptionMessage("Conditioning not updated."), HttpStatus.INTERNAL_SERVER_ERROR);
