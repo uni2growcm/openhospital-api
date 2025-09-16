@@ -286,6 +286,9 @@ public class DiseaseController {
 	@PutMapping(value="/diseases")
 	public DiseaseDTO updateDisease(@Valid @RequestBody DiseaseDTO diseaseDTO) throws OHServiceException {
 		Disease disease = mapper.map2Model(diseaseDTO);
+		Integer currentLock = disease.getLock();
+		if (currentLock == null) currentLock = 0;
+		disease.setLock(currentLock + 1);
 		if (!diseaseManager.isCodePresent(disease.getCode())) {
 			throw new OHAPIException(new OHExceptionMessage("Disease not found."), HttpStatus.NOT_FOUND);
 		}
