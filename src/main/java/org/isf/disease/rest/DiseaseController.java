@@ -22,6 +22,7 @@
 package org.isf.disease.rest;
 
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.validation.Valid;
 
@@ -287,16 +288,21 @@ public class DiseaseController {
 	 */
 	@PutMapping(value="/diseases")
 	public DiseaseDTO updateDisease(@Valid @RequestBody DiseaseDTO diseaseDTO) throws OHServiceException {
-		int currentLock = diseaseDTO.getLock();
 		Disease disease = mapper.map2Model(diseaseDTO);
-		disease.setLock(currentLock + 1);
 		if (!diseaseManager.isCodePresent(disease.getCode())) {
 			throw new OHAPIException(new OHExceptionMessage("Disease not found."), HttpStatus.NOT_FOUND);
 		}
 
 		Disease oldDisease = diseaseManager.getDiseaseByCode(disease.getCode());
-		if(disease.getLock().equals(oldDisease.getLock())){
-			throw new OHAPIException(new OHExceptionMessage("angal.sql.thedatahasbeenupdatedbysomeoneelse.msg"), HttpStatus.INTERNAL_SERVER_ERROR);
+
+		if (oldDisease == null) {
+			throw new OHAPIException(new OHExceptionMessage("Disease not found."), HttpStatus.NOT_FOUND);
+		}
+
+		if(!Objects.equals(disease.getLock(), oldDisease.getLock())){
+			throw new OHAPIException(new OHExceptionMessage("The data has been updated by someone else."), HttpStatus.CONFLICT);
+		} else {
+			disease.setLock(diseaseDTO.getLock() + 1);
 		}
 
 		try {

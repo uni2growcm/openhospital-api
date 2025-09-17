@@ -22,6 +22,7 @@
 package org.isf.disease.rest;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -321,22 +322,30 @@ class DiseaseControllerTest {
 	void testUpdateDisease_201() throws Exception {
 		String request = "/diseases";
 
-		Disease disease = DiseaseHelper.setup();
-		DiseaseDTO body = diseaseMapper.map2DTO(disease);
+		Disease existingDisease = DiseaseHelper.setup();
+		existingDisease.setLock(1); // Set initial lock value
 
-		when(diseaseBrowserManagerMock.isCodePresent(disease.getCode()))
+		DiseaseDTO updateDTO = diseaseMapper.map2DTO(existingDisease);
+		updateDTO.setLock(1); // Same lock value for optimistic locking
+
+		Disease updatedDisease = DiseaseHelper.setup();
+		updatedDisease.setLock(2); // Incremented lock after update
+
+		when(diseaseBrowserManagerMock.isCodePresent(existingDisease.getCode()))
 			.thenReturn(true);
 
-		when(diseaseBrowserManagerMock.updateDisease(disease))
-			.thenReturn(disease);
+		when(diseaseBrowserManagerMock.getDiseaseByCode(existingDisease.getCode()))
+			.thenReturn(existingDisease);
+
+		when(diseaseBrowserManagerMock.updateDisease(any(Disease.class)))
+			.thenReturn(updatedDisease);
 
 		MvcResult result = this.mockMvc
 			.perform(put(request)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(Objects.requireNonNull(DiseaseHelper.asJsonString(body)))
+				.content(Objects.requireNonNull(DiseaseHelper.asJsonString(updateDTO)))
 			)
 			.andDo(log())
-			.andExpect(status().is2xxSuccessful())
 			.andExpect(status().isOk())
 			.andReturn();
 
