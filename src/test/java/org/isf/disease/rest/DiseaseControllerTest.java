@@ -323,13 +323,13 @@ class DiseaseControllerTest {
 		String request = "/diseases";
 
 		Disease existingDisease = DiseaseHelper.setup();
-		existingDisease.setLock(1); // Set initial lock value
+		existingDisease.setLock(1);
 
 		DiseaseDTO updateDTO = diseaseMapper.map2DTO(existingDisease);
-		updateDTO.setLock(1); // Same lock value for optimistic locking
+		updateDTO.setLock(1);
 
 		Disease updatedDisease = DiseaseHelper.setup();
-		updatedDisease.setLock(2); // Incremented lock after update
+		updatedDisease.setLock(2);
 
 		when(diseaseBrowserManagerMock.isCodePresent(existingDisease.getCode()))
 			.thenReturn(true);
