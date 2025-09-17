@@ -29,7 +29,9 @@ import org.isf.disease.dto.DiseaseDTO;
 import org.isf.disease.manager.DiseaseBrowserManager;
 import org.isf.disease.mapper.DiseaseMapper;
 import org.isf.disease.model.Disease;
+import org.isf.generaldata.MessageBundle;
 import org.isf.shared.exceptions.OHAPIException;
+import org.isf.utils.exception.OHDataLockFailureException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.slf4j.Logger;
@@ -285,18 +287,24 @@ public class DiseaseController {
 	 */
 	@PutMapping(value="/diseases")
 	public DiseaseDTO updateDisease(@Valid @RequestBody DiseaseDTO diseaseDTO) throws OHServiceException {
+		int currentLock = diseaseDTO.getLock();
+		LOGGER.info("lock of DTO : {}", diseaseDTO.getLock());
 		Disease disease = mapper.map2Model(diseaseDTO);
-		Integer currentLock = disease.getLock();
-		if (currentLock == null) currentLock = 0;
 		disease.setLock(currentLock + 1);
+		LOGGER.info("lock of entity : {}", disease.getLock());
 		if (!diseaseManager.isCodePresent(disease.getCode())) {
 			throw new OHAPIException(new OHExceptionMessage("Disease not found."), HttpStatus.NOT_FOUND);
 		}
 
-		disease.setLock(diseaseDTO.getLock());
+		Disease oldDisease = diseaseManager.getDiseaseByCode(disease.getCode());
+		if(disease.getLock().equals(oldDisease.getLock())){
+			throw new OHAPIException(new OHExceptionMessage("angal.sql.thedatahasbeenupdatedbysomeoneelse.msg"), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 		try {
 			return mapper.map2DTO(diseaseManager.updateDisease(disease));
 		} catch (OHServiceException serviceException) {
+			LOGGER.error("Error Disease not found ", serviceException);
 			throw new OHAPIException(new OHExceptionMessage("Disease not updated."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
