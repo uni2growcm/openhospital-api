@@ -288,10 +288,8 @@ public class DiseaseController {
 	@PutMapping(value="/diseases")
 	public DiseaseDTO updateDisease(@Valid @RequestBody DiseaseDTO diseaseDTO) throws OHServiceException {
 		int currentLock = diseaseDTO.getLock();
-		LOGGER.info("lock of DTO : {}", diseaseDTO.getLock());
 		Disease disease = mapper.map2Model(diseaseDTO);
 		disease.setLock(currentLock + 1);
-		LOGGER.info("lock of entity : {}", disease.getLock());
 		if (!diseaseManager.isCodePresent(disease.getCode())) {
 			throw new OHAPIException(new OHExceptionMessage("Disease not found."), HttpStatus.NOT_FOUND);
 		}
@@ -304,7 +302,6 @@ public class DiseaseController {
 		try {
 			return mapper.map2DTO(diseaseManager.updateDisease(disease));
 		} catch (OHServiceException serviceException) {
-			LOGGER.error("Error Disease not found ", serviceException);
 			throw new OHAPIException(new OHExceptionMessage("Disease not updated."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
