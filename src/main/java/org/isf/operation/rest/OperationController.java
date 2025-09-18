@@ -22,9 +22,11 @@
 package org.isf.operation.rest;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.model.Admission;
+import org.isf.disease.model.Disease;
 import org.isf.opd.dto.OpdDTO;
 import org.isf.opd.mapper.OpdMapper;
 import org.isf.operation.dto.OperationDTO;
@@ -145,7 +147,19 @@ public class OperationController {
 		if (!operationManager.isCodePresent(code)) {
 			throw new OHAPIException(new OHExceptionMessage("Operation not found."));
 		}
-		operation.setLock(operationDTO.getLock());
+
+		Operation oldOperation = operationManager.getOperationByCode(operation.getCode());
+
+		if (oldOperation == null) {
+			throw new OHAPIException(new OHExceptionMessage("Operation not found."), HttpStatus.NOT_FOUND);
+		}
+
+		if(!Objects.equals(operation.getLock(), oldOperation.getLock())){
+			throw new OHAPIException(new OHExceptionMessage("The data has been updated by someone else."), HttpStatus.CONFLICT);
+		} else {
+			operation.setLock(operationDTO.getLock() + 1);
+		}
+//		operation.setLock(operationDTO.getLock());
 		Operation isUpdatedOperation = operationManager.updateOperation(operation);
 		if (isUpdatedOperation == null) {
 			throw new OHAPIException(new OHExceptionMessage("Operation not updated."));
