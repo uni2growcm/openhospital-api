@@ -26,7 +26,6 @@ import java.util.Objects;
 
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.model.Admission;
-import org.isf.disease.model.Disease;
 import org.isf.opd.dto.OpdDTO;
 import org.isf.opd.mapper.OpdMapper;
 import org.isf.operation.dto.OperationDTO;
@@ -159,7 +158,6 @@ public class OperationController {
 		} else {
 			operation.setLock(operationDTO.getLock() + 1);
 		}
-//		operation.setLock(operationDTO.getLock());
 		Operation isUpdatedOperation = operationManager.updateOperation(operation);
 		if (isUpdatedOperation == null) {
 			throw new OHAPIException(new OHExceptionMessage("Operation not updated."));

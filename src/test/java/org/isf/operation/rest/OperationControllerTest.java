@@ -36,9 +36,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.isf.admission.manager.AdmissionBrowserManager;
-import org.isf.disease.data.DiseaseHelper;
-import org.isf.disease.dto.DiseaseDTO;
-import org.isf.disease.model.Disease;
 import org.isf.opd.mapper.OpdMapper;
 import org.isf.operation.data.OperationHelper;
 import org.isf.operation.dto.OperationDTO;
