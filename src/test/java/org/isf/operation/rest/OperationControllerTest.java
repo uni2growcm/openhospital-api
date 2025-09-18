@@ -162,9 +162,6 @@ class OperationControllerTest {
 		Operation updatedOperation = OperationHelper.setup();
 		updatedOperation.setLock(2);
 
-//		Operation operation = OperationHelper.setup();
-//		OperationDTO body = operationMapper.map2DTO(operation);
-
 		when(operationBrowserManagerMock.isCodePresent(code))
 			.thenReturn(true);
 
