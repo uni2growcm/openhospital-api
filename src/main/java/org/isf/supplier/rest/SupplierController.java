@@ -83,6 +83,7 @@ public class SupplierController {
 			LOGGER.info("Supplier saved successfully.");
 			return mapper.map2DTO(newSupplier);
 		} catch (OHServiceException serviceException) {
+			LOGGER.error("Supplier is not created.");
 			throw new OHAPIException(new OHExceptionMessage("Supplier not created."));
 		}
 	}
@@ -104,6 +105,7 @@ public class SupplierController {
 			LOGGER.info("Supplier updated successfully.");
 			return mapper.map2DTO(updatedSupplier);
 		} catch (OHServiceException serviceException) {
+			LOGGER.error("Supplier is not updated.");
 			throw new OHAPIException(new OHExceptionMessage("Supplier not updated."));
 		}
 	}
