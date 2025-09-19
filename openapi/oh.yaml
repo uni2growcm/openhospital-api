@@ -6924,9 +6924,9 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
-          type: boolean
         male:
+          type: boolean
+        pharmacy:
           type: boolean
         female:
           type: boolean
@@ -7388,7 +7388,6 @@ components:
           description: Lock
           example: 0
       required:
-      - supId
       - supName
     UpdateSettingDTO:
       type: object
@@ -7785,11 +7784,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
