@@ -25,10 +25,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.poi.util.IOUtils;
+import org.isf.encounter.manager.EncounterBrowserManager;
+import org.isf.encounter.model.Encounter;
 import org.isf.examination.manager.ExaminationBrowserManager;
 import org.isf.examination.model.PatientExamination;
 import org.isf.patient.manager.PatientBrowserManager;
@@ -61,11 +64,13 @@ public class ReportsController {
 	private final JasperReportsManager reportsManager;
 	private final ExaminationBrowserManager examinationBrowserManager;
 	private final PatientBrowserManager patientBrowserManager;
+	private final EncounterBrowserManager encounterBrowserManager;
 
-	public ReportsController(JasperReportsManager reportsManager, ExaminationBrowserManager examinationBrowserManager, PatientBrowserManager patientBrowserManager) {
+	public ReportsController(JasperReportsManager reportsManager, ExaminationBrowserManager examinationBrowserManager, PatientBrowserManager patientBrowserManager, EncounterBrowserManager encounterBrowserManager) {
 		this.reportsManager = reportsManager;
 		this.examinationBrowserManager = examinationBrowserManager;
 		this.patientBrowserManager = patientBrowserManager;
+		this.encounterBrowserManager = encounterBrowserManager;
 	}
 
 	@GetMapping("/reports/exams-list")
@@ -116,5 +121,20 @@ public class ReportsController {
 			.header(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"" + resource.getFilename() + '"')
 			.body(resource);
+	}
+
+	@GetMapping("/reports/encounter/{encounterCode}")
+	public ResponseEntity<Resource> printEncounterReportPdf(@PathVariable("encounterCode") String encounterCode, HttpServletRequest request) throws OHServiceException, IOException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(encounterCode);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found."), HttpStatus.NOT_FOUND);
+		}
+		Locale locale;
+		if (request.getLocale().toString().equals("en_US")) {
+			locale = Locale.FRENCH;
+		} else {
+			locale = Locale.FRENCH;
+		}
+		return getReport(reportsManager.getGenericReportForEncounterPdf(encounter, locale), request);
 	}
 }
