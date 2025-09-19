@@ -78,7 +78,6 @@ public class SupplierController {
 	public SupplierDTO saveSupplier(@RequestBody @Valid SupplierDTO supplierDTO) throws OHServiceException {
 		LOGGER.info("Saving a new supplier...");
 		try {
-			supplierDTO.setSupId(null);
 			Supplier newSupplier = manager.saveOrUpdate(mapper.map2Model(supplierDTO));
 			LOGGER.info("Supplier saved successfully.");
 			return mapper.map2DTO(newSupplier);
