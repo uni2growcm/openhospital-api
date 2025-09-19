@@ -4123,27 +4123,6 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
-  /reports/encounter/{encounterCode}:
-    get:
-      tags:
-      - Reports
-      operationId: printEncounterReportPdf
-      parameters:
-      - name: encounterCode
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
-      security:
-      - bearerAuth: []
   /reports/diseases-list:
     get:
       tags:
@@ -6945,11 +6924,11 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
-          type: boolean
         female:
           type: boolean
         male:
+          type: boolean
+        pharmacy:
           type: boolean
         opd:
           type: boolean
@@ -7409,7 +7388,6 @@ components:
           description: Lock
           example: 0
       required:
-      - supId
       - supName
     UpdateSettingDTO:
       type: object

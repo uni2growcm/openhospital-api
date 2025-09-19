@@ -129,12 +129,7 @@ public class ReportsController {
 		if (encounter == null) {
 			throw new OHAPIException(new OHExceptionMessage("Encounter not found."), HttpStatus.NOT_FOUND);
 		}
-		Locale locale;
-		if (request.getLocale().toString().equals("en_US")) {
-			locale = Locale.FRENCH;
-		} else {
-			locale = Locale.FRENCH;
-		}
-		return getReport(reportsManager.getGenericReportForEncounterPdf(encounter, locale), request);
+
+		return getReport(reportsManager.getGenericReportForEncounterPdf(encounter, request.getLocale()), request);
 	}
 }
