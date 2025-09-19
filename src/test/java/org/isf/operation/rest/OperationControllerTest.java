@@ -22,6 +22,7 @@
 package org.isf.operation.rest;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -152,22 +153,30 @@ class OperationControllerTest {
 		String request = "/operations/{code}";
 		String code = "25";
 
-		Operation operation = OperationHelper.setup();
-		OperationDTO body = operationMapper.map2DTO(operation);
+		Operation existingOperation = OperationHelper.setup();
+		existingOperation.setLock(1);
+
+		OperationDTO updateDTO = operationMapper.map2DTO(existingOperation);
+		updateDTO.setLock(1);
+
+		Operation updatedOperation = OperationHelper.setup();
+		updatedOperation.setLock(2);
 
 		when(operationBrowserManagerMock.isCodePresent(code))
 			.thenReturn(true);
 
-		when(operationBrowserManagerMock.updateOperation(operation))
-			.thenReturn(operation);
+		when(operationBrowserManagerMock.getOperationByCode(existingOperation.getCode()))
+			.thenReturn(existingOperation);
+
+		when(operationBrowserManagerMock.updateOperation(any(Operation.class)))
+			.thenReturn(updatedOperation);
 
 		MvcResult result = this.mockMvc
 			.perform(put(request, code)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(Objects.requireNonNull(OperationHelper.asJsonString(body)))
+				.content(Objects.requireNonNull(OperationHelper.asJsonString(updateDTO)))
 			)
 			.andDo(log())
-			.andExpect(status().is2xxSuccessful())
 			.andExpect(status().isOk())
 			.andReturn();
 
