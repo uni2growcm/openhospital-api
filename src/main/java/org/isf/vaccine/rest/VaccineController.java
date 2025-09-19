@@ -22,6 +22,7 @@
 package org.isf.vaccine.rest;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHDataIntegrityViolationException;
@@ -123,8 +124,30 @@ public class VaccineController {
     public VaccineDTO updateVaccine(@RequestBody VaccineDTO updateVaccine) throws OHServiceException {
         LOGGER.info("Update vaccine: {}", updateVaccine);
 
+        Vaccine vaccine = mapper.map2Model(updateVaccine);
+        if (!vaccineManager.isCodePresent(vaccine.getCode())) {
+            throw new OHAPIException(new OHExceptionMessage("Vaccine not found."));
+        }
+        vaccine.setLock(updateVaccine.getLock());
+
+        Vaccine oldVaccine = vaccineManager.findVaccine(vaccine.getCode());
+
+        if (oldVaccine == null) {
+            throw new OHAPIException(new OHExceptionMessage("Vaccine not found."), HttpStatus.NOT_FOUND);
+        }
+
+        if(!Objects.equals(vaccine.getLock(), oldVaccine.getLock())){
+            throw new OHAPIException(new OHExceptionMessage("The data has been updated by someone else."), HttpStatus.CONFLICT);
+        } else {
+            vaccine.setLock(updateVaccine.getLock() + 1);
+        }
+        Vaccine updatedVaccine = vaccineManager.updateVaccine(vaccine);
+        if (updatedVaccine == null) {
+            throw new OHAPIException(new OHExceptionMessage("Vaccine not updated."));
+        }
+
         try {
-            return mapper.map2DTO(vaccineManager.updateVaccine(mapper.map2Model(updateVaccine)));
+            return mapper.map2DTO(vaccineManager.updateVaccine(updatedVaccine));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Vaccine not updated."));
         }
