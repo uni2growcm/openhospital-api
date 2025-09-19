@@ -141,13 +141,13 @@ public class VaccineController {
         } else {
             vaccine.setLock(updateVaccine.getLock() + 1);
         }
-        Vaccine isUpdatedVaccine = vaccineManager.updateVaccine(vaccine);
-        if (isUpdatedVaccine == null) {
+        Vaccine updatedVaccine = vaccineManager.updateVaccine(vaccine);
+        if (updatedVaccine == null) {
             throw new OHAPIException(new OHExceptionMessage("Vaccine not updated."));
         }
 
         try {
-            return mapper.map2DTO(vaccineManager.updateVaccine(isUpdatedVaccine));
+            return mapper.map2DTO(vaccineManager.updateVaccine(updatedVaccine));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Vaccine not updated."));
         }
