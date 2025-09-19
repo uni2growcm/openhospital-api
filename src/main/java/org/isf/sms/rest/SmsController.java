@@ -77,11 +77,15 @@ public class SmsController {
 		@RequestParam() String dateTo
 	) throws OHServiceException {
 		LOGGER.info("Fetching the list of sms");
-
-		return smsMapper.map2DTOList(smsManager.getAll(
+		List<Sms> smsList = smsManager.getAll(
 			LocalDate.parse(dateFrom).atStartOfDay(),
 			LocalDate.parse(dateTo).atStartOfDay()
-		));
+		);
+
+		if (smsList == null) {
+			throw new OHAPIException(new OHExceptionMessage("No sms found."));
+		}
+		return smsMapper.map2DTOList(smsList);
 	}
 
 	/**

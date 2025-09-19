@@ -64,14 +64,22 @@ public class PermissionController {
 		@PathVariable("userGroupCode") String userGroupCode
 	) throws OHServiceException {
 		LOGGER.info("Retrieving permissions: retrievePermissionsByUserGroupCode({}).", userGroupCode);
+		List<Permission> permissions = permissionManager.retrievePermissionsByGroupCode(userGroupCode);
 
+		if (permissions == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Permission found."));
+		}
 		return permissionMapper.map2DTOList(permissionManager.retrievePermissionsByGroupCode(userGroupCode));
 	}
 
 	@GetMapping(value = "/permissions")
 	public List<PermissionDTO> retrieveAllPermissions() throws OHServiceException {
 		LOGGER.info("Retrieving permissions: retrieveAllPermissions().");
+		List<Permission> permissions = permissionManager.retrieveAllPermissions();
 
+		if (permissions == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Permission found."));
+		}
 		return permissionMapper.map2DTOList(permissionManager.retrieveAllPermissions());
 	}
 

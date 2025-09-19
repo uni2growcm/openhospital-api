@@ -78,7 +78,7 @@ public class DischargeTypeController {
 		LOGGER.info("Create discharge type {}", code);
 
 		DischargeType newDischargeType = discTypeManager.newDischargeType(mapper.map2Model(dischargeTypeDTO));
-		if (!discTypeManager.isCodePresent(code)) {
+		if ( newDischargeType == null || !discTypeManager.isCodePresent(code)) {
 			throw new OHAPIException(new OHExceptionMessage("Discharge Type is not created."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -104,7 +104,7 @@ public class DischargeTypeController {
 		}
 
 		DischargeType updatedDischargeType = discTypeManager.updateDischargeType(dischargeType);
-		if (!discTypeManager.isCodePresent(updatedDischargeType.getCode())) {
+		if (dischargeType == null || !discTypeManager.isCodePresent(updatedDischargeType.getCode())) {
 			throw new OHAPIException(new OHExceptionMessage("Discharge Type is not updated."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -121,7 +121,11 @@ public class DischargeTypeController {
 	public List<DischargeTypeDTO> getDischargeTypes() throws OHServiceException {
 		LOGGER.info("Get all discharge types ");
 
-		return mapper.map2DTOList(discTypeManager.getDischargeType());
+		List<DischargeType> dischargeTypes = discTypeManager.getDischargeType();
+		if (dischargeTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No discharge types found."));
+		}
+		return mapper.map2DTOList(dischargeTypes);
 	}
 
 	/**

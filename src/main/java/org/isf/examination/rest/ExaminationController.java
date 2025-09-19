@@ -94,7 +94,11 @@ public class ExaminationController {
 		patientExamination.setPatient(patient);
 		patientExamination.setPex_date(newPatientExamination.getPex_date());
 
-		return patientExaminationMapper.map2DTO(examinationBrowserManager.saveOrUpdate(patientExamination));
+		PatientExamination patientExaminationSaved = examinationBrowserManager.saveOrUpdate(patientExamination);
+		if (patientExaminationSaved == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to create patient examination."));
+		}
+		return patientExaminationMapper.map2DTO(patientExaminationSaved);
 	}
 
 	@PutMapping("/examinations/{id}")
@@ -118,7 +122,12 @@ public class ExaminationController {
 		patientExamination.setPatient(patient);
 		patientExamination.setPex_date(dto.getPex_date());
 
-		return patientExaminationMapper.map2DTO(examinationBrowserManager.saveOrUpdate(patientExamination));
+		PatientExamination patientExaminationUpdated = examinationBrowserManager.saveOrUpdate(patientExamination);
+		if (patientExaminationUpdated == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to update patient examination."));
+		}
+
+		return patientExaminationMapper.map2DTO(patientExaminationUpdated);
 	}
 
 	@GetMapping("/examinations/defaultPatientExamination")
@@ -149,6 +158,9 @@ public class ExaminationController {
 
 		PatientExamination patientExamination = examinationBrowserManager.getFromLastPatientExamination(lastPatientExamination);
 
+		if (patientExamination == null) {
+			throw new OHAPIException(new OHExceptionMessage("Patient examination not found."));
+		}
 		return patientExaminationMapper.map2DTO(patientExamination);
 	}
 

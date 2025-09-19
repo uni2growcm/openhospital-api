@@ -118,7 +118,11 @@ public class OperationTypeController {
 	@GetMapping("/operationtypes")
 	public List<OperationTypeDTO> getOperationTypes() throws OHServiceException {
 		LOGGER.info("Get all operation Types ");
+		List<OperationType> operationTypes = opeTypeManager.getOperationType();
 
+		if (operationTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Operation Type found."));
+		}
 		return mapper.map2DTOList(opeTypeManager.getOperationType());
 	}
 

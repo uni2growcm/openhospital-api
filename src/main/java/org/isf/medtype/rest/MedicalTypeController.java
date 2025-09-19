@@ -76,7 +76,12 @@ public class MedicalTypeController {
 	@GetMapping(value = "/medicaltypes")
 	public List<MedicalTypeDTO> getMedicalTypes() throws OHServiceException {
 		LOGGER.info("Retrieving all the medical types ...");
-		return medicalTypeMapper.map2DTOList(medicalTypeBrowserManager.getMedicalType());
+		List<MedicalType> medicalTypes = medicalTypeBrowserManager.getMedicalType();
+
+		if (medicalTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No medical type found."));
+		}
+		return medicalTypeMapper.map2DTOList(medicalTypes);
 	}
 
 	/**

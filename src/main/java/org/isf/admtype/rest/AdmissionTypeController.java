@@ -85,6 +85,10 @@ public class AdmissionTypeController {
 			throw new OHAPIException(new OHExceptionMessage("Admission Type is not created."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
+		if (newAdmissionType == null) {
+			throw new OHAPIException(new OHExceptionMessage("Admission Type is not created."), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 		return mapper.map2DTO(newAdmissionType);
 	}
 
@@ -106,6 +110,11 @@ public class AdmissionTypeController {
 			throw new OHAPIException(new OHExceptionMessage("Admission Type not found."));
 		}
 
+		AdmissionType admissionTypeUpdated = admissionTypeManager.updateAdmissionType(admissionType);
+
+		if (admissionTypeUpdated == null) {
+			throw new OHAPIException(new OHExceptionMessage("Update Admission Type fail."));
+		}
 		return mapper.map2DTO(admissionTypeManager.updateAdmissionType(admissionType));
 	}
 
@@ -119,6 +128,11 @@ public class AdmissionTypeController {
 	public List<AdmissionTypeDTO> getAdmissionTypes() throws OHServiceException {
 		LOGGER.info("Get all Admission Types ");
 
+		List<AdmissionType> admissionTypes = admissionTypeManager.getAdmissionType();
+
+		if (admissionTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Admission Types found."));
+		}
 		return mapper.map2DTOList(admissionTypeManager.getAdmissionType());
 	}
 

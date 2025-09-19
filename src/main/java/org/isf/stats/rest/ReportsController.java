@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.poi.util.IOUtils;
 import org.isf.examination.manager.ExaminationBrowserManager;
 import org.isf.examination.model.PatientExamination;
 import org.isf.patient.manager.PatientBrowserManager;

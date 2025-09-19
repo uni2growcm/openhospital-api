@@ -129,6 +129,9 @@ public class PregnantTreatmentTypeController {
 
 		List<PregnantTreatmentType> pregnantTreatmentTypes = pregnantTreatmentTypeManager.getPregnantTreatmentType();
 
+		if (pregnantTreatmentTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Pregnant Treatment Type found."));
+		}
 		return mapper.map2DTOList(pregnantTreatmentTypes);
 	}
 

@@ -118,8 +118,12 @@ public class PricesOthersController {
 	@GetMapping("/pricesothers")
 	public List<PricesOthersDTO> getPricesOthers() throws OHServiceException {
 		LOGGER.info("Get all prices others ");
+		List<PricesOthers> pricesOthers = pricesOthersManager.getOthers();
 
-		return mapper.map2DTOList(pricesOthersManager.getOthers());
+		if (pricesOthers == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Price other found."));
+		}
+		return mapper.map2DTOList(pricesOthers);
 	}
 
 	/**

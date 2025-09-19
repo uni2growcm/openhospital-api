@@ -32,6 +32,7 @@ import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.mapper.AdmissionMapper;
 import org.isf.admission.mapper.AdmittedPatientMapper;
 import org.isf.admission.model.Admission;
+import org.isf.admission.model.AdmittedPatient;
 import org.isf.admtype.model.AdmissionType;
 import org.isf.disctype.manager.DischargeTypeBrowserManager;
 import org.isf.disctype.model.DischargeType;
@@ -146,7 +147,12 @@ public class AdmissionController {
 			throw new OHAPIException(new OHExceptionMessage("Patient not found with ID :" + patientCode), HttpStatus.NOT_FOUND);
 		}
 
-		return admissionMapper.map2DTOList(admissionManager.getAdmissions(patient));
+		List<Admission> admissions = admissionManager.getAdmissions(patient);
+
+		if (admissions == null) {
+			throw new OHAPIException(new OHExceptionMessage("No admission found"), HttpStatus.NOT_FOUND);
+		}
+		return admissionMapper.map2DTOList(admissions);
 	}
 
 	/**
@@ -197,7 +203,12 @@ public class AdmissionController {
 			LOGGER.debug("Get admissions that end between {} and {}", dischargeRange[0], dischargeRange[1]);
 		}
 
-		return admittedMapper.map2DTOList(admissionManager.getAdmittedPatients(admissionRange, dischargeRange, searchTerms));
+		List<AdmittedPatient> admittedPatients = admissionManager.getAdmittedPatients(admissionRange, dischargeRange, searchTerms);
+
+		if (admittedPatients == null) {
+			throw new OHAPIException(new OHExceptionMessage("No admitted patient found"));
+		}
+		return admittedMapper.map2DTOList(admittedPatients);
 	}
 
 	/**
@@ -520,6 +531,8 @@ public class AdmissionController {
 		if (aId > 0) {
 			newAdmission.setId(aId);
 		}
+
+
 
 		return admissionMapper.map2DTO(newAdmission);
 	}

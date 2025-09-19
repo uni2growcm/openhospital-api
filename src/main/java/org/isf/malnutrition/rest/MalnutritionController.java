@@ -139,7 +139,11 @@ public class MalnutritionController {
 	public MalnutritionDTO updateMalnutrition(
 		@RequestBody @Valid MalnutritionDTO malnutritionDTO
 	) throws OHServiceException {
-		return mapper.map2DTO(manager.updateMalnutrition(mapper.map2Model(malnutritionDTO)));
+		Malnutrition malnutrition = manager.updateMalnutrition(mapper.map2Model(malnutritionDTO));
+		if (malnutrition == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to update malnutrition."));
+		}
+		return mapper.map2DTO(malnutrition);
 	}
 
 	/**

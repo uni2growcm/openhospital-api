@@ -115,7 +115,11 @@ public class PriceListController {
 	@GetMapping("/pricelists")
 	public List<PriceListDTO> getPriceLists() throws OHServiceException {
 		LOGGER.info("Get all price lists.");
+		List<PriceList> priceLists = priceListManager.getLists();
 
+		if (priceLists == null) {
+			throw new OHAPIException(new OHExceptionMessage("No price list found."));
+		}
 		return mapper.map2DTOList(priceListManager.getLists());
 	}
 
@@ -127,8 +131,12 @@ public class PriceListController {
 	@GetMapping("/pricelists/prices")
 	public List<PriceDTO> getPrices() throws OHServiceException {
 		LOGGER.info("Get all prices.");
+		List<Price> prices = priceListManager.getPrices();
 
-		return priceMapper.map2DTOList(priceListManager.getPrices());
+		if (prices == null) {
+			throw new OHAPIException(new OHExceptionMessage("No Price found."));
+		}
+		return priceMapper.map2DTOList(prices);
 	}
 
 	/**

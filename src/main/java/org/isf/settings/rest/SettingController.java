@@ -113,7 +113,12 @@ public class SettingController {
 	@GetMapping("/settings")
 	public List<SettingDTO> getAllSettings() throws OHServiceException {
 		logger.info("Retrieved all settings");
-		return mapper.map2DTOList(manager.findAll());
+		List<Setting> settings = manager.findAll();
+
+		if (settings == null) {
+			throw new OHAPIException(new OHExceptionMessage("No setting found."));
+		}
+		return mapper.map2DTOList(settings);
 	}
 
 	/**
@@ -137,7 +142,12 @@ public class SettingController {
 
 		setting.setValue(dto.getValue());
 
-		return mapper.map2DTO(manager.update(setting));
+		Setting settingUpdated = manager.update(setting);
+
+		if (settingUpdated == null) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to update setting."));
+		}
+		return mapper.map2DTO(settingUpdated);
 	}
 
 	/**

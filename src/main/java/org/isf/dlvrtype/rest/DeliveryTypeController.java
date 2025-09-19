@@ -119,6 +119,10 @@ public class DeliveryTypeController {
 	@GetMapping(value = "/deliverytypes")
 	public List<DeliveryTypeDTO> getDeliveryTypes() throws OHServiceException {
 		LOGGER.info("Get all Delivery Types");
+		List<DeliveryType> deliveryTypes = deliveryTypeManager.getDeliveryType();
+		if (deliveryTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No delivery type found"));
+		}
 		return deliveryTypeMapper.map2DTOList(deliveryTypeManager.getDeliveryType());
 	}
 

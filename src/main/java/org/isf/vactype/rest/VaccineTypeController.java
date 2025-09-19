@@ -77,7 +77,11 @@ public class VaccineTypeController {
 	@GetMapping("/vaccinetypes")
 	public List<VaccineTypeDTO> getVaccineType() throws OHServiceException {
 		LOGGER.info("Get vaccine types.");
-		return mapper.map2DTOList(vaccineTypeManager.getVaccineType());
+		List<VaccineType> vaccineTypes = vaccineTypeManager.getVaccineType();
+		if (vaccineTypes == null) {
+			throw new OHAPIException(new OHExceptionMessage("No vaccine type found."));
+		}
+		return mapper.map2DTOList(vaccineTypes);
 	}
 
 	/**

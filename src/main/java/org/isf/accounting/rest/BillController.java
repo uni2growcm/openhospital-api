@@ -222,6 +222,9 @@ public class BillController {
 			bills = billManager.getBills(dateFrom, dateTo, pat);
 		}
 
+		if (bills == null) {
+			throw new OHAPIException(new OHExceptionMessage("No bill found."));
+		}
 		return billMapper.map2DTOList(bills);
 	}
 
@@ -250,6 +253,10 @@ public class BillController {
 			payments = billManager.getPayments(dateFrom, dateTo, pat);
 		}
 
+		if (payments == null) {
+			throw new OHAPIException(new OHExceptionMessage("No payments found."));
+		}
+
 		return billPaymentsMapper.map2DTOList(payments);
 	}
 
@@ -262,8 +269,12 @@ public class BillController {
 	@GetMapping("/bills/payments/{bill_id}")
 	public List<BillPaymentsDTO> getPaymentsByBillId(@PathVariable(value = "bill_id") Integer id) throws OHServiceException {
 		LOGGER.info("Get getPayments for bill with id: {}", id);
+		List<BillPayments> billPayments = billManager.getPayments(id);
 
-		return billPaymentsMapper.map2DTOList(billManager.getPayments(id));
+		if (billPayments == null) {
+			throw new OHAPIException(new OHExceptionMessage("No payments for bill found."));
+		}
+		return billPaymentsMapper.map2DTOList(billPayments);
 	}
 
 	/**
@@ -275,8 +286,12 @@ public class BillController {
 	@GetMapping("/bills/items/{bill_id}")
 	public List<BillItemsDTO> getItems(@PathVariable(value = "bill_id") Integer id) throws OHServiceException {
 		LOGGER.info("Get Items for bill with id: {}", id);
+		List<BillItems> billItems = billManager.getItems(id);
 
-		return billItemsMapper.map2DTOList(billManager.getItems(id));
+		if (billItems == null) {
+			throw new OHAPIException(new OHExceptionMessage("No items for bill found."));
+		}
+		return billItemsMapper.map2DTOList(billItems);
 	}
 
 	/**
@@ -291,13 +306,11 @@ public class BillController {
 
 		Bill bill = billManager.getBill(id);
 
-		BillDTO billDTO = billMapper.map2DTO(bill);
-
-		if (billDTO == null) {
+		if (bill == null) {
 			throw new OHAPIException(new OHExceptionMessage("Bill not found with ID :" + id), HttpStatus.NOT_FOUND);
 		}
 
-		return billDTO;
+		return billMapper.map2DTO(bill);
 	}
 
 	/**
@@ -308,9 +321,13 @@ public class BillController {
 	 */
 	@GetMapping("/bills/pending/affiliate")
 	public List<BillDTO> getPendingBillsAffiliate(@RequestParam(value = "patient_code") Integer code) throws OHServiceException {
-		LOGGER.info("Get bill with id: {}", code);
+		LOGGER.info("Get associate bills to patient with id: {}", code);
+		List<Bill> bills = billManager.getPendingBillsAffiliate(code);
 
-		return billMapper.map2DTOList(billManager.getPendingBillsAffiliate(code));
+		if (bills == null) {
+			throw new OHAPIException(new OHExceptionMessage("No associate bills found with patient code :" + code), HttpStatus.NOT_FOUND);
+		}
+		return billMapper.map2DTOList(bills);
 	}
 
 	/**
@@ -321,9 +338,13 @@ public class BillController {
 	 */
 	@GetMapping("/bills/pending")
 	public List<BillDTO> getPendingBills(@RequestParam(value = "patient_code") Integer code) throws OHServiceException {
-		LOGGER.info("Get bill with id: {}", code);
+		LOGGER.info("Get pending bills with id: {}", code);
+		List<Bill> pendingBills = billManager.getPendingBills(code);
 
-		return billMapper.map2DTOList(billManager.getPendingBills(code));
+		if (pendingBills == null) {
+			throw new OHAPIException(new OHExceptionMessage("No pending bills found."), HttpStatus.NOT_FOUND);
+		}
+		return billMapper.map2DTOList(pendingBills);
 	}
 
 	/**
@@ -343,7 +364,11 @@ public class BillController {
 
 		LOGGER.info("Get Bills dateFrom: {}  dateTo: {}  Bill ITEM ID: {}", dateFrom, dateTo, billItem.getId());
 
-		return billMapper.map2DTOList(billManager.getBills(dateFrom, dateTo, billItem));
+		List<Bill> bills = billManager.getBills(dateFrom, dateTo, billItem);
+		if (bills == null) {
+			throw new OHAPIException(new OHExceptionMessage("No bills found."), HttpStatus.NOT_FOUND);
+		}
+		return billMapper.map2DTOList(bills);
 	}
 
 	/**
@@ -355,8 +380,12 @@ public class BillController {
 	@GetMapping("/bills/items")
 	public List<BillItemsDTO> getDistinctItems() throws OHServiceException {
 		LOGGER.info("get all the distinct stored BillItems");
+		List<BillItems> billItems = billManager.getDistinctItems();
 
-		return billItemsMapper.map2DTOList(billManager.getDistinctItems()); // TODO: verify if it's correct
+		if (billItems == null) {
+			throw new OHAPIException(new OHExceptionMessage("No distinct stored bill items found."), HttpStatus.NOT_FOUND);
+		}
+		return billItemsMapper.map2DTOList(billItems); // TODO: verify if it's correct
 	}
 
 	/**
@@ -395,7 +424,11 @@ public class BillController {
 		@RequestBody List<BillPaymentsDTO> paymentsDTO
 	) throws OHServiceException {
 		List<BillPayments> billPayments = billPaymentsMapper.map2ModelList(paymentsDTO);
+		List<Bill> bills = billManager.getBills(billPayments);
 
-		return billMapper.map2DTOList(billManager.getBills(billPayments));
+		if (bills == null) {
+			throw new OHAPIException(new OHExceptionMessage("No bill found."), HttpStatus.NOT_FOUND);
+		}
+		return billMapper.map2DTOList(bills);
 	}
 }
