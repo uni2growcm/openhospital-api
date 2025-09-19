@@ -99,11 +99,11 @@ public class SupplierController {
 			throw new OHAPIException(new OHExceptionMessage("Supplier not found."), HttpStatus.NOT_FOUND);
 		}
 		LOGGER.info("Updating supplier...");
-		try {
-			Supplier updatedSupplier = manager.saveOrUpdate(mapper.map2Model(supplierDTO));
+		Supplier updatedSupplier = manager.saveOrUpdate(mapper.map2Model(supplierDTO));
+		if(updatedSupplier != null) {
 			LOGGER.info("Supplier updated successfully.");
 			return mapper.map2DTO(updatedSupplier);
-		} catch (OHServiceException serviceException) {
+		} else {
 			LOGGER.error("Supplier is not updated.");
 			throw new OHAPIException(new OHExceptionMessage("Supplier not updated."));
 		}
