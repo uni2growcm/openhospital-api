@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public class SupplierDTO {
 
-//	@NotNull(message = "supplier's ID is required")
 	private Integer supId;
 
 	@NotNull(message = "supplier's name is required")
