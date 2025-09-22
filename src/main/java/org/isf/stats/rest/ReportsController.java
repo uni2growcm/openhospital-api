@@ -25,11 +25,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.poi.util.IOUtils;
 import org.isf.encounter.manager.EncounterBrowserManager;
 import org.isf.encounter.model.Encounter;
 import org.isf.examination.manager.ExaminationBrowserManager;
