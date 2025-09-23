@@ -4343,6 +4343,18 @@ paths:
         schema:
           type: string
           default: ""
+      - name: city
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      - name: age
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
       responses:
         "200":
           description: OK
@@ -6508,13 +6520,13 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
+        opd:
           type: boolean
         male:
           type: boolean
         female:
           type: boolean
-        opd:
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -6975,6 +6987,7 @@ components:
           - pharmacy
           - gui
           - application
+          - integration
           example: application
         type:
           type: string
@@ -7317,11 +7330,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted

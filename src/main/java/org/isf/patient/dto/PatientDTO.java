@@ -51,7 +51,7 @@ public class PatientDTO {
 
 	@NotNull
 	@Schema(description = "Age", example = "40")
-	private int age;
+	private Integer age;
 
 	@Schema(description = "Age type", example = "null")
 	private String agetype;

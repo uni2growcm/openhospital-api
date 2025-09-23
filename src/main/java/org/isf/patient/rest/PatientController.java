@@ -187,7 +187,9 @@ public class PatientController {
 		@RequestParam(value = "firstName", defaultValue = "", required = false) String firstName,
 		@RequestParam(value = "secondName", defaultValue = "", required = false) String secondName,
 		@RequestParam(value = "birthDate", defaultValue = "", required = false) LocalDateTime birthDate,
-		@RequestParam(value = "address", defaultValue = "", required = false) String address
+		@RequestParam(value = "address", defaultValue = "", required = false) String address,
+		@RequestParam(value = "city", defaultValue = "", required = false) String city,
+		@RequestParam(value = "age", defaultValue = "", required = false) String age
 	) throws OHServiceException {
 		Map<String, Object> params = new HashMap<>();
 
@@ -205,6 +207,14 @@ public class PatientController {
 
 		if (address != null && !address.isEmpty()) {
 			params.put("address", address);
+		}
+
+		if (city != null && !city.isEmpty()) {
+			params.put("city", city);
+		}
+
+		if (age != null && !age.isEmpty()) {
+			params.put("age", age);
 		}
 
 		List<Patient> patientList = new ArrayList<>();
