@@ -21,6 +21,7 @@
  */
 package org.isf.patient.rest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.utils.pagination.PagedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -186,7 +188,8 @@ public class PatientController {
 	public List<PatientDTO> searchPatient(
 		@RequestParam(value = "firstName", defaultValue = "", required = false) String firstName,
 		@RequestParam(value = "secondName", defaultValue = "", required = false) String secondName,
-		@RequestParam(value = "birthDate", defaultValue = "", required = false) LocalDateTime birthDate,
+		@RequestParam(value = "birthDate", required = false)
+		@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
 		@RequestParam(value = "address", defaultValue = "", required = false) String address,
 		@RequestParam(value = "city", defaultValue = "", required = false) String city,
 		@RequestParam(value = "age", defaultValue = "", required = false) String age
@@ -214,11 +217,12 @@ public class PatientController {
 		}
 
 		if (age != null && !age.isEmpty()) {
+			patientManager.updateAllPatientsAge();
 			params.put("age", age);
 		}
 
 		List<Patient> patientList = new ArrayList<>();
-		if (!params.entrySet().isEmpty()) {
+		if (!params.isEmpty()) {
 			patientList = patientManager.getPatients(params);
 		}
 
@@ -228,6 +232,7 @@ public class PatientController {
 			return patientMapper.map2DTOWS(patient, status);
 		}).toList();
 	}
+
 
 	@GetMapping(value = "/patients/all")
 	public PatientDTO getPatientAll(@RequestParam int code) throws OHServiceException {

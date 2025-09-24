@@ -4336,7 +4336,7 @@ paths:
         required: false
         schema:
           type: string
-          format: date-time
+          format: date
       - name: address
         in: query
         required: false
@@ -6522,11 +6522,11 @@ components:
           example: 0
         opd:
           type: boolean
-        male:
+        pharmacy:
           type: boolean
         female:
           type: boolean
-        pharmacy:
+        male:
           type: boolean
       required:
       - beds
@@ -7330,11 +7330,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
+        fhu:
+          type: string
         yprog:
           type: integer
           format: int32
-        fhu:
-          type: string
       required:
       - admDate
       - admitted
