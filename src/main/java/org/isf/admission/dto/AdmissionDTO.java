@@ -146,13 +146,6 @@ public class AdmissionDTO {
 	)
 	private String preAssessment;
 
-	@Schema(
-		description = "Patient's condition at the time of admission. " +
-			"Stored as a list of descriptors (e.g., stable, critical, unconscious).",
-		example = "[\"stable\", \"conscious\"]"
-	)
-	private List<String> conditionAtAdmission;
-
 	@Schema(description = "User id")
 	private String userID;
 
@@ -446,11 +439,4 @@ public class AdmissionDTO {
 		this.preAssessment = preAssessment;
 	}
 
-	public List<String> getConditionAtAdmission() {
-		return conditionAtAdmission;
-	}
-
-	public void setConditionAtAdmission(List<String> conditionAtAdmission) {
-		this.conditionAtAdmission = conditionAtAdmission;
-	}
 }
