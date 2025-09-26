@@ -153,6 +153,9 @@ public class PatientDTO {
 	@Schema(description = "Mother phone", example = "+393456789012")
 	private String motherPhone;
 
+	@Schema(description = "Folder number", example = "30")
+	private Integer folderNumber;
+
 	public boolean isConsensusFlag() {
 		return consensusFlag;
 	}
@@ -453,4 +456,11 @@ public class PatientDTO {
 		this.blobPhoto = blobPhoto;
 	}
 
+	public Integer getFolderNumber() {
+		return folderNumber;
+	}
+
+	public void setFolderNumber(Integer folderNumber) {
+		this.folderNumber = folderNumber;
+	}
 }
