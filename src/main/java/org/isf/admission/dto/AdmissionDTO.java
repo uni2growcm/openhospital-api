@@ -102,8 +102,8 @@ public class AdmissionDTO {
 	@Schema(description = "DisChargeType")
 	private DischargeTypeDTO disType;
 
-	@Schema(description = "Free note", maxLength = 65535)
-	private String note;
+	@Schema(description = "Anamnesis", maxLength = 65535)
+	private String anamnesis;
 
 	@Schema(description = "Transfusional unit")
 	private Float transUnit;
@@ -147,11 +147,10 @@ public class AdmissionDTO {
 	private String preAssessment;
 
 	@Schema(
-		description = "Patient's condition at the time of admission. " +
-			"Stored as a list of descriptors (e.g., stable, critical, unconscious).",
-		example = "[\"stable\", \"conscious\"]"
+		description = "Reason for patient admission to hospital",
+		example = "Headache"
 	)
-	private List<String> conditionAtAdmission;
+	private String entryReason;
 
 	@Schema(description = "User id")
 	private String userID;
@@ -237,8 +236,8 @@ public class AdmissionDTO {
 		return this.disType;
 	}
 
-	public String getNote() {
-		return this.note;
+	public String getAnamnesis() {
+		return this.anamnesis;
 	}
 
 	public Float getTransUnit() {
@@ -366,8 +365,8 @@ public class AdmissionDTO {
 		this.disType = disType;
 	}
 
-	public void setNote(String note) {
-		this.note = note;
+	public void setAnamnesis(String anamnesis) {
+		this.anamnesis = anamnesis;
 	}
 
 	public void setTransUnit(Float transUnit) {
@@ -446,11 +445,11 @@ public class AdmissionDTO {
 		this.preAssessment = preAssessment;
 	}
 
-	public List<String> getConditionAtAdmission() {
-		return conditionAtAdmission;
+	public String getEntryReason() {
+		return entryReason;
 	}
 
-	public void setConditionAtAdmission(List<String> conditionAtAdmission) {
-		this.conditionAtAdmission = conditionAtAdmission;
+	public void setEntryReason(String entryReason) {
+		this.entryReason = entryReason;
 	}
 }
