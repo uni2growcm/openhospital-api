@@ -7126,6 +7126,11 @@ components:
           type: string
           description: Mother phone
           example: "+393456789012"
+        folderNumber:
+          type: integer
+          format: int32
+          description: Folder number
+          example: 30
       required:
       - age
       - bloodType
