@@ -25,9 +25,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -36,8 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -454,65 +451,52 @@ class PatientControllerTest {
 
 	/**
 	 * Test method for
-	 * {@link PatientController#searchPatient(String, String, java.time.LocalDateTime, String)}.
+	 * {@link PatientController#searchPatient(String, String, java.time.LocalDate, String, String, String, int, int)}.
 	 *
 	 * @throws Exception
 	 */
 	@Test
-	void when_get_patients_search_without_name_and_unexistent_code_then_response_null_and_NO_Content() throws Exception {
-		Integer code = 1000;
+	void when_get_patients_search_without_name_and_unexistent_params_then_response_NO_Content() throws Exception {
 		String request = "/patients/search";
 
-		when(patientBrowserManagerMock.getPatientById(code)).thenReturn(null);
+		when(patientBrowserManagerMock.getPatients(anyMap(), anyInt(), anyInt()))
+			.thenReturn(new PagedResponse<>());
 
 		this.mockMvc
 			.perform(
 				get(request)
-					.param("code", code.toString())
+					.param("firstName", "")   // pas de prénom
+					.param("secondName", "")  // pas de nom
+					.param("city", "UnknownCity") // une ville inexistante
 					.contentType(MediaType.APPLICATION_JSON))
 			.andDo(log())
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data").isEmpty());
 	}
 
 	/**
 	 * Test method for
-	 * {@link PatientController#searchPatient(String, String, java.time.LocalDateTime, String)}.
+	 * {@link PatientController#searchPatient(String, String, java.time.LocalDate, String, String, String, int, int)}.
 	 *
 	 * @throws Exception
 	 */
 	@Test
-	void when_get_patients_search_without_name_and_without_code_then_response_null_and_NO_Content() throws Exception {
+	void when_get_patients_search_with_unexistent_firstName_then_response_NO_Content() throws Exception {
 		String request = "/patients/search";
+
+		when(patientBrowserManagerMock.getPatients(anyMap(), anyInt(), anyInt()))
+			.thenReturn(new PagedResponse<>());
 
 		this.mockMvc
 			.perform(
 				get(request)
+					.param("firstName", "UnknownName")
 					.contentType(MediaType.APPLICATION_JSON))
 			.andDo(log())
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data").isEmpty());
 	}
 
-	/**
-	 * Test method for
-	 * {@link PatientController#searchPatient(String, String, java.time.LocalDateTime, String)}.
-	 *
-	 * @throws Exception
-	 */
-	@Test
-	void when_get_patients_search_with_unexistent_name_and_without_code_then_response_null_and_NO_Content() throws Exception {
-		String name = null;
-		String request = "/patients/search";
-
-		when(patientBrowserManagerMock.getPatientById(null)).thenReturn(null);
-
-		this.mockMvc
-			.perform(
-				get(request)
-					.param("name", name)
-					.contentType(MediaType.APPLICATION_JSON))
-			.andDo(log())
-			.andExpect(status().isOk());
-	}
 
 	/**
 	 * Test method for {@link PatientController#deletePatient(int)}.

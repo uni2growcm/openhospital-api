@@ -22,12 +22,12 @@
 package org.isf.patient.rest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.model.Admission;
@@ -41,6 +41,7 @@ import org.isf.shared.exceptions.OHAPIException;
 import org.isf.shared.pagination.Page;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.isf.utils.pagination.PageInfo;
 import org.isf.utils.pagination.PagedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,15 +219,32 @@ public class PatientController {
 			params.put("city", city);
 		}
 
-		if (age != null && !age.isEmpty()) {
-			patientManager.updateAllPatientsAge();
-			params.put("age", age);
-		}
-
 		PagedResponse<Patient> patientList = new PagedResponse<>();
-		if (!params.isEmpty()) {
-			patientList = patientManager.getPatients(params, page, size);
-		}
+		if (age != null && !age.isEmpty()) {
+			PagedResponse<Patient> ageFiltered = patientManager.AgeFromBirthDate(Integer.parseInt(age), page, size);
+
+			if (!params.isEmpty()) {
+				PagedResponse<Patient> paramFiltered = patientManager.getPatients(params, page, size);
+
+				List<Patient> combined = ageFiltered.getData().stream()
+					.filter(paramFiltered.getData()::contains)
+					.collect(Collectors.toList());
+
+				PageInfo pageInfo = new PageInfo();
+				pageInfo.setPage(page);
+				pageInfo.setSize(size);
+				pageInfo.setTotalNbOfElements(combined.size());
+				pageInfo.setTotalPages((int) Math.ceil((double) combined.size() / size));
+
+				patientList.setData(combined);
+				patientList.setPageInfo(pageInfo);
+
+			} else {
+				patientList = ageFiltered;
+			}
+		} else {
+				patientList = patientManager.getPatients(params, page, size);
+			}
 
 		Page<PatientDTO> patientPageableDTO = new Page<>();
 		List<PatientDTO> patientsDTO = new ArrayList<>();
