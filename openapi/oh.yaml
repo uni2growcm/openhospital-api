@@ -6924,15 +6924,13 @@ components:
           format: int32
           description: lock
           example: 0
+        opd:
+          type: boolean
         pharmacy:
           type: boolean
         male:
           type: boolean
         female:
-          type: boolean
-        opd:
-          type: boolean
-        pharmacy:
           type: boolean
       required:
       - beds
@@ -7782,11 +7780,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
@@ -8236,8 +8234,7 @@ components:
           $ref: "#/components/schemas/PatientDTO"
           description: The patient identifier linked to this medical history
         siblingRank:
-          type: integer
-          format: int32
+          type: string
         termPregnancy:
           type: string
         deliveryMode:
@@ -8522,6 +8519,10 @@ components:
           type: string
           description: Date of Patient Examination
           example: 2020-03-19T14:58:00.000Z
+        pex_type:
+          type: string
+          description: type of Patient Examination
+          example: Admission
         patientCode:
           type: integer
           format: int32
@@ -8621,6 +8622,7 @@ components:
       required:
       - patientCode
       - pex_date
+      - pex_type
     ConditioningDTO:
       type: object
       properties:
