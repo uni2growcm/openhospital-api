@@ -38,7 +38,7 @@ public class MedicalHistoryDTO {
 	@Schema(description = "The patient identifier linked to this medical history")
 	private PatientDTO patient;
 
-	private Integer siblingRank;
+	private String siblingRank;
 
 	private String termPregnancy;
 
@@ -98,10 +98,10 @@ public class MedicalHistoryDTO {
 	public void setPatient(PatientDTO patient) {
 		this.patient = patient;
 	}
-	public Integer getSiblingRank() {
+	public String getSiblingRank() {
 		return siblingRank;
 	}
-	public void setSiblingRank(Integer siblingRank) {
+	public void setSiblingRank(String siblingRank) {
 		this.siblingRank = siblingRank;
 	}
 

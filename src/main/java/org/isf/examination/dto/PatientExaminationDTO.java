@@ -43,6 +43,10 @@ public class PatientExaminationDTO {
 	private LocalDateTime pex_date;
 
 	@NotNull
+	@Schema(description = "type of Patient Examination", example = "Admission")
+	private String pex_type;
+
+	@NotNull
 	@Schema(description = "Patient Examination Code")
 	private Integer patientCode;
 
@@ -107,6 +111,10 @@ public class PatientExaminationDTO {
 	public LocalDateTime getPex_date() {
 		return this.pex_date;
 	}
+
+	public String getPex_type() { return this.pex_type; }
+
+	public void setPex_type( String pex_type) { this.pex_type = pex_type; }
 
 	public Integer getPex_ap_min() {
 		return pex_ap_min;
