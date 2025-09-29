@@ -43,7 +43,7 @@ public class PatientExaminationDTO {
 	private LocalDateTime pex_date;
 
 	@NotNull
-	@Schema(description = "type of Patient Examination", example = "Admission")
+	@Schema(description = "type of Patient Examination", example = "admission")
 	private String pex_type;
 
 	@NotNull
