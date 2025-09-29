@@ -6924,13 +6924,13 @@ components:
           format: int32
           description: lock
           example: 0
-        opd:
-          type: boolean
-        pharmacy:
-          type: boolean
         male:
           type: boolean
         female:
+          type: boolean
+        opd:
+          type: boolean
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -8522,7 +8522,7 @@ components:
         pex_type:
           type: string
           description: type of Patient Examination
-          example: Admission
+          example: admission
         patientCode:
           type: integer
           format: int32
