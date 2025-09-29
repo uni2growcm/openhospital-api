@@ -102,8 +102,8 @@ public class AdmissionDTO {
 	@Schema(description = "DisChargeType")
 	private DischargeTypeDTO disType;
 
-	@Schema(description = "Free note", maxLength = 65535)
-	private String note;
+	@Schema(description = "Anamnesis", maxLength = 65535)
+	private String anamnesis;
 
 	@Schema(description = "Transfusional unit")
 	private Float transUnit;
@@ -145,6 +145,12 @@ public class AdmissionDTO {
 		example = "Blood test and X-ray prior to admission"
 	)
 	private String preAssessment;
+
+	@Schema(
+		description = "Reason for patient admission to hospital",
+		example = "Headache"
+	)
+	private String entryReason;
 
 	@Schema(description = "User id")
 	private String userID;
@@ -230,8 +236,8 @@ public class AdmissionDTO {
 		return this.disType;
 	}
 
-	public String getNote() {
-		return this.note;
+	public String getAnamnesis() {
+		return this.anamnesis;
 	}
 
 	public Float getTransUnit() {
@@ -359,8 +365,8 @@ public class AdmissionDTO {
 		this.disType = disType;
 	}
 
-	public void setNote(String note) {
-		this.note = note;
+	public void setAnamnesis(String anamnesis) {
+		this.anamnesis = anamnesis;
 	}
 
 	public void setTransUnit(Float transUnit) {
@@ -439,4 +445,11 @@ public class AdmissionDTO {
 		this.preAssessment = preAssessment;
 	}
 
+	public String getEntryReason() {
+		return entryReason;
+	}
+
+	public void setEntryReason(String entryReason) {
+		this.entryReason = entryReason;
+	}
 }
