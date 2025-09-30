@@ -122,6 +122,11 @@ public class SecurityConfig {
 				// age types
 				.requestMatchers(HttpMethod.GET, "/agetypes/**").hasAnyAuthority("agetypes.read")
 				.requestMatchers(HttpMethod.PUT, "/agetypes/**").hasAuthority("agetypes.update")
+				//conditionings
+				.requestMatchers(HttpMethod.POST, "/conditionings/**").hasAuthority("conditionings.create")
+				.requestMatchers(HttpMethod.GET, "/conditionings/**").hasAnyAuthority("conditionings.read")
+				.requestMatchers(HttpMethod.PUT, "/conditionings/**").hasAuthority("conditionings.update")
+				.requestMatchers(HttpMethod.DELETE, "/conditionings/**").hasAuthority("conditionings.delete")
 				// dischargetypes
 				.requestMatchers(HttpMethod.POST, "/dischargetypes/**").hasAuthority("dischargetypes.create")
 				.requestMatchers(HttpMethod.GET, "/dischargetypes/**").hasAnyAuthority("dischargetypes.read")
