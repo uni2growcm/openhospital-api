@@ -22,6 +22,7 @@
 package org.isf.conditioning.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.isf.patient.dto.PatientDTO;
 
@@ -60,6 +61,15 @@ public class ConditioningDTO {
 	@Schema(description = "Conditioning others", example = "others")
 	private String others;
 
+	@Schema(
+		description = "Patient's condition at the time of admission. " +
+			"Stored as a list of descriptors (e.g., stable, critical, unconscious).",
+		example = "[\"stable\", \"conscious\"]"
+	)
+	private List<String> conditionAtAdmission;
+
+	@Schema(description = "Conditioning tdr ", example = "sonde")
+	private String tdr;
 
 	@NotNull
 	@Schema(description = "patient", example = "22")
@@ -146,6 +156,16 @@ public class ConditioningDTO {
 	public void setOthers(String others) {
 		this.others = others;
 	}
+
+	public List<String> getConditionAtAdmission() {
+		return conditionAtAdmission;
+	}
+
+	public void setConditionAtAdmission(List<String> conditionAtAdmission) {this.conditionAtAdmission = conditionAtAdmission;}
+
+	public String getTdr() {return tdr;}
+
+	public void setTdr(String tdr) {this.tdr = tdr;}
 
 	public LocalDateTime getPerformedAt() {
 		return performedAt;
