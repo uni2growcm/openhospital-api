@@ -22,6 +22,7 @@
 package org.isf.disease.rest;
 
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.validation.Valid;
 
@@ -29,7 +30,9 @@ import org.isf.disease.dto.DiseaseDTO;
 import org.isf.disease.manager.DiseaseBrowserManager;
 import org.isf.disease.mapper.DiseaseMapper;
 import org.isf.disease.model.Disease;
+import org.isf.generaldata.MessageBundle;
 import org.isf.shared.exceptions.OHAPIException;
+import org.isf.utils.exception.OHDataLockFailureException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.slf4j.Logger;
@@ -290,7 +293,18 @@ public class DiseaseController {
 			throw new OHAPIException(new OHExceptionMessage("Disease not found."), HttpStatus.NOT_FOUND);
 		}
 
-		disease.setLock(diseaseDTO.getLock());
+		Disease oldDisease = diseaseManager.getDiseaseByCode(disease.getCode());
+
+		if (oldDisease == null) {
+			throw new OHAPIException(new OHExceptionMessage("Disease not found."), HttpStatus.NOT_FOUND);
+		}
+
+		if(!Objects.equals(disease.getLock(), oldDisease.getLock())){
+			throw new OHAPIException(new OHExceptionMessage("The data has been updated by someone else."), HttpStatus.CONFLICT);
+		} else {
+			disease.setLock(diseaseDTO.getLock() + 1);
+		}
+
 		try {
 			return mapper.map2DTO(diseaseManager.updateDisease(disease));
 		} catch (OHServiceException serviceException) {

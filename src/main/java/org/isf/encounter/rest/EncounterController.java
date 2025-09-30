@@ -21,14 +21,47 @@
  */
 package org.isf.encounter.rest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import org.isf.admission.dto.AdmissionDTO;
+import org.isf.admission.manager.AdmissionBrowserManager;
+import org.isf.admission.mapper.AdmissionMapper;
+import org.isf.admission.model.Admission;
+import org.isf.conditioning.dto.ConditioningDTO;
+import org.isf.conditioning.manager.ConditioningBrowserManager;
+import org.isf.conditioning.mapper.ConditioningMapper;
+import org.isf.conditioning.model.Conditioning;
 import org.isf.encounter.dto.EncounterDTO;
-import org.isf.encounter.mapper.EncounterMapper;
 import org.isf.encounter.manager.EncounterBrowserManager;
+import org.isf.encounter.mapper.EncounterMapper;
 import org.isf.encounter.model.Encounter;
 import org.isf.encounter.model.EncounterStatus;
+import org.isf.examination.dto.PatientExaminationDTO;
+import org.isf.examination.manager.ExaminationBrowserManager;
+import org.isf.examination.mapper.PatientExaminationMapper;
+import org.isf.examination.model.PatientExamination;
+import org.isf.medicalhistory.dto.MedicalHistoryDTO;
+import org.isf.medicalhistory.manager.MedicalHistoryBrowsingManager;
+import org.isf.medicalhistory.mapper.MedicalHistoryMapper;
+import org.isf.medicalhistory.model.MedicalHistory;
+import org.isf.lab.dto.LaboratoryDTO;
+import org.isf.lab.manager.LabManager;
+import org.isf.lab.mapper.LaboratoryMapper;
+import org.isf.lab.model.Laboratory;
+import org.isf.lab.model.LaboratoryStatus;
+import org.isf.opd.dto.OpdDTO;
+import org.isf.opd.dto.OpdWithOperationRowDTO;
+import org.isf.opd.manager.OpdBrowserManager;
+import org.isf.opd.mapper.OpdMapper;
+import org.isf.opd.model.Opd;
+
+import org.isf.operation.manager.OperationRowBrowserManager;
+import org.isf.operation.mapper.OperationRowMapper;
+import org.isf.operation.model.OperationRow;
+import org.isf.patient.dto.PatientSTATUS;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
 import org.isf.shared.exceptions.OHAPIException;
@@ -38,8 +71,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,23 +90,72 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class EncounterController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EncounterController.class);
-	
+
+	private static final String DRAFT = LaboratoryStatus.draft.toString();
+
+	private static final String OPEN = LaboratoryStatus.open.toString();
+
 	private final EncounterBrowserManager encounterBrowserManager;
 	private final EncounterMapper encounterMapper;
 	private final PatientBrowserManager patientBrowserManager;
+	private final ExaminationBrowserManager examinationBrowserManager;
+	private final PatientExaminationMapper examinationMapper;
+	private final OpdBrowserManager opdManager;
+	private final OpdMapper opdMapper;
+	private final AdmissionMapper admissionMapper;
+	private final AdmissionBrowserManager admissionBrowserManager;
+	private final ConditioningBrowserManager conditioningManager;
+	private final ConditioningMapper conditioningMapper;
+	private final MedicalHistoryBrowsingManager medicalHistoryManager;
+	private final MedicalHistoryMapper medicalHistoryMapper;
+	private final LabManager labManager;
+	private final LaboratoryMapper laboratoryMapper;
+	private final OperationRowBrowserManager operationRowManager;
+	private final OperationRowMapper opRowMapper;
 
-	public EncounterController(EncounterBrowserManager encounterBrowserManager,
-							   EncounterMapper encounterMapper,
-							   PatientBrowserManager patientBrowserManager
-							   ) {
+	public EncounterController(
+		EncounterBrowserManager encounterBrowserManager,
+		EncounterMapper encounterMapper,
+		PatientBrowserManager patientBrowserManager,
+
+		ExaminationBrowserManager examinationBrowserManager,
+		PatientExaminationMapper examinationMapper,
+		OpdBrowserManager opdManager,
+		OpdMapper opdMapper,
+		AdmissionBrowserManager admissionBrowserManager,
+		AdmissionMapper admissionMapper,
+		ConditioningBrowserManager conditioningManager,
+		ConditioningMapper conditioningMapper,
+		MedicalHistoryBrowsingManager medicalHistoryManager,
+		MedicalHistoryMapper medicalHistoryMapper,
+		LabManager labManager,
+		LaboratoryMapper laboratoryMapper,
+		OperationRowMapper opRowMapper,
+		OperationRowBrowserManager operationRowManager
+
+	) {
 		this.encounterBrowserManager = encounterBrowserManager;
 		this.encounterMapper = encounterMapper;
 		this.patientBrowserManager = patientBrowserManager;
+		this.examinationBrowserManager = examinationBrowserManager;
+		this.examinationMapper = examinationMapper;
+		this.opdManager = opdManager;
+		this.opdMapper = opdMapper;
+		this.admissionBrowserManager = admissionBrowserManager;
+		this.admissionMapper = admissionMapper;
+		this.conditioningManager = conditioningManager;
+		this.conditioningMapper = conditioningMapper;
+		this.medicalHistoryManager = medicalHistoryManager;
+		this.medicalHistoryMapper = medicalHistoryMapper;
+		this.labManager = labManager;
+		this.laboratoryMapper = laboratoryMapper;
+		this.opRowMapper = opRowMapper;
+		this.operationRowManager = operationRowManager;
 	}
 
 	@PostMapping(value = "/encounters")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<EncounterDTO> createEncounter(@RequestBody EncounterDTO encounterDTO) throws OHServiceException {
+	public EncounterDTO createEncounter(@RequestBody EncounterDTO encounterDTO) throws OHServiceException {
 		LOGGER.info("Create encounter with {}", encounterDTO.getCode());
 		if (encounterDTO.getPatient() == null) {
 			throw new OHAPIException(new OHExceptionMessage("Patient must not be null."));
@@ -83,74 +171,253 @@ public class EncounterController {
 
 		Encounter encounter = encounterMapper.map2Model(encounterDTO);
 		encounter.setPatient(patient);
-		encounter.setStatus(EncounterStatus.OPEN);
-		encounter = encounterBrowserManager.saveEncounter(encounter);			
+		encounter.setStatus(EncounterStatus.ACTIVE);
+		encounter = encounterBrowserManager.saveEncounter(encounter);
 		if (encounter == null) {
 			throw new OHAPIException(new OHExceptionMessage("Failed to create encounter"));
 		}
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(encounterMapper.map2DTO(encounter));
-	}
-
-	@PatchMapping("/encounters/{code}/status")
-	public ResponseEntity<EncounterDTO> updateEncounterStatus(@PathVariable String code) throws OHServiceException {
-		LOGGER.info("Update encounter with code {}", code);
-		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
-		if (encounter == null) {
-			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code :" + code), HttpStatus.NOT_FOUND);
-		}
-		if (encounter.getStatus().toString().equals(EncounterStatus.OPEN.toString())) {
-			encounter.setStatus(EncounterStatus.CLOSE);
-		} else {
-			encounter.setStatus(EncounterStatus.OPEN);
-		}
-
-		encounter = encounterBrowserManager.saveEncounter(encounter);
-		if (encounter == null) {
-			throw new OHAPIException(new OHExceptionMessage("Failed to update encounter"));
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(encounterMapper.map2DTO(encounter));
+		return encounterMapper.map2DTO(encounter);
 	}
 
 	@GetMapping("/encounters/{patientId}")
-	public ResponseEntity<List<EncounterDTO>> getEncountersByPatient(@PathVariable int patientId) throws OHServiceException {
+	public List<EncounterDTO> getEncountersByPatient(@PathVariable int patientId) throws OHServiceException {
 		LOGGER.info("Get patient encounters  with code {}", patientId);
 		List<Encounter> encounters = encounterBrowserManager.getEncountersByPatient(patientId);
-		 return ResponseEntity.status(HttpStatus.OK).body(encounterMapper.map2DTOList(encounters));
+		return encounterMapper.map2DTOList(encounters);
 	}
 
 	@GetMapping("/encounters/current/{patientId}")
-	public ResponseEntity<EncounterDTO> getCurrentEncounterByPatient(@PathVariable int patientId) throws OHServiceException {
+	public EncounterDTO getCurrentEncounterByPatient(@PathVariable int patientId) throws OHServiceException {
 		Encounter encounter = encounterBrowserManager.getCurrentEncounter(patientId);
 		if (encounter == null) {
 			return null;
 		}
-		return ResponseEntity.status(HttpStatus.OK).body(encounterMapper.map2DTO(encounter));
+		return encounterMapper.map2DTO(encounter);
+	}
+
+	/**
+	 * Retrieves the list of {@link OpdWithOperationRowDTO} objects associated with a specific encounter,
+	 * identified by its unique code.
+	 *
+	 * @param code the unique encounter code used to identify the encounter
+	 * @return a {@link List} of {@link OpdWithOperationRowDTO} objects associated with the given encounter
+	 * @throws OHServiceException if an error occurs while retrieving patient examinations
+	 * @throws OHAPIException if no encounter is found with the provided code
+	 */
+	@GetMapping("/encounters/{code}/opds")
+	public List<OpdWithOperationRowDTO> getOPDByEncounter(@PathVariable String code) throws OHServiceException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+		List<Opd> opdList = opdManager.getOpdForEncounter(encounter);
+		List<OpdWithOperationRowDTO> opdWithOperations = new ArrayList<>();
+		if (!opdList.isEmpty()) {
+			opdWithOperations = opdList.stream().map(opd -> {
+				OpdWithOperationRowDTO opRows = new OpdWithOperationRowDTO();
+				opRows.setOpdDTO(opdMapper.map2DTO(opd));
+				List<OperationRow> listOp = new ArrayList<>();
+				try {
+					listOp = operationRowManager.getOperationRowByOpd(opd);
+				} catch (OHServiceException e) {
+					// TODO Auto-generated catch block
+					LOGGER.error("Unable to get the List of operation associate to this Opd");
+				}
+				if (!listOp.isEmpty()) {
+					opRows.setOperationRows(opRowMapper.map2DTOList(listOp));
+				} else {
+					opRows.setOperationRows(new ArrayList<>());
+				}
+
+				return opRows;
+			}).collect(Collectors.toList());
+
+		}
+		return opdWithOperations;
+	}
+
+	/**
+	 * Retrieves the list of {@link PatientExaminationDTO} objects associated with a specific encounter,
+	 * identified by its unique code.
+	 *
+	 * @param code the unique encounter code used to identify the encounter
+	 * @return a {@link List} of {@link PatientExaminationDTO} objects associated with the given encounter
+	 * @throws OHServiceException if an error occurs while retrieving patient examinations
+	 * @throws OHAPIException if no encounter is found with the provided code
+	 */
+	@GetMapping("/encounters/{code}/examinations")
+	public List<PatientExaminationDTO> getPatientExaminationsByEncounter(@PathVariable String code) throws OHServiceException {
+		LOGGER.info("Get patient examination By encounter code: {}", code);
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+		List<PatientExamination> patientExaminationList = examinationBrowserManager.getPatientExaminationsForEncounter(encounter);
+		return examinationMapper.map2DTOList(patientExaminationList);
 	}
 
 	@PatchMapping("/encounters/{code}")
-	public ResponseEntity<EncounterDTO> updateEncounterCode(@PathVariable String code, @RequestBody EncounterDTO encounter) throws OHServiceException {
+	public EncounterDTO updateEncounter(@PathVariable String code, @RequestBody EncounterDTO encounter) throws OHServiceException {
 		LOGGER.info("Update encounter with new code {}", encounter.getCode());
 		Encounter encounterToUpdate = encounterBrowserManager.getEncountersByCode(code);
-		if (encounterToUpdate == null) {
+		if (encounterToUpdate == null || encounterToUpdate.getStatus() == EncounterStatus.CANCELLED) {
 			throw new OHAPIException(new OHExceptionMessage("Encounter not found"));
 		}
 
-		if (!Objects.equals(encounter.getPatient().getCode(), encounterToUpdate.getPatient().getCode())) {
-			throw new OHAPIException(new OHExceptionMessage("The encounter and the patient do not match."));
+		if (encounter.getPatient() == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter most have patient property"));
 		}
 
-		if (encounter.getStatus() == EncounterStatus.CLOSE) {
-			throw new OHAPIException(new OHExceptionMessage("You cannot modify the code of a closed encounter."));
+		Integer patientCode = encounter.getPatient().getCode();
+
+		if (!Objects.equals(patientCode, encounterToUpdate.getPatient().getCode())) {
+			throw new OHAPIException(new OHExceptionMessage("The encounter found is not for the patient with code "+patientCode));
+		}
+
+		if (encounterToUpdate.getClosedAt() != null) {
+			throw new OHAPIException(new OHExceptionMessage("You cannot modify a closed encounter."));
 		}
 
 		Encounter encounterFound = encounterBrowserManager.getEncountersByCode(encounter.getCode());
-		if (encounterFound != null) {
+		if (encounterFound != null && !Objects.equals(encounterFound.getCode(), encounterToUpdate.getCode())) {
 			throw new OHAPIException(new OHExceptionMessage("The encounter code is already in use."));
 		}
 
-		encounterToUpdate.setCode(encounter.getCode());
-		Encounter encounterUpdated = encounterBrowserManager.saveEncounter(encounterToUpdate);
-		return ResponseEntity.status(HttpStatus.OK).body(encounterMapper.map2DTO(encounterUpdated));
+		if (encounter.getStatus() == null) {
+			encounter.setStatus(EncounterStatus.ACTIVE);
+		}
+
+		Encounter encounterToUpdated = encounterMapper.map2Model(encounter);
+
+		if (encounter.getStatus() == EncounterStatus.CANCELLED) {
+			List<Conditioning> conditioningList = conditioningManager.getConditioningByPatientEncounter(encounterToUpdated);
+			if (conditioningList != null && !conditioningList.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("This encounter cannot be deleted because it is associated with a Conditioning."));
+			}
+
+			List<MedicalHistory> medicalHistoryList = medicalHistoryManager.getMedicalHistoriesForEncounter(encounterToUpdated);
+			if (medicalHistoryList != null && !medicalHistoryList.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("This encounter cannot be deleted because it is associated with a Medical History."));
+			}
+
+			List<Admission> admissionList = admissionBrowserManager.getAdmissionsByEncounter(encounterToUpdated);
+			if (admissionList != null && !admissionList.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("This encounter cannot be deleted because it is associated with an Admission."));
+			}
+
+			List<Laboratory> LaboratoryList = labManager.getLaboratoryByEncounter(encounterToUpdated).stream()
+				.filter(e -> !DRAFT.equalsIgnoreCase(e.getStatus()) && !OPEN.equalsIgnoreCase(e.getStatus())).toList();
+			if (admissionList != null && !admissionList.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("This encounter cannot be deleted because it is associated with a Laboratory."));
+			}
+
+			List<Opd> opdList = opdManager.getOpdForEncounter(encounterToUpdated);
+			if (opdList != null && !opdList.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("This encounter cannot be deleted because it is associated with an Opd."));
+			}
+		}
+
+		encounterToUpdated = encounterBrowserManager.saveEncounter(encounterToUpdated);
+
+		return encounterMapper.map2DTO(encounterToUpdated);
+	}
+
+	/**
+	 * Retrieves the list of {@link ConditioningDTO} objects associated with a specific encounter,
+	 * identified by its unique code.
+	 *
+	 * @param code the unique encounter code used to identify the encounter
+	 * @return a {@link List} of {@link ConditioningDTO} objects associated with the given encounter
+	 * @throws OHServiceException if an error occurs while retrieving patient examinations
+	 * @throws OHAPIException if no encounter is found with the provided code
+	 */
+	@GetMapping("/encounters/{code}/conditionings")
+	public List<ConditioningDTO> getConditioningByPatientEncounter(@PathVariable String code) throws OHServiceException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+
+		List<Conditioning> conditioningList = conditioningManager.getConditioningByPatientEncounter(encounter);
+
+		return conditioningMapper.map2DTOList(conditioningList);
+	}
+
+	/**
+	 * Retrieves the list of {@link MedicalHistoryDTO} objects associated with a specific encounter,
+	 * identified by its unique code.
+	 *
+	 * @param code the unique encounter code used to identify the encounter
+	 * @return a {@link List} of {@link MedicalHistoryDTO} objects associated with the given encounter
+	 * @throws OHServiceException if an error occurs while retrieving patient examinations
+	 * @throws OHAPIException if no encounter is found with the provided code
+	 */
+	@GetMapping("/encounters/{code}/medicalhistories")
+	public List<MedicalHistoryDTO> getMedicalHistoriesEncounterByEncounter(@PathVariable String code) throws OHServiceException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+		List<MedicalHistory> medicalHistoryList = medicalHistoryManager.getMedicalHistoriesForEncounter(encounter);
+		return medicalHistoryMapper.map2DTOList(medicalHistoryList);
+	}
+
+	@GetMapping("/encounters/{code}/admissions")
+	public List<AdmissionDTO> getAdmissionsByEncounter(@PathVariable String code) throws OHServiceException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+
+		List<Admission> admissionList = admissionBrowserManager.getAdmissionsByEncounter(encounter);
+
+		return admissionMapper.map2DTOList(admissionList);
+	}
+
+	/**
+	 * Get all {@link LaboratoryDTO}s linked to the specified {@link Encounter}.
+	 *
+	 * @param code Encounter code
+	 * @return the {@link List} of found {@link LaboratoryDTO} or NO_CONTENT otherwise.
+	 * @throws OHServiceException When failed to get lab exams for the encounter
+	 */
+	@GetMapping("/encounters/{code}/exams")
+	public List<LaboratoryDTO> getLaboratoryByEncounter(@PathVariable String code) throws OHServiceException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+
+		List<Laboratory> LaboratoryList = labManager.getLaboratoryByEncounter(encounter).stream()
+			.filter(e -> !DRAFT.equalsIgnoreCase(e.getStatus()) && !OPEN.equalsIgnoreCase(e.getStatus())).toList();
+
+		return laboratoryMapper.map2DTOList(LaboratoryList);
+	}
+
+	/**
+	 * Get all {@link LaboratoryDTO}s examRequest linked to the specified {@link Encounter}.
+	 *
+	 * @param code Encounter code
+	 * @return the {@link List} of found {@link LaboratoryDTO} of examRequest or NO_CONTENT otherwise.
+	 * @throws OHServiceException When failed to get lab exams for the encounter
+	 */
+	@GetMapping("/encounters/{code}/examRequest")
+	public List<LaboratoryDTO> getLaboratoryExamRequestByEncounter(@PathVariable String code) throws OHServiceException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+
+		List<Laboratory> LaboratoryList = labManager.getLaboratoryByEncounter(encounter).stream()
+			.filter(e -> DRAFT.equalsIgnoreCase(e.getStatus()) || OPEN.equalsIgnoreCase(e.getStatus())).toList();
+
+		return LaboratoryList.stream().map(lab -> {
+			LaboratoryDTO laboratoryDTO = laboratoryMapper.map2DTO(lab);
+			laboratoryDTO.setRegistrationDate(lab.getCreatedDate());
+			laboratoryDTO.setInOutPatient(PatientSTATUS.valueOf(lab.getInOutPatient()));
+			laboratoryDTO.setStatus(LaboratoryStatus.valueOf(lab.getStatus()));
+			return laboratoryDTO;
+		}).collect(Collectors.toList());
 	}
 }

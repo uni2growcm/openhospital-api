@@ -38,7 +38,7 @@ public class MedicalHistoryDTO {
 	@Schema(description = "The patient identifier linked to this medical history")
 	private PatientDTO patient;
 
-	private Integer siblingRank;
+	private String siblingRank;
 
 	private String termPregnancy;
 
@@ -82,6 +82,9 @@ public class MedicalHistoryDTO {
 	private String otherPersonalPathologies;
 
 	private String otherFamilyPathologies;
+	
+	@Schema(description = "Lock", example = "0")
+	private int lock;
 
 	public Integer getId() {
 		return id;
@@ -95,10 +98,10 @@ public class MedicalHistoryDTO {
 	public void setPatient(PatientDTO patient) {
 		this.patient = patient;
 	}
-	public Integer getSiblingRank() {
+	public String getSiblingRank() {
 		return siblingRank;
 	}
-	public void setSiblingRank(Integer siblingRank) {
+	public void setSiblingRank(String siblingRank) {
 		this.siblingRank = siblingRank;
 	}
 
@@ -254,5 +257,13 @@ public class MedicalHistoryDTO {
 	}
 	public void setOtherFamilyPathologies(String otherFamilyPathologies) {
 		this.otherFamilyPathologies = otherFamilyPathologies;
+	}
+	
+	public int getLock() {
+		return lock;
+	}
+	
+	public void setLock(int lock) {
+		this.lock = lock;
 	}
 }

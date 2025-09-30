@@ -19,58 +19,56 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.medicalhistory.data;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.isf.medicalhistory.TestMedicalHistory;
-import org.isf.medicalhistory.dto.MedicalHistoryDTO;
-import org.isf.medicalhistory.mapper.MedicalHistoryMapper;
-import org.isf.medicalhistory.model.MedicalHistory;
-import org.isf.patient.TestPatient;
-import org.isf.patient.model.Patient;
-import org.isf.patient.service.PatientIoOperationRepository;
-import org.isf.utils.exception.OHException;
+package org.isf.encounter.data;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.isf.encounter.TestEncounter;
+import org.isf.encounter.dto.EncounterDTO;
+import org.isf.encounter.mapper.EncounterMapper;
+import org.isf.encounter.model.Encounter;
+import org.isf.utils.exception.OHException;
 
-public class MedicalHistoryHelper {
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class EncounterHelper {
+
 	private static ObjectMapper objectMapper;
-	private static PatientIoOperationRepository patientRepository;
 
-	public static MedicalHistory setup() throws OHException {
-		TestMedicalHistory testMedicalHistory = new TestMedicalHistory();
-		Patient patient = new TestPatient().setup(false);
-		return testMedicalHistory.createMedicalHistory(patient);
+	public static Encounter setup() throws OHException {
+		TestEncounter testEncounter = new TestEncounter();
+		return testEncounter.setup(false);
 	}
 
-	public static List<MedicalHistory> setupMedicalHistories(int size) {
-		return IntStream.range(1, size + 1)
+	public static List<Encounter> setupEncounterList(int size) {
+		return IntStream.range(0, size)
 			.mapToObj(i -> {
-					MedicalHistory mh = null;
-					try {
-						mh = MedicalHistoryHelper.setup();
-					} catch (OHException e) {
-						e.printStackTrace();
-					}
-					return mh;
+				try {
+					return EncounterHelper.setup();
+				} catch (OHException e) {
+					e.printStackTrace();
 				}
-			).collect(Collectors.toList());
+				return null;
+			})
+			.collect(Collectors.toList());
 	}
 
-	public static String asJsonString(MedicalHistoryDTO medicalHistoryDTO) {
+	public static String asJsonString(EncounterDTO encounterDTO) {
 		try {
-			return getObjectMapper().writeValueAsString(medicalHistoryDTO);
+			return getObjectMapper().writeValueAsString(encounterDTO);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static EncounterDTO setup(EncounterMapper encounterMapper) throws OHException {
+		return encounterMapper.map2DTO(EncounterHelper.setup());
 	}
 
 	public static String asJsonString(List<?> list) {
@@ -82,10 +80,6 @@ public class MedicalHistoryHelper {
 		return null;
 	}
 
-	public static MedicalHistoryDTO setup(MedicalHistoryMapper medicalHistoryMapper) throws OHException {
-		return medicalHistoryMapper.map2DTO(MedicalHistoryHelper.setup());
-	}
-
 	public static ObjectMapper getObjectMapper() {
 		if (objectMapper == null) {
 			objectMapper = new ObjectMapper()
@@ -95,4 +89,5 @@ public class MedicalHistoryHelper {
 		}
 		return objectMapper;
 	}
+
 }

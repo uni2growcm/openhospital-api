@@ -24,26 +24,45 @@ package org.isf.encounter.dto;
 import org.isf.encounter.model.EncounterStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotNull;
+
 import org.isf.patient.dto.PatientDTO;
 
 import java.time.LocalDateTime;
 
 public class EncounterDTO {
 
+	@Schema(description = "id of the encounter", example = "13")
+	private Integer id;
+
 	@NotNull
 	@Schema(description = "Code of the encounter", example = "123")
 	private String code;
 
-	@Schema(description = "Status of encounter", example = "OPEN")
+	@Schema(description = "Status of encounter", example = "ACTIVE")
 	private EncounterStatus status;
-	
+
 	@NotNull
 	@Schema(description = "Patient")
 	private PatientDTO patient;
 
-	@Schema(description = "Created date", example = "2025-08-26 16:15:58")
-	private LocalDateTime createdDate;
+	@Schema(description = "Encounter date", example = "2025-08-26 16:15:58")
+	private LocalDateTime performedAt;
+
+	@Schema(description = "Closed date", example = "2025-08-26 16:15:58")
+	private LocalDateTime closedAt;
+
+	@Schema(description = "Lock", example = "1")
+	private Integer lock;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public String getCode() {
 		return code;
@@ -56,7 +75,7 @@ public class EncounterDTO {
 	public EncounterStatus getStatus() {
 		return status;
 	}
-	
+
 	public void setStatus(EncounterStatus status) {
 		this.status = status;
 	}
@@ -69,13 +88,30 @@ public class EncounterDTO {
 		this.patient = patient;
 	}
 
-	public LocalDateTime getCreatedDate() {
-		return createdDate;
+	public LocalDateTime getPerformedAt() {
+		return performedAt;
 	}
 
-	public void setCreatedDate(LocalDateTime createdDate) {
-		this.createdDate = createdDate;
+	public void setPerformedAt(LocalDateTime performedAt) {
+		this.performedAt = performedAt;
 	}
 
-	public EncounterDTO() {}
+	public LocalDateTime getClosedAt() {
+		return closedAt;
+	}
+
+	public void setClosedAt(LocalDateTime closedAt) {
+		this.closedAt = closedAt;
+	}
+
+	public Integer getLock() {
+		return lock;
+	}
+
+	public void setLock(Integer lock) {
+		this.lock = lock;
+	}
+
+	public EncounterDTO() {
+	}
 }

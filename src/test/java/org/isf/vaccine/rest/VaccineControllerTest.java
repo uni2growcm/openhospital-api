@@ -22,6 +22,7 @@
 package org.isf.vaccine.rest;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -157,19 +158,30 @@ public class VaccineControllerTest {
 	void testUpdateVaccine_200() throws Exception {
 		String request = "/vaccines";
 		String code = "ZZ";
-		Vaccine vaccine = VaccineHelper.setup(code);
-		VaccineDTO body = vaccineMapper.map2DTO(vaccine);
+		Vaccine existingVaccine = VaccineHelper.setup(code);
+		existingVaccine.setLock(1);
 
-		when(vaccineBrowserManagerMock.updateVaccine(vaccineMapper.map2Model(body)))
-				.thenReturn(vaccine);
+		VaccineDTO updateDTO = vaccineMapper.map2DTO(existingVaccine);
+		updateDTO.setLock(1);
+
+		Vaccine updatedVaccine = VaccineHelper.setup(code);
+		updatedVaccine.setLock(2);
+
+		when(vaccineBrowserManagerMock.isCodePresent(existingVaccine.getCode()))
+			.thenReturn(true);
+
+		when(vaccineBrowserManagerMock.findVaccine(existingVaccine.getCode()))
+			.thenReturn(existingVaccine);
+
+		when(vaccineBrowserManagerMock.updateVaccine(any(Vaccine.class)))
+			.thenReturn(updatedVaccine);
 
 		MvcResult result = this.mockMvc
 				.perform(put(request)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(Objects.requireNonNull(VaccineHelper.asJsonString(body)))
+						.content(Objects.requireNonNull(VaccineHelper.asJsonString(updateDTO)))
 				)
 				.andDo(log())
-				.andExpect(status().is2xxSuccessful())
 				.andExpect(status().isOk())
 				.andReturn();
 
