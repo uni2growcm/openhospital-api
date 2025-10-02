@@ -82,6 +82,9 @@ public class MedicalHistoryDTO {
 	private String otherPersonalPathologies;
 
 	private String otherFamilyPathologies;
+
+	@Schema(description = "Medical history performed date", example = "2025-08-26 16:15:58")
+	private LocalDateTime performedAt;
 	
 	@Schema(description = "Lock", example = "0")
 	private int lock;
@@ -258,7 +261,16 @@ public class MedicalHistoryDTO {
 	public void setOtherFamilyPathologies(String otherFamilyPathologies) {
 		this.otherFamilyPathologies = otherFamilyPathologies;
 	}
-	
+
+
+	public LocalDateTime getPerformedAt() {
+		return performedAt;
+	}
+
+	public void setPerformedAt(LocalDateTime performedAt) {
+		this.performedAt = performedAt;
+	}
+
 	public int getLock() {
 		return lock;
 	}
