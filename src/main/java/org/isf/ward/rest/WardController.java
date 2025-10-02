@@ -198,4 +198,18 @@ public class WardController {
         LOGGER.info("Check ward maternity code");
         return wardManager.maternityControl(createIfNotExist);
     }
+
+	/**
+	 * Get all the {@link Ward}s flagged as pharmacy (isPharmacy = true).
+	 *
+	 * @return NO_CONTENT if there aren't pharmacy wards, {@code List<WardDTO>} otherwise
+	 * @throws OHServiceException When failed to get pharmacy wards
+	 */
+	@GetMapping(value = "/wards/pharmacy")
+	public List<WardDTO> getPharmacyWards() throws OHServiceException {
+		LOGGER.info("Get pharmacy wards");
+
+		return mapper.map2DTOList(wardManager.getPharmacyWards());
+	}
+
 }
