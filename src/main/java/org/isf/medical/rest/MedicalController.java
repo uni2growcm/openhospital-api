@@ -21,6 +21,7 @@
  */
 package org.isf.medical.rest;
 
+import java.util.Comparator;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -30,6 +31,10 @@ import org.isf.medical.dto.MedicalSortBy;
 import org.isf.medical.mapper.MedicalMapper;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
+import org.isf.medicalstock.dto.MovementDTO;
+import org.isf.medicalstock.manager.MovBrowserManager;
+import org.isf.medicalstock.mapper.MovementMapper;
+import org.isf.medicalstock.model.Movement;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
@@ -59,13 +64,19 @@ public class MedicalController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MedicalController.class);
 
+	private final MovBrowserManager movementManager;
+
+	private final MovementMapper movementMapper;
+
 	private final MedicalBrowsingManager medicalManager;
 
 	private final MedicalMapper mapper;
 
-	public MedicalController(MedicalBrowsingManager medicalManager, MedicalMapper mapper) {
+	public MedicalController(MedicalBrowsingManager medicalManager, MedicalMapper mapper, MovBrowserManager movementManager, MovementMapper movementMapper) {
 		this.medicalManager = medicalManager;
 		this.mapper = mapper;
+		this.movementManager = movementManager;
+		this.movementMapper = movementMapper;
 	}
 	/**
 	 * Returns the requested medical.
@@ -100,6 +111,7 @@ public class MedicalController {
 		LOGGER.info("Retrieving all the medicals...");
 
 		List<Medical> medicals;
+		List<Movement> movements;
 		if (sortBy == null || sortBy == MedicalSortBy.NONE) {
 			medicals = medicalManager.getMedicals();
 		} else if (sortBy == MedicalSortBy.CODE) {
@@ -113,6 +125,40 @@ public class MedicalController {
 		}
 
 		return mapper.map2DTOList(medicals);
+	}
+
+	/**
+	 * Returns all medicals along with their latest lot from movements.
+	 * <p>
+	 * This method retrieves all medicals and all movements, maps them to their corresponding DTOs,
+	 * and then assigns to each medical the lot from the most recent movement (by date) associated with it,
+	 * if such a movement exists.
+	 * </p>
+	 *
+	 * @return A list of {@link MedicalDTO} objects where each medical may have its lot set from the latest movement.
+	 * @throws OHServiceException When failed to retrieve medicals or movements.
+	 *
+	 */
+	@GetMapping(value = "/medicals/mov")
+	public List<MedicalDTO> getMedicalsMov() throws OHServiceException {
+		LOGGER.info("Retrieving all medicals with one lot from movements (DTO-based)...");
+
+		List<Medical> medicals = medicalManager.getMedicals();
+		List<Movement> movements = movementManager.getMovements();
+
+		List<MedicalDTO> medicalDTOs = mapper.map2DTOList(medicals);
+		List<MovementDTO> movementDTOs = movementMapper.map2DTOList(movements);
+
+		for (MedicalDTO medDTO : medicalDTOs) {
+			movementDTOs.stream()
+				.filter(mov -> mov.getMedical() != null
+					&& mov.getMedical().getCode().equals(medDTO.getCode())
+					&& mov.getLot() != null)
+				.max(Comparator.comparing(MovementDTO::getDate))
+				.ifPresent(lastMov -> medDTO.setLot(lastMov.getLot()));
+		}
+
+		return medicalDTOs;
 	}
 
 	/**
