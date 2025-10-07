@@ -40,6 +40,7 @@ import org.isf.shared.exceptions.OHAPIException;
 import org.isf.shared.pagination.Page;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.isf.utils.pagination.PageInfo;
 import org.isf.utils.pagination.PagedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,6 +185,7 @@ public class PatientController {
 
 	@GetMapping(value = "/patients/search")
 	public Page<PatientDTO> searchPatient(
+		@RequestParam(value = "folderNumber", defaultValue = "", required = false) String folderNumber,
 		@RequestParam(value = "firstName", defaultValue = "", required = false) String firstName,
 		@RequestParam(value = "secondName", defaultValue = "", required = false) String secondName,
 		@RequestParam(value = "birthDate", defaultValue = "", required = false) LocalDateTime birthDate,
@@ -210,8 +212,19 @@ public class PatientController {
 		}
 
 		PagedResponse<Patient> patientList = new PagedResponse<>();
-		if (!params.entrySet().isEmpty()) {
-			patientList = patientManager.getPatients(params, page, size);
+		if (folderNumber != null && !folderNumber.isBlank()) {
+			Patient patientFound = patientManager.getPatientByFolderNumber(Integer.parseInt(folderNumber));
+			if (patientFound != null) {
+				List<Patient> patients = new ArrayList<>();
+				patients.add(patientFound);
+				patientList.setData(patients);
+				PageInfo pageInfo = new PageInfo(1, 0, 1, 1, 1, false, false);
+				patientList.setPageInfo(pageInfo);
+			}
+		} else {
+			if (!params.entrySet().isEmpty()) {
+				patientList = patientManager.getPatients(params, page, size);
+			}
 		}
 
 		Page<PatientDTO> patientPageableDTO = new Page<>();
