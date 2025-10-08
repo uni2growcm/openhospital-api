@@ -25,9 +25,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
 import org.apache.poi.util.IOUtils;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
@@ -37,10 +40,12 @@ import org.isf.utils.exception.model.OHExceptionMessage;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -102,4 +107,26 @@ public class ReportsController {
 				"attachment; filename=\"" + resource.getFilename() + '"')
 			.body(out);
 	}
+
+	@GetMapping("/reports/pharmaceuticalOrder")
+	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(
+		@RequestParam(value = "lang", required = false, defaultValue = "en") String lang) throws OHServiceException {
+
+		try {
+			Locale locale = Locale.forLanguageTag(lang);
+			JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", locale);
+
+			byte[] pdfBytes = JasperExportManager.exportReportToPdf(result.getJasperPrint());
+
+			return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalOrder.pdf")
+				.contentType(MediaType.APPLICATION_PDF)
+				.body(pdfBytes);
+
+		} catch (JRException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
 }
