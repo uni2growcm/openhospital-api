@@ -23,8 +23,11 @@ package org.isf.stats.rest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -36,11 +39,13 @@ import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -66,6 +71,34 @@ public class ReportsController {
 	@GetMapping("/reports/diseases-list")
 	public ResponseEntity<byte[]> printDiseasesListPdf(HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getDiseasesListPdf(), request);
+	}
+
+	@GetMapping("/reports/pharmaceuticalAMC")
+	public ResponseEntity<byte[]> printPharmaceuticalAMC(
+		HttpServletRequest request,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
+		@RequestParam(defaultValue = "false") boolean toExcel,
+		@RequestParam(required = false) Locale locale
+	) throws OHServiceException, IOException {
+
+		if (date == null) {
+			date = LocalDateTime.now();
+		}
+
+		String jasperFileName = "PharmaceuticalAMC";
+
+		JasperReportResultDto resultDto;
+
+		if (toExcel) {
+			Path tempFile = Files.createTempFile("PharmaceuticalAMC_", ".xlsx");
+			reportsManager.getGenericReportPharmaceuticalAMCExcel(date, jasperFileName, tempFile.toAbsolutePath().toString(), locale);
+
+			return getReport(new JasperReportResultDto(), request);
+
+		} else {
+			resultDto = reportsManager.GenericReportPharmaceuticalAMCPdf(date, jasperFileName, locale);
+			return getReport(resultDto, request);
+		}
 	}
 
 	private ResponseEntity<byte[]> getReport(
