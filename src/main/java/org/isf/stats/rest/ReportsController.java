@@ -25,23 +25,27 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.poi.util.IOUtils;
+import org.isf.medicals.manager.MedicalBrowsingManager;
+import org.isf.medicals.model.Medical;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.isf.ward.manager.WardBrowserManager;
+import org.isf.ward.model.Ward;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,9 +57,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ReportsController {
 
 	private final JasperReportsManager reportsManager;
+	private final MedicalBrowsingManager medicalBrowsingManager;
+	private final WardBrowserManager wardBrowserManager;
 
-	public ReportsController(JasperReportsManager reportsManager) {
+	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
+
+	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
 		this.reportsManager = reportsManager;
+		this.medicalBrowsingManager = medicalBrowsingManager;
+		this.wardBrowserManager = wardBrowserManager;
 	}
 
 	@GetMapping("/reports/exams-list")
@@ -66,6 +76,28 @@ public class ReportsController {
 	@GetMapping("/reports/diseases-list")
 	public ResponseEntity<byte[]> printDiseasesListPdf(HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getDiseasesListPdf(), request);
+	}
+
+	@GetMapping("/reports/pharmaceuticalStockCard")
+	public ResponseEntity<byte[]> printPharmaceuticalStockCardPdf(
+		@RequestParam String exportFileName,
+		@RequestParam LocalDateTime dateFrom,
+		@RequestParam LocalDateTime dateTo,
+		@RequestParam Integer medicalCode,
+		@RequestParam String wardCode,
+		HttpServletRequest request
+	) throws  OHServiceException, IOException {
+		Medical medical = medicalBrowsingManager.getMedical(medicalCode);
+		if (medical == null) {
+			throw new OHAPIException(new OHExceptionMessage("Medical not found."), HttpStatus.NOT_FOUND);
+		}
+
+		Ward ward = wardBrowserManager.findWard(wardCode);
+		if (ward == null) {
+			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
+		}
+
+		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
 	}
 
 	private ResponseEntity<byte[]> getReport(
