@@ -60,6 +60,8 @@ public class ReportsController {
 	private final MedicalBrowsingManager medicalBrowsingManager;
 	private final WardBrowserManager wardBrowserManager;
 
+	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
+
 	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
 		this.reportsManager = reportsManager;
 		this.medicalBrowsingManager = medicalBrowsingManager;
@@ -95,7 +97,7 @@ public class ReportsController {
 			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
 		}
 
-		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf("ProductLedger", exportFileName, dateFrom, dateTo, medical, ward), request);
+		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
 	}
 
 	private ResponseEntity<byte[]> getReport(
