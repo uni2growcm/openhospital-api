@@ -61,6 +61,7 @@ public class ReportsController {
 	private final WardBrowserManager wardBrowserManager;
 
 	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
+	private static final String PHARMACEUTICAL_STOCK_WARD_REPORT = "PharmaceuticalStockWard";
 
 	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
 		this.reportsManager = reportsManager;
@@ -98,6 +99,20 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
+	}
+
+	@GetMapping("/reports/pharmaceuticalStockWard")
+	public ResponseEntity<byte[]> printPharmaceuticalStockWardPdf(
+		@RequestParam LocalDateTime date,
+		@RequestParam String wardCode,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+		Ward ward = wardBrowserManager.findWard(wardCode);
+		if (ward == null) {
+			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
+		}
+
+		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
 	}
 
 	private ResponseEntity<byte[]> getReport(
