@@ -139,11 +139,6 @@ public class ReportsController {
 		HttpServletRequest request,
 		@RequestParam(required = false) LocalDateTime date
 	) throws OHServiceException, IOException {
-
-		if (date == null) {
-			date = LocalDateTime.now();
-		}
-
 		return getReport(reportsManager.GenericReportPharmaceuticalAMCPdf(date, PHARMACEUTICAL_AMC_REPORT, request.getLocale()), request);
 	}
 	
