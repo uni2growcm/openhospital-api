@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
@@ -141,6 +142,18 @@ public class ReportsController {
 
 		return ResponseEntity.ok()
 			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalOrder.pdf")
+			.contentType(MediaType.APPLICATION_PDF)
+			.body(pdfBytes);
+	}
+
+	@GetMapping("/reports/pharmaceuticalExpiration")
+	public ResponseEntity<byte[]> printPharmaceuticalExpirationPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request) throws OHServiceException, JRException {
+		JasperReportResultDto result = reportsManager.getGenericReportFromDateToDate2Pdf(fromDate, toDate, "PharmaceuticalExpiration", request.getLocale());
+
+		byte[] pdfBytes = JasperExportManager.exportReportToPdf(result.getJasperPrint());
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalExpiration.pdf")
 			.contentType(MediaType.APPLICATION_PDF)
 			.body(pdfBytes);
 	}
