@@ -70,6 +70,7 @@ public class ReportsController {
 	private final WardBrowserManager wardBrowserManager;
 
 	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
+	private static final String PHARMACEUTICAL_AMC_REPORT = "PharmaceuticalAMC";
 	private static final String PHARMACEUTICAL_STOCK_WARD_REPORT = "PharmaceuticalStockWard";
 
 	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
@@ -109,7 +110,7 @@ public class ReportsController {
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
 	}
-
+		
 	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
 	public ResponseEntity<byte[]> printPharmaceuticalStockPdf(HttpServletRequest request, @RequestParam String option, @RequestParam LocalDateTime date, @RequestParam(name = "groupBy", defaultValue = "") String groupBy, @RequestParam(name="sortBy", defaultValue = "") String sortBy, @RequestParam(name = "filter", defaultValue = "") String filter)
 		throws OHServiceException, IOException {
@@ -134,6 +135,14 @@ public class ReportsController {
 		}
 	}
 
+	@GetMapping("/reports/pharmaceuticalAMC")
+	public ResponseEntity<byte[]> printPharmaceuticalAMC(
+		HttpServletRequest request,
+		@RequestParam(required = false) LocalDateTime date
+	) throws OHServiceException, IOException {
+		return getReport(reportsManager.GenericReportPharmaceuticalAMCPdf(date, PHARMACEUTICAL_AMC_REPORT, request.getLocale()), request);
+	}
+	
 	@GetMapping("/reports/pharmaceuticalOrder")
 	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
 		JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", request.getLocale());
