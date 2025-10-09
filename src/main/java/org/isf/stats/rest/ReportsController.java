@@ -27,10 +27,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Locale;
-import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
 import org.apache.poi.util.IOUtils;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
@@ -69,6 +70,7 @@ public class ReportsController {
 
 	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
 	private static final String PHARMACEUTICAL_AMC_REPORT = "PharmaceuticalAMC";
+	private static final String PHARMACEUTICAL_STOCK_WARD_REPORT = "PharmaceuticalStockWard";
 
 	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
 		this.reportsManager = reportsManager;
@@ -120,7 +122,7 @@ public class ReportsController {
 		if (filter.isEmpty()) {
 			filter = null;
 		}
-        Locale locale = request.getLocale();
+		Locale locale = request.getLocale();
 		if (EnumOption.ONLY_QUANTITY.toString().equalsIgnoreCase(option)) {
 			return getReport(reportsManager.getGenericReportPharmaceuticalStockPdf(
 				date, GeneralData.PHARMACEUTICALSTOCK, filter, groupBy, sortBy,locale
@@ -143,6 +145,32 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.GenericReportPharmaceuticalAMCPdf(date, PHARMACEUTICAL_AMC_REPORT, request.getLocale()), request);
+	}
+	
+	@GetMapping("/reports/pharmaceuticalOrder")
+	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
+		JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", request.getLocale());
+
+		byte[] pdfBytes = JasperExportManager.exportReportToPdf(result.getJasperPrint());
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalOrder.pdf")
+			.contentType(MediaType.APPLICATION_PDF)
+			.body(pdfBytes);
+	}
+
+	@GetMapping("/reports/pharmaceuticalStockWard")
+	public ResponseEntity<byte[]> printPharmaceuticalStockWardPdf(
+		@RequestParam LocalDateTime date,
+		@RequestParam String wardCode,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+		Ward ward = wardBrowserManager.findWard(wardCode);
+		if (ward == null) {
+			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
+		}
+
+		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
 	}
 
 	private ResponseEntity<byte[]> getReport(
