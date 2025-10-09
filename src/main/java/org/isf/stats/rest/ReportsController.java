@@ -156,15 +156,8 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/pharmaceuticalExpiration")
-	public ResponseEntity<byte[]> printPharmaceuticalExpirationPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request) throws OHServiceException, JRException {
-		JasperReportResultDto result = reportsManager.getGenericReportFromDateToDate2Pdf(fromDate, toDate, "PharmaceuticalExpiration", request.getLocale());
-
-		byte[] pdfBytes = JasperExportManager.exportReportToPdf(result.getJasperPrint());
-
-		return ResponseEntity.ok()
-			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalExpiration.pdf")
-			.contentType(MediaType.APPLICATION_PDF)
-			.body(pdfBytes);
+	public ResponseEntity<byte[]> printPharmaceuticalExpirationPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request) throws OHServiceException, JRException, IOException {
+		return getReport(reportsManager.getGenericReportFromDateToDate2Pdf(fromDate, toDate, "PharmaceuticalExpiration", request.getLocale()), request);
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWard")
