@@ -26,15 +26,20 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
 import org.apache.poi.util.IOUtils;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
+import org.isf.generaldata.GeneralData;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
+import org.isf.stats.rest.model.EnumOption;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.ward.manager.WardBrowserManager;
@@ -45,7 +50,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -99,6 +107,42 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
+	}
+
+	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
+	public ResponseEntity<byte[]> printPharmaceuticalStockPdf(HttpServletRequest request, @RequestParam String option, @RequestParam LocalDateTime date, @RequestParam(name = "groupBy", defaultValue = "") String groupBy, @RequestParam(name="sortBy", defaultValue = "") String sortBy, @RequestParam(name = "filter", defaultValue = "") String filter)
+		throws OHServiceException, IOException {
+		if (groupBy.isEmpty()) {
+			groupBy = null;
+		}
+		if (sortBy.isEmpty()) {
+			sortBy = null;
+		}
+		if (filter.isEmpty()) {
+			filter = null;
+		}
+		Locale locale = request.getLocale();
+		if (EnumOption.ONLY_QUANTITY.toString().equalsIgnoreCase(option)) {
+			return getReport(reportsManager.getGenericReportPharmaceuticalStockPdf(
+				date, GeneralData.PHARMACEUTICALSTOCK, filter, groupBy, sortBy,locale
+			), request);
+		} else {
+			return getReport(reportsManager.getGenericReportPharmaceuticalStockPdf(
+				date, GeneralData.PHARMACEUTICALSTOCKLOT, filter, groupBy, sortBy,locale
+			), request);
+		}
+	}
+
+	@GetMapping("/reports/pharmaceuticalOrder")
+	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
+		JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", request.getLocale());
+
+		byte[] pdfBytes = JasperExportManager.exportReportToPdf(result.getJasperPrint());
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalOrder.pdf")
+			.contentType(MediaType.APPLICATION_PDF)
+			.body(pdfBytes);
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWard")
