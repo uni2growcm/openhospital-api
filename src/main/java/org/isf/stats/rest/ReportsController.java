@@ -72,6 +72,7 @@ public class ReportsController {
 	private final WardBrowserManager wardBrowserManager;
 
 	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
+	private static final String PHARMACEUTICAL_AMC_REPORT = "PharmaceuticalAMC";
 	private static final String PHARMACEUTICAL_STOCK_WARD_REPORT = "PharmaceuticalStockWard";
 
 	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
@@ -170,6 +171,14 @@ public class ReportsController {
 				request
 			);
 		}
+	}
+
+	@GetMapping("/reports/pharmaceuticalAMC")
+	public ResponseEntity<byte[]> printPharmaceuticalAMC(
+		HttpServletRequest request,
+		@RequestParam(required = false) LocalDateTime date
+	) throws OHServiceException, IOException {
+		return getReport(reportsManager.GenericReportPharmaceuticalAMCPdf(date, PHARMACEUTICAL_AMC_REPORT, request.getLocale()), request);
 	}
 
 	@GetMapping("/reports/pharmaceuticalOrder")
