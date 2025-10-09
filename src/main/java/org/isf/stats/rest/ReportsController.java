@@ -28,9 +28,12 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
 import org.apache.poi.util.IOUtils;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
@@ -119,7 +122,7 @@ public class ReportsController {
 		if (filter.isEmpty()) {
 			filter = null;
 		}
-Locale locale = request.getLocale();
+		Locale locale = request.getLocale();
 		if (EnumOption.ONLY_QUANTITY.toString().equalsIgnoreCase(option)) {
 			return getReport(reportsManager.getGenericReportPharmaceuticalStockPdf(
 				date, GeneralData.PHARMACEUTICALSTOCK, filter, groupBy, sortBy,locale
@@ -129,6 +132,18 @@ Locale locale = request.getLocale();
 				date, GeneralData.PHARMACEUTICALSTOCKLOT, filter, groupBy, sortBy,locale
 			), request);
 		}
+	}
+
+	@GetMapping("/reports/pharmaceuticalOrder")
+	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
+		JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", request.getLocale());
+
+		byte[] pdfBytes = JasperExportManager.exportReportToPdf(result.getJasperPrint());
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalOrder.pdf")
+			.contentType(MediaType.APPLICATION_PDF)
+			.body(pdfBytes);
 	}
 
 	private ResponseEntity<byte[]> getReport(
