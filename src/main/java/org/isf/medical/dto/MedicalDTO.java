@@ -21,9 +21,12 @@
  */
 package org.isf.medical.dto;
 
+import org.isf.medicalstock.dto.LotDTO;
 import org.isf.medtype.dto.MedicalTypeDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
 
 public class MedicalDTO {
 
@@ -54,6 +57,9 @@ public class MedicalDTO {
 	@Schema(description = "The min quantity of the medical", example = "15")
 	private double minqty;
 
+	@Schema(description = "The lot of the medical")
+	private LotDTO lot;
+
 	@Schema(description = "Lock", example = "0")
 	private int lock;
 
@@ -75,6 +81,10 @@ public class MedicalDTO {
 		this.inqty = inqty;
 		this.outqty = outqty;
 	}
+
+	public LotDTO getLot() {return lot;}
+
+	public void setLot(LotDTO lot) {this.lot = lot;}
 
 	public int getLock() {
 		return lock;
