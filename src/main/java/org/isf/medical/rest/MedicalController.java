@@ -135,13 +135,13 @@ public class MedicalController {
 	 * if such a movement exists.
 	 * </p>
 	 *
-	 * @return A list of {@link MedicalDTO} objects where each medical may have its lot set from the latest movement.
+	 * @return A list of {@link MedicalDTO} objects where each medical may have its lot set from the movement.
 	 * @throws OHServiceException When failed to retrieve medicals or movements.
 	 *
 	 */
 	@GetMapping(value = "/medicals/mov")
 	public List<MedicalDTO> getMedicalsMov() throws OHServiceException {
-		LOGGER.info("Retrieving all medicals with one lot from movements (DTO-based)...");
+		LOGGER.info("Retrieving all medicals with the lot having the nearest expiration date from movements (DTO-based)...");
 
 		List<Medical> medicals = medicalManager.getMedicals();
 		List<Movement> movements = movementManager.getMovements();
@@ -153,13 +153,18 @@ public class MedicalController {
 			movementDTOs.stream()
 				.filter(mov -> mov.getMedical() != null
 					&& mov.getMedical().getCode().equals(medDTO.getCode())
-					&& mov.getLot() != null)
-				.max(Comparator.comparing(MovementDTO::getDate))
-				.ifPresent(lastMov -> medDTO.setLot(lastMov.getLot()));
+					&& mov.getLot() != null
+					&& mov.getLot().getDueDate() != null
+					&& mov.getLot().getDueDate().isAfter(java.time.LocalDateTime.now()))
+				.min(Comparator.comparing(mov -> mov.getLot().getDueDate()))
+				.ifPresent(nearestMov -> {
+					medDTO.setLot(nearestMov.getLot());
+				});
 		}
 
 		return medicalDTOs;
 	}
+
 
 	/**
 	 * Returns all the medicals with the specified criteria.
