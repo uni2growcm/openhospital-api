@@ -21,8 +21,10 @@
  */
 package org.isf.stats.rest;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -41,6 +43,7 @@ import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
 import org.isf.stats.rest.model.EnumOption;
+import org.isf.utils.exception.OHReportException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.ward.manager.WardBrowserManager;
@@ -172,6 +175,30 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
+	}
+
+	@GetMapping("/reports/pharmaceuticalStockWardExcel")
+	public ResponseEntity<?> printPharmaceuticalStockWardExcel(
+		@RequestParam LocalDateTime date,
+		@RequestParam String wardCode,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+		Ward ward = wardBrowserManager.findWard(wardCode);
+		if (ward == null) {
+			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
+		}
+
+		File tempFile = File.createTempFile(PHARMACEUTICAL_STOCK_WARD_REPORT, ".xlsx");
+		String exportPath = tempFile.getAbsolutePath();
+
+		reportsManager.getGenericReportPharmaceuticalStockWardExcel(PHARMACEUTICAL_STOCK_WARD_REPORT, exportPath, ward, date);
+
+		byte[] fileContent = Files.readAllBytes(tempFile.toPath());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+		System.out.println(tempFile.toPath());
+		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
 	}
 
 	private ResponseEntity<byte[]> getReport(
