@@ -43,7 +43,6 @@ import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
 import org.isf.stats.rest.model.EnumOption;
-import org.isf.utils.exception.OHReportException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.ward.manager.WardBrowserManager;
@@ -191,13 +190,13 @@ public class ReportsController {
 		File tempFile = File.createTempFile(PHARMACEUTICAL_STOCK_WARD_REPORT, ".xlsx");
 		String exportPath = tempFile.getAbsolutePath();
 
-		reportsManager.getGenericReportPharmaceuticalStockWardExcel(PHARMACEUTICAL_STOCK_WARD_REPORT, exportPath, ward, date);
+		reportsManager.getGenericReportPharmaceuticalStockWardExcel(PHARMACEUTICAL_STOCK_WARD_REPORT, exportPath, wardCode, date);
 
 		byte[] fileContent = Files.readAllBytes(tempFile.toPath());
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentDispositionFormData("attachment", "pharmaceutical_stock_ward.xlsx");
 
-		System.out.println(tempFile.toPath());
 		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
 	}
 
