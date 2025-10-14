@@ -514,32 +514,6 @@ paths:
                 $ref: "#/components/schemas/SupplierDTO"
       security:
       - bearerAuth: []
-  /settings/{code}:
-    put:
-      tags:
-      - Settings
-      operationId: updateSetting
-      parameters:
-      - name: code
-        in: path
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateSettingDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SettingDTO"
-      security:
-      - bearerAuth: []
   /pricesothers/{id}:
     put:
       tags:
@@ -2527,20 +2501,6 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
-  /settings/reset:
-    post:
-      tags:
-      - Settings
-      operationId: resetAllSettings
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: boolean
-      security:
-      - bearerAuth: []
   /pricesothers:
     get:
       tags:
@@ -3847,51 +3807,69 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
-  /settings:
+  /reports/pharmaceuticalStock:
     get:
       tags:
-      - Settings
-      operationId: getAllSettings
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SettingDTO"
-      security:
-      - bearerAuth: []
-  /settings/{id}:
-    get:
-      tags:
-      - Settings
-      operationId: getSettingById
+      - Reports
+      operationId: printPharmaceuticalStockPdf
       parameters:
-      - name: id
-        in: path
+      - name: option
+        in: query
         required: true
         schema:
-          type: integer
-          format: int32
+          type: string
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      - name: filter
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
       responses:
         "200":
           description: OK
           content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
             application/json:
               schema:
-                $ref: "#/components/schemas/SettingDTO"
+                type: string
+                format: byte
       security:
       - bearerAuth: []
-  /settings/code/{code}:
+  /reports/pharmaceuticalStockWard:
     get:
       tags:
-      - Settings
-      operationId: getSettingByCode
+      - Reports
+      operationId: printPharmaceuticalStockWardPdf
       parameters:
-      - name: code
-        in: path
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: wardCode
+        in: query
         required: true
         schema:
           type: string
@@ -3901,7 +3879,117 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SettingDTO"
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalStockCard:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalStockCardPdf
+      parameters:
+      - name: exportFileName
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: medicalCode
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: wardCode
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalOrder:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalOrderPdf
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalExpiration:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalExpirationPdf
+      parameters:
+      - name: fromDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: toDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalAMC:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalAMC
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: byte
       security:
       - bearerAuth: []
   /reports/exams-list:
@@ -6380,9 +6468,9 @@ components:
           example: 0
         female:
           type: boolean
-        opd:
-          type: boolean
         male:
+          type: boolean
+        opd:
           type: boolean
         pharmacy:
           type: boolean
@@ -6812,77 +6900,6 @@ components:
       required:
       - supId
       - supName
-    UpdateSettingDTO:
-      type: object
-      properties:
-        value:
-          type: string
-          description: The value of the setting
-          example: "FALSE"
-    SettingDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-          description: Setting ID
-          example: 1
-        code:
-          type: string
-          description: Setting code
-          example: AUTOMATICLOT_IN
-          maxLength: 50
-          minLength: 1
-        category:
-          type: string
-          description: Setting category
-          enum:
-          - general
-          - telemetry
-          - security
-          - imaging
-          - accounting
-          - reports
-          - pharmacy
-          - gui
-          - application
-          - integration
-          example: application
-        type:
-          type: string
-          description: value type
-          enum:
-          - bool
-          - number
-          - text
-          - select
-          example: bool
-        valueOptions:
-          type: string
-          description: Comma-separated list of possible values
-          maxLength: 500
-        defaultValue:
-          type: string
-          description: Default value
-          example: "TRUE"
-          minLength: 1
-        value:
-          type: string
-          description: The value of the setting
-          example: "FALSE"
-        description:
-          type: string
-          description: Description
-          maxLength: 500
-        needRestart:
-          type: boolean
-          description: Whether the app needs restart after the setting has been modified
-          example: true
-      required:
-      - category
-      - id
-      - needRestart
-      - type
     PricesOthersDTO:
       type: object
       description: Class representing a price others
@@ -7581,6 +7598,30 @@ components:
       required:
       - code
       - description
+    LotDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: The lot's code
+          example: LT001
+          maxLength: 50
+        preparationDate:
+          type: string
+          description: The preparation date
+          example: 2020-06-24
+        dueDate:
+          type: string
+          description: The due date
+          example: 2021-06-24
+        cost:
+          type: number
+          description: The lot's code
+          example: 750
+      required:
+      - code
+      - dueDate
+      - preparationDate
     MedicalDTO:
       type: object
       properties:
@@ -7627,6 +7668,11 @@ components:
           format: double
           description: The min quantity of the medical
           example: 15
+        lots:
+          type: array
+          description: The lots associated to the medical
+          items:
+            $ref: "#/components/schemas/LotDTO"
         lock:
           type: integer
           format: int32
@@ -8212,30 +8258,6 @@ components:
           description: "The sms flag: true if sms need to be sent to patient, false\
             \ otherwise"
           example: false
-    LotDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: The lot's code
-          example: LT001
-          maxLength: 50
-        preparationDate:
-          type: string
-          description: The preparation date
-          example: 2020-06-24
-        dueDate:
-          type: string
-          description: The due date
-          example: 2021-06-24
-        cost:
-          type: number
-          description: The lot's code
-          example: 750
-      required:
-      - code
-      - dueDate
-      - preparationDate
     MovementDTO:
       type: object
       properties:
@@ -8554,6 +8576,9 @@ components:
         medical:
           $ref: "#/components/schemas/MedicalDTO"
           description: The medical
+        lot:
+          $ref: "#/components/schemas/LotDTO"
+          description: The medical lot
       required:
       - medical
       - ward

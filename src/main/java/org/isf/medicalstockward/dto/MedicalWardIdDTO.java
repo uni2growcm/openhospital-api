@@ -50,6 +50,11 @@ public class MedicalWardIdDTO {
 		this.medical = medical;
 	}
 
+	public MedicalWardIdDTO(WardDTO ward, MedicalDTO medical, LotDTO lot) {
+		this(ward, medical);
+		this.lot = lot;
+	}
+
 	public WardDTO getWard() {
 		return this.ward;
 	}
