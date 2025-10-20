@@ -129,10 +129,10 @@ public class PatientDTO {
 	@Schema(description = "Consensus service flag", example = "true")
 	private boolean consensusServiceFlag;
 
-	@Schema(description = "Commune", example = "")
+	@Schema(description = "Commune", example = "Savalou")
 	private String commune;
 
-	@Schema(description = "Ethnic", example = "")
+	@Schema(description = "Ethnic", example = "Adja")
 	private String ethnic;
 
 	@Schema(description = "Father occupation", example = "Doctor")
@@ -155,6 +155,15 @@ public class PatientDTO {
 
 	@Schema(description = "Folder number", example = "30")
 	private Integer folderNumber;
+
+	@Schema(description = "Patient schooling level", example = "No schooling")
+	private String schoolingLevel;
+
+	@Schema(description = "Father schooling level", example = "Secondary")
+	private String fatherSchoolingLevel;
+
+	@Schema(description = "Mother schooling level", example = "Primary")
+	private String motherSchoolingLevel;
 
 	public boolean isConsensusFlag() {
 		return consensusFlag;
@@ -462,5 +471,29 @@ public class PatientDTO {
 
 	public void setFolderNumber(Integer folderNumber) {
 		this.folderNumber = folderNumber;
+	}
+
+	public String getSchoolingLevel() {
+		return schoolingLevel;
+	}
+
+	public void setSchoolingLevel(String schoolingLevel) {
+		this.schoolingLevel = schoolingLevel;
+	}
+
+	public String getFatherSchoolingLevel() {
+		return fatherSchoolingLevel;
+	}
+
+	public void setFatherSchoolingLevel(String fatherSchoolingLevel) {
+		this.fatherSchoolingLevel = fatherSchoolingLevel;
+	}
+
+	public String getMotherSchoolingLevel() {
+		return motherSchoolingLevel;
+	}
+
+	public void setMotherSchoolingLevel(String motherSchoolingLevel) {
+		this.motherSchoolingLevel = motherSchoolingLevel;
 	}
 }
