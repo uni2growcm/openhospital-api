@@ -6951,13 +6951,13 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
-          type: boolean
-        male:
+        opd:
           type: boolean
         female:
           type: boolean
-        opd:
+        male:
+          type: boolean
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -7825,11 +7825,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
@@ -8314,7 +8314,16 @@ components:
           type: string
         neonatalPeriod:
           type: string
-        antiMalarialProphylaxis:
+        previousHospitalization:
+          type: string
+        father:
+          type: string
+        mother:
+          type: string
+        siblings:
+          type: integer
+          format: int32
+        otherUsefulInformation:
           type: string
         diet:
           type: string
