@@ -6951,13 +6951,13 @@ components:
           format: int32
           description: lock
           example: 0
-        opd:
+        pharmacy:
           type: boolean
         female:
           type: boolean
         male:
           type: boolean
-        pharmacy:
+        opd:
           type: boolean
       required:
       - beds
@@ -8263,26 +8263,58 @@ components:
           format: int32
         patient:
           $ref: "#/components/schemas/PatientDTO"
-          description: The patient identifier linked to this medical history
+          description: The patient linked to this medical history
         siblingRank:
           type: string
         termPregnancy:
           type: string
         deliveryMode:
           type: string
+        reasonMode:
+          type: string
         apgarScore:
           type: string
         birthWeight:
           type: number
           format: double
-        vaccinationState:
+        vaccinationStatePev:
           type: string
-        antiMalarialProphylaxis:
+        vaccinationStateNoPev:
+          type: string
+        antiMalarialProphylaxisMilda:
+          type: string
+        antiMalarialProphylaxisVap:
+          type: string
+        antiMalarialProphylaxisOthers:
+          type: string
+        surgicalProcedure:
+          type: boolean
+        surgicalProcedureCondition:
+          type: string
+        surgicalProcedureType:
+          type: string
+        surgicalProcedureDate:
+          type: string
+          format: date-time
+        diversification:
+          type: string
+        neonatalPeriod:
+          type: string
+        previousHospitalization:
+          type: string
+        father:
+          type: string
+        mother:
+          type: string
+        siblings:
+          type: integer
+          format: int32
+        otherUsefulInformation:
           type: string
         diet:
           type: string
         deParasitization:
-          type: string
+          type: boolean
         psychomotorDev:
           type: string
         somaticGrowth:
@@ -8316,11 +8348,11 @@ components:
           type: string
           format: date-time
           description: Medical history performed date
-          example: 2025-08-26 16:15:58
+          example: 2025-08-26T16:15:58
         lock:
           type: integer
           format: int32
-          description: Lock
+          description: Optimistic lock value
           example: 0
       required:
       - patient
