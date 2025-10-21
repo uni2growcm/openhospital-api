@@ -29,58 +29,125 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Class representing the medical history of a patient")
 public class MedicalHistoryDTO {
 
+	@Schema(description = "Unique identifier of the medical history", example = "1")
 	private Integer id;
 
 	@NotNull
 	@Schema(description = "The patient linked to this medical history")
 	private PatientDTO patient;
 
+	@Schema(description = "Rank of the patient among siblings", example = "2")
 	private String siblingRank;
+
+	@Schema(description = "Pregnancy term description", example = "FULL TERM", maxLength = 50)
 	private String termPregnancy;
+
+	@Schema(description = "Mode of delivery", example = "CESAREAN", maxLength = 50)
 	private String deliveryMode;
+
+	@Schema(description = "Reason for the delivery mode", example = "Fetal distress", maxLength = 100)
 	private String reasonMode;
+
+	@Schema(description = "Apgar score of the newborn", example = "8/10", maxLength = 10)
 	private String apgarScore;
+
+	@Schema(description = "Birth weight of the patient (kg)", example = "3.2")
 	private Double birthWeight;
 
+	@Schema(description = "Vaccination state for PEV vaccines", example = "Up to date")
 	private String vaccinationStatePev;
+
+	@Schema(description = "Vaccination state for non-PEV vaccines", example = "BCG pending")
 	private String vaccinationStateNoPev;
 
+	@Schema(description = "Use of Milda for anti-malarial prophylaxis", example = "YES")
 	private String antiMalarialProphylaxisMilda;
+
+	@Schema(description = "Use of VAP for anti-malarial prophylaxis", example = "NO")
 	private String antiMalarialProphylaxisVap;
+
+	@Schema(description = "Other anti-malarial prophylaxis methods used", example = "Herbal medicine")
 	private String antiMalarialProphylaxisOthers;
 
+	@Schema(description = "Indicates if a surgical procedure has been performed", example = "true")
 	private Boolean surgicalProcedure;
+
+	@Schema(description = "Condition leading to surgery", example = "Appendicitis")
 	private String surgicalProcedureCondition;
+
+	@Schema(description = "Type of surgical procedure performed", example = "Appendectomy")
 	private String surgicalProcedureType;
+
+	@Schema(description = "Date of the surgical procedure", example = "2024-09-15T08:30:00")
 	private LocalDateTime surgicalProcedureDate;
 
+	@Schema(description = "Details about food diversification", example = "Started at 6 months")
 	private String diversification;
+
+	@Schema(description = "Description of neonatal period condition", example = "Normal")
 	private String neonatalPeriod;
+
+	@Schema(description = "Previous hospitalizations details", example = "Hospitalized in 2023 for malaria")
 	private String previousHospitalization;
+
+	@Schema(description = "Father", example = "John Doe")
 	private String father;
+
+	@Schema(description = "Mother", example = "Jane Doe")
 	private String mother;
-	private Integer siblings;
+
+	@Schema(description = "Siblings", example = "Jone")
+	private String siblings;
+
+	@Schema(description = "Any other useful medical or personal information", example = "History of asthma in family")
 	private String otherUsefulInformation;
 
+	@Schema(description = "Patient's diet information", example = "Vegetarian diet")
 	private String diet;
+
+	@Schema(description = "Indicates if the patient has undergone de-parasitization", example = "true")
 	private Boolean deParasitization;
+
+	@Schema(description = "Psychomotor development status", example = "Normal development")
 	private String psychomotorDev;
+
+	@Schema(description = "Somatic growth status", example = "Normal growth")
 	private String somaticGrowth;
 
+	@Schema(description = "Indicates if the patient receives iron supplements", example = "true")
 	private Boolean ironSupplement;
+
+	@Schema(description = "Indicates if the patient receives folic acid supplements", example = "false")
 	private Boolean folicAcidSupplement;
+
+	@Schema(description = "Indicates if the patient receives vitamin A supplements", example = "true")
 	private Boolean vitASupplement;
+
+	@Schema(description = "Details of any other supplements used", example = "Zinc and calcium")
 	private String otherSupplements;
 
+	@Schema(description = "Indicates if the patient has received blood transfusions", example = "false")
 	private Boolean transfusion;
+
+	@Schema(description = "Date of the last blood transfusion", example = "2023-12-01T14:00:00")
 	private LocalDateTime lastTransfusionDate;
 
+	@Schema(description = "Indicates if the patient has sickle cell disease", example = "false")
 	private Boolean sickleCell;
+
+	@Schema(description = "Indicates if the patient has a drug allergy", example = "true")
 	private Boolean drugAllergy;
+
+	@Schema(description = "Details about the allergy", example = "Allergic to penicillin")
 	private String allergyPrecision;
 
+	@Schema(description = "Information about hemolysis or related conditions", example = "None")
 	private String hemylosis;
+
+	@Schema(description = "Other personal pathologies", example = "Hypertension")
 	private String otherPersonalPathologies;
+
+	@Schema(description = "Other family pathologies", example = "Diabetes")
 	private String otherFamilyPathologies;
 
 	@Schema(description = "Medical history performed date", example = "2025-08-26T16:15:58")
@@ -265,11 +332,11 @@ public class MedicalHistoryDTO {
 		this.mother = mother;
 	}
 
-	public Integer getSiblings() {
+	public String getSiblings() {
 		return siblings;
 	}
 
-	public void setSiblings(Integer siblings) {
+	public void setSiblings(String siblings) {
 		this.siblings = siblings;
 	}
 
