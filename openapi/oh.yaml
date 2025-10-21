@@ -6953,9 +6953,9 @@ components:
           example: 0
         opd:
           type: boolean
-        male:
-          type: boolean
         female:
+          type: boolean
+        male:
           type: boolean
         pharmacy:
           type: boolean
@@ -7786,6 +7786,12 @@ components:
           type: number
           format: float
           description: Weight
+        alertReceived:
+          type: boolean
+        referenceSheet:
+          type: boolean
+        qualifiedAgent:
+          type: boolean
         ctrlDate1:
           type: string
           format: date-time
@@ -7825,11 +7831,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
