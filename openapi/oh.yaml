@@ -4595,6 +4595,38 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
+  /patients/ethnics:
+    get:
+      tags:
+      - Patients
+      operationId: getPatientEthnics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+      security:
+      - bearerAuth: []
+  /patients/communes:
+    get:
+      tags:
+      - Patients
+      operationId: getPatientCommunes
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+      security:
+      - bearerAuth: []
   /patients/cities:
     get:
       tags:
@@ -6953,9 +6985,9 @@ components:
           example: 0
         opd:
           type: boolean
-        female:
-          type: boolean
         male:
+          type: boolean
+        female:
           type: boolean
         pharmacy:
           type: boolean
