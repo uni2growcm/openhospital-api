@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.isf.patient.dto.PatientDTO;
+import org.isf.users.dto.UserDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -68,12 +69,22 @@ public class ConditioningDTO {
 	)
 	private List<String> conditionAtAdmission;
 
-	@Schema(description = "Conditioning tdr ", example = "sonde")
-	private String tdr;
+	@Schema(description = "Conditioning malaria ", example = "sonde")
+	private String malaria;
+
+	@Schema(description = "Conditioning HIV test ", example = "INDETERMINATE")
+	private String hivTest;
+
+	@Schema(description = "Conditioning blood glucose level ", example = "5.6")
+	private Double bloodGlucoseLevel;
 
 	@NotNull
 	@Schema(description = "patient", example = "22")
 	private PatientDTO patient;
+
+	@NotNull
+	@Schema(description = "user", example = "2")
+	private UserDTO performedBy;
 
 	@NotNull
 	@Schema(description = "Conditioning date", example = "String")
@@ -163,9 +174,17 @@ public class ConditioningDTO {
 
 	public void setConditionAtAdmission(List<String> conditionAtAdmission) {this.conditionAtAdmission = conditionAtAdmission;}
 
-	public String getTdr() {return tdr;}
+	public String getMalaria() {return malaria;}
 
-	public void setTdr(String tdr) {this.tdr = tdr;}
+	public void setMalaria(String malaria) {this.malaria = malaria;}
+
+	public String getHivTest() {return hivTest;}
+
+	public void setHivTest(String hivTest) {this.hivTest = hivTest;}
+
+	public Double getBloodGlucoseLevel() {return bloodGlucoseLevel;}
+
+	public void setBloodGlucoseLevel(Double tdr) {this.bloodGlucoseLevel = bloodGlucoseLevel;}
 
 	public LocalDateTime getPerformedAt() {
 		return performedAt;
@@ -191,6 +210,14 @@ public class ConditioningDTO {
 		this.patient = patient;
 	}
 
+	public UserDTO getPerformedBy() {
+		return performedBy;
+	}
+
+	public void setPerformedBy(UserDTO user) {
+		this.performedBy = user;
+	}
+
 	public int getLock() {
 		return lock;
 	}
@@ -206,5 +233,4 @@ public class ConditioningDTO {
 	public void setCpap(Boolean cpap) {
 		this.cpap = cpap;
 	}
-	
 }

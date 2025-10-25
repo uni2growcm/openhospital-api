@@ -27,6 +27,8 @@ import org.isf.conditioning.dto.ConditioningDTO;
 import org.isf.conditioning.manager.ConditioningBrowserManager;
 import org.isf.conditioning.mapper.ConditioningMapper;
 import org.isf.conditioning.model.Conditioning;
+import org.isf.menu.manager.UserBrowsingManager;
+import org.isf.menu.model.User;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
 import org.isf.shared.exceptions.OHAPIException;
@@ -60,11 +62,18 @@ public class ConditioningController {
 	private final ConditioningBrowserManager conditioningBrowserManager;
 	private final ConditioningMapper conditioningMapper;
 	private final PatientBrowserManager patientBrowserManager;
+	private final UserBrowsingManager userBrowsingManager;
 
-	public ConditioningController(ConditioningBrowserManager browserManager, ConditioningMapper conditioningMapper, PatientBrowserManager patientBrowserManager) {
+	public ConditioningController(
+		ConditioningBrowserManager browserManager,
+		ConditioningMapper conditioningMapper,
+		PatientBrowserManager patientBrowserManager,
+		UserBrowsingManager userBrowsingManager
+	) {
 		this.conditioningBrowserManager = browserManager;
 		this.conditioningMapper = conditioningMapper;
 		this.patientBrowserManager = patientBrowserManager;
+		this.userBrowsingManager = userBrowsingManager;
 	}
 
 	/**
@@ -85,7 +94,16 @@ public class ConditioningController {
 		} else {
 			throw new OHAPIException(new OHExceptionMessage("Patient is required."), HttpStatus.BAD_REQUEST);
 		}
-		
+
+		if (conditioningDTO.getPerformedBy() != null) {
+			User user = userBrowsingManager.getUserByName(conditioningDTO.getPerformedBy().getUserName());
+			if (user == null) {
+				throw new OHAPIException(new OHExceptionMessage("User not found."), HttpStatus.NOT_FOUND);
+			}
+		} else {
+			throw new OHAPIException(new OHExceptionMessage("User is required."), HttpStatus.BAD_REQUEST);
+		}
+
 		Conditioning newConditioning = conditioningMapper.map2Model(conditioningDTO);
 		Conditioning savedConditioning = conditioningBrowserManager.newConditioning(newConditioning);
 		if (savedConditioning == null) {
@@ -101,7 +119,7 @@ public class ConditioningController {
 	 * @return a list of {@link ConditioningDTO} objects, empty if none found
 	 * @throws OHServiceException When the retrieval operation fails
 	 */
-	@GetMapping("/conditionings/{patientCode}")
+	@GetMapping("/conditionings/patient/{patientCode}")
 	public ResponseEntity<List<ConditioningDTO>> getConditioningByPatientCode(@PathVariable("patientCode") int patientCode) throws OHServiceException {
 		LOGGER.info("get conditioning by patient code : {}", patientCode);
 
@@ -113,6 +131,54 @@ public class ConditioningController {
 			.map(conditioningMapper::map2DTO)
 			.toList();
 		return ResponseEntity.ok(conditioningDTOS);
+	}
+
+	/**
+	 * Retrieve all existing {@link Conditioning} by patient code.
+	 *
+	 * @param userName - the patient code.
+	 * @return a list of {@link ConditioningDTO} objects, empty if none found
+	 * @throws OHServiceException When the retrieval operation fails
+	 */
+	@GetMapping("/conditionings/user/{userName}")
+	public ResponseEntity<List<ConditioningDTO>> getConditioningByUserName(@PathVariable("userName") String userName) throws OHServiceException {
+		LOGGER.info("get conditioning by user name : {}", userName);
+
+		List<Conditioning> conditioningList = conditioningBrowserManager.getConditioningByUserName(userName);
+		if (conditioningList == null) {
+			throw new OHAPIException(new OHExceptionMessage("Conditioning not found."), HttpStatus.NOT_FOUND);
+		}
+		List<ConditioningDTO> conditioningDTOS = conditioningList.stream()
+			.map(conditioningMapper::map2DTO)
+			.toList();
+		return ResponseEntity.ok(conditioningDTOS);
+	}
+
+	/**
+	 * Retrieve all existing {@link Conditioning} by patient code and user name.
+	 *
+	 * @param patientCode - the patient's code.
+	 * @param userName - the user's name.
+	 * @return a list of {@link ConditioningDTO} objects, empty if none found
+	 * @throws OHServiceException When the retrieval operation fails
+	 */
+	@GetMapping("/conditionings/patient/{patientCode}/user/{userName}")
+	public ResponseEntity<List<ConditioningDTO>> getConditioningByPatientCodeAndUserName(
+		@PathVariable("patientCode") int patientCode,
+		@PathVariable("userName") String userName) throws OHServiceException {
+
+		LOGGER.info("Get conditionings by patient code: {} and user name: {}", patientCode, userName);
+
+		List<Conditioning> conditioningList = conditioningBrowserManager.getConditioningByPatientCodeAndUserName(patientCode, userName);
+		if (conditioningList == null || conditioningList.isEmpty()) {
+			throw new OHAPIException(new OHExceptionMessage("No conditionings found for the given patient and user."), HttpStatus.NOT_FOUND);
+		}
+
+		List<ConditioningDTO> conditioningDTOs = conditioningList.stream()
+			.map(conditioningMapper::map2DTO)
+			.toList();
+
+		return ResponseEntity.ok(conditioningDTOs);
 	}
 
 	/**
