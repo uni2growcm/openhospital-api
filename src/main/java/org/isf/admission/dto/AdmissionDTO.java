@@ -158,6 +158,9 @@ public class AdmissionDTO {
 	)
 	private String entryReason;
 
+	@Schema(description = "Transportation", example = "Moto")
+	private String transportation;
+
 	@Schema(description = "User id")
 	private String userID;
 
@@ -457,6 +460,14 @@ public class AdmissionDTO {
 
 	public void setEntryReason(String entryReason) {
 		this.entryReason = entryReason;
+	}
+
+	public String getTransportation() {
+		return transportation;
+	}
+
+	public void setTransportation(String transportation) {
+		this.transportation = transportation;
 	}
 
 	public Boolean getReferenceSheet() {

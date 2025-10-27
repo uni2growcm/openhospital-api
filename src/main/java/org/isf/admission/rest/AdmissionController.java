@@ -366,6 +366,13 @@ public class AdmissionController {
 		return admissionUpdated != null;
 	}
 
+	@GetMapping(value = "/admissions/transportation")
+	public List<String> getAdmissionTransportation() throws OHServiceException {
+		LOGGER.info("Get all transportation for admission.");
+
+		return admissionManager.getTransportation();
+	}
+
 	/**
 	 * Create a new {@link Admission}.
 	 *
