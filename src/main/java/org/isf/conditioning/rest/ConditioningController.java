@@ -119,7 +119,7 @@ public class ConditioningController {
 	 * @return a list of {@link ConditioningDTO} objects, empty if none found
 	 * @throws OHServiceException When the retrieval operation fails
 	 */
-	@GetMapping("/conditionings/patient/{patientCode}")
+	@GetMapping("/conditionings/{patientCode}")
 	public ResponseEntity<List<ConditioningDTO>> getConditioningByPatientCode(@PathVariable("patientCode") int patientCode) throws OHServiceException {
 		LOGGER.info("get conditioning by patient code : {}", patientCode);
 

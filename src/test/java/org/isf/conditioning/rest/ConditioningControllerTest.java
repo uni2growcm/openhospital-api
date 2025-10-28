@@ -172,7 +172,7 @@ public class ConditioningControllerTest {
 	@Test
 	void testGetConditioningByPatientCode_success() throws Exception {
 		int patientCode = 1;
-		String request = "/conditionings/patient/{patientCode}";
+		String request = "/conditionings/{patientCode}";
 
 		Patient patient = PatientHelper.setup();
 		patient.setCode(patientCode);
