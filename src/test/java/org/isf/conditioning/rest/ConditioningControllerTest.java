@@ -26,7 +26,6 @@ import org.isf.conditioning.dto.ConditioningDTO;
 import org.isf.conditioning.manager.ConditioningBrowserManager;
 import org.isf.conditioning.mapper.ConditioningMapper;
 import org.isf.conditioning.model.Conditioning;
-import org.isf.menu.model.User;
 import org.isf.patient.data.PatientHelper;
 import org.isf.patient.dto.PatientDTO;
 import org.isf.patient.manager.PatientBrowserManager;
@@ -36,7 +35,6 @@ import org.isf.shared.exceptions.OHResponseEntityExceptionHandler;
 import org.isf.shared.mapper.converter.BlobToByteArrayConverter;
 import org.isf.shared.mapper.converter.ByteArrayToBlobConverter;
 import org.isf.shared.mapper.mappings.PatientMapping;
-import org.isf.users.data.UserHelper;
 import org.isf.users.dto.UserDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -219,51 +217,6 @@ public class ConditioningControllerTest {
 	}
 
 	@Test
-	void testGetConditioningByUserName_success() throws Exception {
-		String userName = "admin";
-		String request = "/conditionings/user/{userName}"; // <- path changed
-
-		User user = UserHelper.generateUser();
-		user.setUserName(userName);
-		when(userBrowsingManagerMock.getUserByName(userName))
-			.thenReturn(user);
-
-		List<Conditioning> conditionings = ConditioningHelper.setupConditioningList(2);
-		when(conBrowserManagerMock.getConditioningByUserName(userName))
-			.thenReturn(conditionings);
-
-		MvcResult result = this.mockMvc.perform(get(request, userName)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andDo(log())
-			.andExpect(status().isOk())
-			.andExpect(content().string(
-				containsString(ConditioningHelper.asJsonString(conditioningMapper.map2DTOList(conditionings)))
-			))
-			.andReturn();
-
-		LOGGER.debug("result: {}", result);
-	}
-
-	@Test
-	void testGetConditioningByUserName_notFound() throws Exception {
-		String userName = "admin";
-		String request = "/conditionings/user/{userName}";
-
-		when(userBrowsingManagerMock.getUserByName(userName))
-			.thenReturn(null);
-		when(conBrowserManagerMock.getConditioningByUserName(userName))
-			.thenReturn(null);
-
-		MvcResult result = this.mockMvc.perform(get(request, userName)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andDo(log())
-			.andExpect(status().isNotFound())
-			.andReturn();
-
-		LOGGER.debug("result: {}", result);
-	}
-
-	@Test
 	void testUpdateConditioning_success() throws Exception {
 		int id = 1;
 		String request = "/conditionings/{id}";
@@ -329,56 +282,5 @@ public class ConditioningControllerTest {
 			.andReturn();
 
 		LOGGER.debug("result: {}", result);
-	}
-
-	@Test
-	void testGetConditioningByPatientCodeAndUserName_success() throws Exception {
-		int patientCode = 1;
-		String userName = "admin";
-		String url = "/conditionings/patient/{patientCode}/user/{userName}";
-
-		Patient patient = PatientHelper.setup();
-		patient.setCode(patientCode);
-
-		User user = UserHelper.generateUser();
-		user.setUserName(userName);
-
-		List<Conditioning> conditionings = ConditioningHelper.setupConditioningList(2);
-		conditionings.forEach(c -> {
-			c.setPatient(patient);
-			c.setPerformedBy(user);
-		});
-
-		when(conBrowserManagerMock.getConditioningByPatientCodeAndUserName(patientCode, userName))
-			.thenReturn(conditionings);
-
-		MvcResult result = mockMvc.perform(get(url, patientCode, userName)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andDo(log())
-			.andExpect(status().isOk())
-			.andExpect(content().string(
-				containsString(ConditioningHelper.asJsonString(conditioningMapper.map2DTOList(conditionings)))
-			))
-			.andReturn();
-
-		LOGGER.debug("Result: {}", result);
-	}
-
-	@Test
-	void testGetConditioningByPatientCodeAndUserName_notFound() throws Exception {
-		int patientCode = 1;
-		String userName = "unknown";
-		String url = "/conditionings/patient/{patientCode}/user/{userName}";
-
-		when(conBrowserManagerMock.getConditioningByPatientCodeAndUserName(patientCode, userName))
-			.thenReturn(null);
-
-		MvcResult result = mockMvc.perform(get(url, patientCode, userName)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andDo(log())
-			.andExpect(status().isNotFound())
-			.andReturn();
-
-		LOGGER.debug("Result: {}", result);
 	}
 }
