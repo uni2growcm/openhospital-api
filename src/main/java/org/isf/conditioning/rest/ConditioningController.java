@@ -134,54 +134,6 @@ public class ConditioningController {
 	}
 
 	/**
-	 * Retrieve all existing {@link Conditioning} by patient code.
-	 *
-	 * @param userName - the patient code.
-	 * @return a list of {@link ConditioningDTO} objects, empty if none found
-	 * @throws OHServiceException When the retrieval operation fails
-	 */
-	@GetMapping("/conditionings/user/{userName}")
-	public ResponseEntity<List<ConditioningDTO>> getConditioningByUserName(@PathVariable("userName") String userName) throws OHServiceException {
-		LOGGER.info("get conditioning by user name : {}", userName);
-
-		List<Conditioning> conditioningList = conditioningBrowserManager.getConditioningByUserName(userName);
-		if (conditioningList == null) {
-			throw new OHAPIException(new OHExceptionMessage("Conditioning not found."), HttpStatus.NOT_FOUND);
-		}
-		List<ConditioningDTO> conditioningDTOS = conditioningList.stream()
-			.map(conditioningMapper::map2DTO)
-			.toList();
-		return ResponseEntity.ok(conditioningDTOS);
-	}
-
-	/**
-	 * Retrieve all existing {@link Conditioning} by patient code and user name.
-	 *
-	 * @param patientCode - the patient's code.
-	 * @param userName - the user's name.
-	 * @return a list of {@link ConditioningDTO} objects, empty if none found
-	 * @throws OHServiceException When the retrieval operation fails
-	 */
-	@GetMapping("/conditionings/patient/{patientCode}/user/{userName}")
-	public ResponseEntity<List<ConditioningDTO>> getConditioningByPatientCodeAndUserName(
-		@PathVariable("patientCode") int patientCode,
-		@PathVariable("userName") String userName) throws OHServiceException {
-
-		LOGGER.info("Get conditionings by patient code: {} and user name: {}", patientCode, userName);
-
-		List<Conditioning> conditioningList = conditioningBrowserManager.getConditioningByPatientCodeAndUserName(patientCode, userName);
-		if (conditioningList == null || conditioningList.isEmpty()) {
-			throw new OHAPIException(new OHExceptionMessage("No conditionings found for the given patient and user."), HttpStatus.NOT_FOUND);
-		}
-
-		List<ConditioningDTO> conditioningDTOs = conditioningList.stream()
-			.map(conditioningMapper::map2DTO)
-			.toList();
-
-		return ResponseEntity.ok(conditioningDTOs);
-	}
-
-	/**
 	 * Update an existing {@link Conditioning}.
 	 *
 	 * @param id - the conditioning id.

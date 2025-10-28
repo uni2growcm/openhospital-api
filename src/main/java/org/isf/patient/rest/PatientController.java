@@ -295,6 +295,20 @@ public class PatientController {
 		}
 	}
 
+	@GetMapping(value = "/patients/communes")
+	public List<String> getPatientCommunes() throws OHServiceException {
+		LOGGER.info("Get all communes of the patients.");
+
+		return patientManager.getCommunes();
+	}
+
+	@GetMapping(value = "/patients/ethnics")
+	public List<String> getPatientEthnics() throws OHServiceException {
+		LOGGER.info("Get all ethnics of the patients.");
+
+		return patientManager.getEthnics();
+	}
+
 	@GetMapping(value = "/patients/cities")
 	public List<String> getPatientCities() throws OHServiceException {
 		LOGGER.info("Get all cities of the patients.");

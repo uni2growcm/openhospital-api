@@ -126,6 +126,12 @@ public class AdmissionDTO {
 	@Schema(description = "Weight")
 	private Float weight;
 
+	private Boolean alertReceived;
+
+	private Boolean referenceSheet;
+
+	private Boolean qualifiedAgent;
+
 	private LocalDateTime ctrlDate1;
 
 	private LocalDateTime ctrlDate2;
@@ -151,6 +157,9 @@ public class AdmissionDTO {
 		example = "Headache"
 	)
 	private String entryReason;
+
+	@Schema(description = "Transportation", example = "Moto")
+	private String transportation;
 
 	@Schema(description = "User id")
 	private String userID;
@@ -451,5 +460,37 @@ public class AdmissionDTO {
 
 	public void setEntryReason(String entryReason) {
 		this.entryReason = entryReason;
+	}
+
+	public String getTransportation() {
+		return transportation;
+	}
+
+	public void setTransportation(String transportation) {
+		this.transportation = transportation;
+	}
+
+	public Boolean getReferenceSheet() {
+		return referenceSheet;
+	}
+
+	public void setReferenceSheet(Boolean referenceSheet) {
+		this.referenceSheet = referenceSheet;
+	}
+
+	public Boolean getAlertReceived() {
+		return alertReceived;
+	}
+
+	public void setAlertReceived(Boolean alertReceived) {
+		this.alertReceived = alertReceived;
+	}
+
+	public Boolean getQualifiedAgent() {
+		return qualifiedAgent;
+	}
+
+	public void setQualifiedAgent(Boolean qualifiedAgent) {
+		this.qualifiedAgent = qualifiedAgent;
 	}
 }
