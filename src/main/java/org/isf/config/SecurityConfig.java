@@ -24,10 +24,7 @@ package org.isf.config;
 import java.util.Arrays;
 
 import org.isf.permissions.manager.PermissionManager;
-import org.isf.security.ApiAuditorAwareImpl;
-import org.isf.security.CustomLogoutHandler;
-import org.isf.security.OHSimpleUrlAuthenticationSuccessHandler;
-import org.isf.security.RestAuthenticationEntryPoint;
+import org.isf.security.*;
 import org.isf.security.jwt.JWTFilter;
 import org.isf.security.jwt.TokenProvider;
 import org.isf.utils.db.AuditorAwareInterface;
@@ -69,6 +66,9 @@ public class SecurityConfig {
 
 	@Autowired
 	private CustomLogoutHandler customLogoutHandler;
+
+	@Autowired
+	private CustomAccessDeniedHandler customAccessDeniedHandler;
 
 	@Bean
 	public PasswordEncoder encoder() {
@@ -337,7 +337,10 @@ public class SecurityConfig {
 
 				.anyRequest().authenticated()
 			)
-			.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint))
+			.exceptionHandling(exceptionHandling -> exceptionHandling
+				.authenticationEntryPoint(restAuthenticationEntryPoint)
+				.accessDeniedHandler(customAccessDeniedHandler)
+			)
 			.logout(logout -> logout.logoutUrl("/auth/logout")
 				.addLogoutHandler(customLogoutHandler)
 				.permitAll())
