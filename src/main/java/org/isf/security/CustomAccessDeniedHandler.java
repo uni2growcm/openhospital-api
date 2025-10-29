@@ -39,7 +39,7 @@ import java.util.Map;
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
@@ -47,7 +47,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 					   HttpServletResponse response,
 					   AccessDeniedException accessDeniedException) throws IOException {
 
-		logger.warn("Access denied for user attempting to access: {}", request.getRequestURI());
+		LOGGER.info("Access denied");
 
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		response.setContentType("application/json;charset=UTF-8");
