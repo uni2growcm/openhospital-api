@@ -27,12 +27,15 @@ import org.isf.conditioning.manager.ConditioningBrowserManager;
 import org.isf.conditioning.mapper.ConditioningMapper;
 import org.isf.conditioning.model.Conditioning;
 import org.isf.patient.data.PatientHelper;
+import org.isf.patient.dto.PatientDTO;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
+import org.isf.menu.manager.UserBrowsingManager;
 import org.isf.shared.exceptions.OHResponseEntityExceptionHandler;
 import org.isf.shared.mapper.converter.BlobToByteArrayConverter;
 import org.isf.shared.mapper.converter.ByteArrayToBlobConverter;
 import org.isf.shared.mapper.mappings.PatientMapping;
+import org.isf.users.dto.UserDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +50,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -68,6 +72,9 @@ public class ConditioningControllerTest {
 	@Mock
 	protected PatientBrowserManager patientBrowserManagerMock;
 
+	@Mock
+	protected UserBrowsingManager userBrowsingManagerMock;
+
 	private final ConditioningMapper conditioningMapper = new ConditioningMapper();
 
 	private MockMvc mockMvc;
@@ -79,7 +86,7 @@ public class ConditioningControllerTest {
 		closeable = MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders
 			.standaloneSetup(new ConditioningController(conBrowserManagerMock, conditioningMapper,
-				patientBrowserManagerMock))
+				patientBrowserManagerMock, userBrowsingManagerMock))
 			.setControllerAdvice(new OHResponseEntityExceptionHandler())
 			.build();
 
@@ -100,11 +107,24 @@ public class ConditioningControllerTest {
 		String request = "/conditionings";
 
 		ConditioningDTO body = ConditioningHelper.setup(conditioningMapper);
+		body.setPerformedAt(LocalDateTime.now());
+
+		UserDTO user = new UserDTO();
+		user.setUserName("admin");
+		body.setPerformedBy(user);
+
+		PatientDTO patient = new PatientDTO();
+		patient.setCode(1);
+		body.setPatient(patient);
+
 		Conditioning conditioning = conditioningMapper.map2Model(body);
 
 		when(patientBrowserManagerMock.getPatientById(body.getPatient().getCode()))
 			.thenReturn(conditioning.getPatient());
-		
+
+		when(userBrowsingManagerMock.getUserByName(body.getPerformedBy().getUserName()))
+			.thenReturn(conditioning.getPerformedBy());
+
 		when(conBrowserManagerMock.newConditioning(any(Conditioning.class)))
 			.thenReturn(conditioning);
 
@@ -124,17 +144,24 @@ public class ConditioningControllerTest {
 	void testNewConditioning_patientNotFound() throws Exception {
 		String request = "/conditionings";
 
-		Conditioning conditioning = ConditioningHelper.setup();
-		ConditioningDTO body = conditioningMapper.map2DTO(conditioning);
+		ConditioningDTO body = ConditioningHelper.setup(conditioningMapper);
+		body.setPerformedAt(LocalDateTime.now());
 
-		when(patientBrowserManagerMock.getPatientById(conditioning.getPatient().getCode()))
+		UserDTO user = new UserDTO();
+		user.setUserName("admin");
+		body.setPerformedBy(user);
+
+		PatientDTO patient = new PatientDTO();
+		patient.setCode(1);
+		body.setPatient(patient);
+
+		when(patientBrowserManagerMock.getPatientById(body.getPatient().getCode()))
 			.thenReturn(null);
 
 		MvcResult result = this.mockMvc
 			.perform(post(request)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(Objects.requireNonNull(ConditioningHelper.asJsonString(body)))
-			)
+				.content(Objects.requireNonNull(ConditioningHelper.asJsonString(body))))
 			.andDo(log())
 			.andExpect(status().isNotFound())
 			.andReturn();
@@ -153,6 +180,7 @@ public class ConditioningControllerTest {
 			.thenReturn(patient);
 
 		List<Conditioning> conditionings = ConditioningHelper.setupConditioningList(2);
+		conditionings.forEach(conditioning -> conditioning.getPatient().setCode(patientCode)); // ✅ fix
 		when(conBrowserManagerMock.getConditioningByPatientCode(patientCode))
 			.thenReturn(conditionings);
 
@@ -171,7 +199,7 @@ public class ConditioningControllerTest {
 	@Test
 	void testGetConditioningByPatientCode_notFound() throws Exception {
 		int patientCode = 1;
-		String request = "/conditionings/{patientCode}";
+		String request = "/conditionings/patient/{patientCode}";
 
 		when(patientBrowserManagerMock.getPatientById(patientCode))
 			.thenReturn(null);
@@ -193,13 +221,25 @@ public class ConditioningControllerTest {
 		int id = 1;
 		String request = "/conditionings/{id}";
 
-		Conditioning conditioning = ConditioningHelper.setup();
-		conditioning.setId(id);
-		ConditioningDTO body = conditioningMapper.map2DTO(conditioning);
+		ConditioningDTO body = ConditioningHelper.setup(conditioningMapper);
+		body.setId(id);
+		body.setPerformedAt(LocalDateTime.now());
+
+		UserDTO user = new UserDTO();
+		user.setUserName("admin");
+		body.setPerformedBy(user);
+
+		PatientDTO patient = new PatientDTO();
+		patient.setCode(1);
+		body.setPatient(patient);
+
+		Conditioning conditioning = conditioningMapper.map2Model(body);
 
 		when(conBrowserManagerMock.getConditioningById(id)).thenReturn(conditioning);
 
 		when(patientBrowserManagerMock.getPatientById(body.getPatient().getCode())).thenReturn(conditioning.getPatient());
+
+		when(userBrowsingManagerMock.getUserByName(body.getPerformedBy().getUserName())).thenReturn(conditioning.getPerformedBy());
 
 		when(conBrowserManagerMock.updateConditioning(any(Conditioning.class))).thenReturn(conditioning);
 
@@ -219,9 +259,17 @@ public class ConditioningControllerTest {
 		int id = 1;
 		String request = "/conditionings/{id}";
 
-		Conditioning conditioning = ConditioningHelper.setup();
-		conditioning.setId(id);
-		ConditioningDTO body = conditioningMapper.map2DTO(conditioning);
+		ConditioningDTO body = ConditioningHelper.setup(conditioningMapper);
+		body.setId(id);
+		body.setPerformedAt(LocalDateTime.now());
+
+		UserDTO user = new UserDTO();
+		user.setUserName("admin");
+		body.setPerformedBy(user);
+
+		PatientDTO patient = new PatientDTO();
+		patient.setCode(1);
+		body.setPatient(patient);
 
 		when(conBrowserManagerMock.getConditioningById(id)).thenReturn(null);
 
@@ -235,5 +283,4 @@ public class ConditioningControllerTest {
 
 		LOGGER.debug("result: {}", result);
 	}
-
 }

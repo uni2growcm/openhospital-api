@@ -27,6 +27,8 @@ import org.isf.conditioning.dto.ConditioningDTO;
 import org.isf.conditioning.manager.ConditioningBrowserManager;
 import org.isf.conditioning.mapper.ConditioningMapper;
 import org.isf.conditioning.model.Conditioning;
+import org.isf.menu.manager.UserBrowsingManager;
+import org.isf.menu.model.User;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
 import org.isf.shared.exceptions.OHAPIException;
@@ -60,11 +62,18 @@ public class ConditioningController {
 	private final ConditioningBrowserManager conditioningBrowserManager;
 	private final ConditioningMapper conditioningMapper;
 	private final PatientBrowserManager patientBrowserManager;
+	private final UserBrowsingManager userBrowsingManager;
 
-	public ConditioningController(ConditioningBrowserManager browserManager, ConditioningMapper conditioningMapper, PatientBrowserManager patientBrowserManager) {
+	public ConditioningController(
+		ConditioningBrowserManager browserManager,
+		ConditioningMapper conditioningMapper,
+		PatientBrowserManager patientBrowserManager,
+		UserBrowsingManager userBrowsingManager
+	) {
 		this.conditioningBrowserManager = browserManager;
 		this.conditioningMapper = conditioningMapper;
 		this.patientBrowserManager = patientBrowserManager;
+		this.userBrowsingManager = userBrowsingManager;
 	}
 
 	/**
@@ -85,7 +94,16 @@ public class ConditioningController {
 		} else {
 			throw new OHAPIException(new OHExceptionMessage("Patient is required."), HttpStatus.BAD_REQUEST);
 		}
-		
+
+		if (conditioningDTO.getPerformedBy() != null) {
+			User user = userBrowsingManager.getUserByName(conditioningDTO.getPerformedBy().getUserName());
+			if (user == null) {
+				throw new OHAPIException(new OHExceptionMessage("User not found."), HttpStatus.NOT_FOUND);
+			}
+		} else {
+			throw new OHAPIException(new OHExceptionMessage("User is required."), HttpStatus.BAD_REQUEST);
+		}
+
 		Conditioning newConditioning = conditioningMapper.map2Model(conditioningDTO);
 		Conditioning savedConditioning = conditioningBrowserManager.newConditioning(newConditioning);
 		if (savedConditioning == null) {
