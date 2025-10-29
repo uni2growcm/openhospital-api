@@ -24,7 +24,11 @@ package org.isf.config;
 import java.util.Arrays;
 
 import org.isf.permissions.manager.PermissionManager;
-import org.isf.security.*;
+import org.isf.security.ApiAuditorAwareImpl;
+import org.isf.security.CustomAccessDeniedHandler;
+import org.isf.security.CustomLogoutHandler;
+import org.isf.security.OHSimpleUrlAuthenticationSuccessHandler;
+import org.isf.security.RestAuthenticationEntryPoint;
 import org.isf.security.jwt.JWTFilter;
 import org.isf.security.jwt.TokenProvider;
 import org.isf.utils.db.AuditorAwareInterface;
