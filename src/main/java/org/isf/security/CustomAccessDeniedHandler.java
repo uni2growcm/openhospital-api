@@ -24,6 +24,8 @@ package org.isf.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -37,12 +39,15 @@ import java.util.Map;
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
+	private static final Logger logger = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
 	public void handle(HttpServletRequest request,
 					   HttpServletResponse response,
 					   AccessDeniedException accessDeniedException) throws IOException {
+
+		logger.warn("Access denied for user attempting to access: {}", request.getRequestURI());
 
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		response.setContentType("application/json;charset=UTF-8");
@@ -51,8 +56,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 		body.put("timestamp", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
 		body.put("status", HttpServletResponse.SC_FORBIDDEN);
 		body.put("error", "Forbidden");
-		body.put("message", "You do not have permission to access this resource."
-		);
+		body.put("message", "You do not have permission to access this resource.");
 		body.put("path", request.getRequestURI());
 
 		mapper.writeValue(response.getOutputStream(), body);
