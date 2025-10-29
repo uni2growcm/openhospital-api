@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 import org.isf.permissions.manager.PermissionManager;
 import org.isf.security.ApiAuditorAwareImpl;
-import org.isf.security.CustomAccessDeniedHandler;
+import org.isf.shared.exceptions.CustomAccessDeniedHandler;
 import org.isf.security.CustomLogoutHandler;
 import org.isf.security.OHSimpleUrlAuthenticationSuccessHandler;
 import org.isf.security.RestAuthenticationEntryPoint;
