@@ -42,6 +42,9 @@ public class MedicalHistoryDTO {
 	@Schema(description = "Pregnancy term description", example = "FULL TERM", maxLength = 50)
 	private String termPregnancy;
 
+	@Schema(description = "Pregnancy information", example = "YES", maxLength = 50)
+	private String pregnancy;
+
 	@Schema(description = "Mode of delivery", example = "CESAREAN", maxLength = 50)
 	private String deliveryMode;
 
@@ -187,6 +190,10 @@ public class MedicalHistoryDTO {
 	public void setTermPregnancy(String termPregnancy) {
 		this.termPregnancy = termPregnancy;
 	}
+
+	public String getPregnancy() {return pregnancy;}
+
+	public void setPregnancy(String pregnancy) {this.pregnancy = pregnancy;}
 
 	public String getDeliveryMode() {
 		return deliveryMode;
