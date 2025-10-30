@@ -42,7 +42,7 @@ public class MedicalHistoryDTO {
 	@Schema(description = "Pregnancy term description", example = "FULL TERM", maxLength = 50)
 	private String termPregnancy;
 
-	@Schema(description = "Pregnancy information", example = "YES", maxLength = 50)
+	@Schema(description = "Pregnancy information", example = "Pregnancy description")
 	private String pregnancy;
 
 	@Schema(description = "Mode of delivery", example = "CESAREAN", maxLength = 50)
