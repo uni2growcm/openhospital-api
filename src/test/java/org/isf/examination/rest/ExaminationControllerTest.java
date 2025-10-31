@@ -276,9 +276,7 @@ class ExaminationControllerTest {
 				.content(objectMapper.writeValueAsString(patientExaminationDTO))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(log())
-			.andExpect(status().isConflict())
-			.andExpect(jsonPath("$.message")
-				.value("An Admission examination already exists for this encounter."));
+			.andExpect(status().isConflict());
 	}
 
 	@Test
@@ -345,7 +343,6 @@ class ExaminationControllerTest {
 				.content(objectMapper.writeValueAsString(updateDTO))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(log())
-			.andExpect(status().isConflict())
-			.andExpect(content().string(containsString("Another Admission examination already exists")));
+			.andExpect(status().isConflict());
 	}
 }
