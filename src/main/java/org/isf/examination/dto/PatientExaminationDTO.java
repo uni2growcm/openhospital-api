@@ -104,6 +104,10 @@ public class PatientExaminationDTO {
 	@Schema(description = "Branchial perimeter", example = "3.5")
 	private Double pex_branchial_perimeter;
 
+	@Nullable
+	@Schema(description = "IPT", example = "regular")
+	private String pex_ipt;
+
 	public int getPex_ID() {
 		return this.pex_ID;
 	}
@@ -266,5 +270,11 @@ public class PatientExaminationDTO {
 
 	public void setPex_branchial_perimeter(Double pex_branchial_perimeter) {
 		this.pex_branchial_perimeter = pex_branchial_perimeter;
+	}
+
+	public String getPex_ipt() { return pex_ipt; }
+
+	public void setPex_ipt(String pex_ipt) {
+		this.pex_ipt = pex_ipt;
 	}
 }
