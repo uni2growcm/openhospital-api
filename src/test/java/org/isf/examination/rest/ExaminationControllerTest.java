@@ -24,17 +24,23 @@ package org.isf.examination.rest;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.isf.OpenHospitalApiApplication;
+import org.isf.encounter.data.EncounterHelper;
+import org.isf.encounter.manager.EncounterBrowserManager;
+import org.isf.encounter.model.Encounter;
 import org.isf.examination.TestPatientExamination;
 import org.isf.examination.dto.PatientExaminationDTO;
 import org.isf.examination.manager.ExaminationBrowserManager;
@@ -76,6 +82,12 @@ class ExaminationControllerTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private ExaminationBrowserManager examinationBrowserManager;
+
+	@MockitoBean
+	private EncounterBrowserManager encounterBrowserManager;
 
 	@Test
 	@WithMockUser(username = "admin", authorities = {"examinations.read"})
@@ -208,12 +220,19 @@ class ExaminationControllerTest {
 	void testNewExamination() throws Exception {
 		Patient patient = PatientHelper.setup();
 		patient.setCode(2);
+
+		Encounter encounter = EncounterHelper.setup();
+
 		PatientExamination patientExamination = new TestPatientExamination().setup(patient, false);
 		patientExamination.setPex_sat(100.0);
 		patientExamination.setPex_branchial_perimeter(30.5);
+		patientExamination.setPex_type("admission");
 		PatientExaminationDTO patientExaminationDTO = mapper.map2DTO(patientExamination);
 		patientExaminationDTO.setPatientCode(patient.getCode());
+
 		when(patientBrowserManager.getPatientById(anyInt())).thenReturn(patient);
+		when(encounterBrowserManager.getCurrentEncounter(anyInt())).thenReturn(encounter);
+		when(examinationBrowserManager.getPatientExaminationsForEncounter(encounter)).thenReturn(null);
 		when(manager.saveOrUpdate(any())).thenReturn(patientExamination);
 
 		mvc.perform(post("/examinations")
@@ -226,8 +245,45 @@ class ExaminationControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "admin", authorities = {"examinations.create"})
+	@DisplayName("Should add patient examination with conflicting type")
+	void testNewExaminationWithConflictingType() throws Exception {
+		Patient patient = PatientHelper.setup();
+		patient.setCode(2);
+
+		Encounter encounter = EncounterHelper.setup();
+
+		PatientExamination patientExamination = new TestPatientExamination().setup(patient, false);
+		patientExamination.setPex_sat(100.0);
+		patientExamination.setPex_branchial_perimeter(30.5);
+		patientExamination.setPex_type("admission");
+
+		PatientExaminationDTO patientExaminationDTO = mapper.map2DTO(patientExamination);
+		patientExaminationDTO.setPatientCode(patient.getCode());
+
+		PatientExamination existingExamination = new TestPatientExamination().setup(patient, false);
+		existingExamination.setPex_sat(67.0);
+		existingExamination.setPex_branchial_perimeter(34.5);
+		existingExamination.setPex_type("admission");
+
+		when(patientBrowserManager.getPatientById(anyInt())).thenReturn(patient);
+		when(encounterBrowserManager.getCurrentEncounter(anyInt())).thenReturn(encounter);
+		when(examinationBrowserManager.getPatientExaminationsForEncounter(eq(encounter)))
+			.thenReturn(List.of(existingExamination));
+		when(manager.saveOrUpdate(any(PatientExamination.class))).thenReturn(patientExamination);
+
+		mvc.perform(post("/examinations")
+				.content(objectMapper.writeValueAsString(patientExaminationDTO))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(log())
+			.andExpect(status().isConflict())
+			.andExpect(jsonPath("$.message")
+				.value("An Admission examination already exists for this encounter."));
+	}
+
+	@Test
 	@WithMockUser(username = "admin", authorities = {"examinations.update"})
-	@DisplayName("Should update patient examination")
+	@DisplayName("Should update patient examination successfully")
 	void testUpdateExamination() throws Exception {
 		Patient patient = PatientHelper.setup();
 		patient.setCode(2);
@@ -235,19 +291,61 @@ class ExaminationControllerTest {
 		patientExamination.setPex_ID(1);
 		patientExamination.setPex_sat(100.0);
 		patientExamination.setPex_branchial_perimeter(30.5);
-		PatientExaminationDTO patientExaminationDTO = mapper.map2DTO(patientExamination);
-		patientExaminationDTO.setPatientCode(patient.getCode());
+		patientExamination.setPex_type("follow-up");
+
+		PatientExaminationDTO dto = mapper.map2DTO(patientExamination);
+		dto.setPatientCode(patient.getCode());
 
 		when(manager.getByID(anyInt())).thenReturn(patientExamination);
 		when(patientBrowserManager.getPatientById(anyInt())).thenReturn(patient);
+		when(encounterBrowserManager.getCurrentEncounter(anyInt())).thenReturn(new Encounter());
+		when(manager.getPatientExaminationsForEncounter(any(Encounter.class))).thenReturn(Collections.singletonList(patientExamination));
 		when(manager.saveOrUpdate(any())).thenReturn(patientExamination);
 
 		mvc.perform(put("/examinations/{id}", String.valueOf(patientExamination.getPex_ID()))
-				.content(objectMapper.writeValueAsString(patientExaminationDTO))
+				.content(objectMapper.writeValueAsString(dto))
 				.contentType(MediaType.APPLICATION_JSON)
 			)
 			.andDo(log())
 			.andExpect(status().isOk())
-			.andExpect(content().string(containsString(objectMapper.writeValueAsString(patientExaminationDTO))));
+			.andExpect(content().string(containsString(objectMapper.writeValueAsString(dto))));
+	}
+
+	@Test
+	@WithMockUser(username = "admin", authorities = {"examinations.update"})
+	@DisplayName("Should fail to update examination to admission when another admission already exists")
+	void testUpdateExaminationWithAdmissionConflict() throws Exception {
+		Patient patient = PatientHelper.setup();
+		patient.setCode(2);
+
+		PatientExamination existingExam = new TestPatientExamination().setup(patient, false);
+		existingExam.setPex_ID(1);
+		existingExam.setPex_type("follow-up");
+		existingExam.setPex_sat(98.0);
+
+		PatientExamination otherAdmissionExam = new TestPatientExamination().setup(patient, false);
+		otherAdmissionExam.setPex_ID(2);
+		otherAdmissionExam.setPex_type("admission");
+		otherAdmissionExam.setPex_sat(98.0);
+
+		PatientExaminationDTO updateDTO = mapper.map2DTO(existingExam);
+		updateDTO.setPex_type("admission");
+		updateDTO.setPex_sat(98.0);
+		updateDTO.setPatientCode(patient.getCode());
+
+		Encounter encounter = new Encounter();
+
+		when(manager.getByID(anyInt())).thenReturn(existingExam);
+		when(patientBrowserManager.getPatientById(anyInt())).thenReturn(patient);
+		when(encounterBrowserManager.getCurrentEncounter(anyInt())).thenReturn(encounter);
+		when(manager.getPatientExaminationsForEncounter(encounter))
+			.thenReturn(List.of(existingExam, otherAdmissionExam));
+
+		mvc.perform(put("/examinations/{id}", String.valueOf(existingExam.getPex_ID()))
+				.content(objectMapper.writeValueAsString(updateDTO))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(log())
+			.andExpect(status().isConflict())
+			.andExpect(content().string(containsString("Another Admission examination already exists")));
 	}
 }

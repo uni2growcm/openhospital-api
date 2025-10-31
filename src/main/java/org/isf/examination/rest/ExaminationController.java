@@ -22,7 +22,11 @@
 package org.isf.examination.rest;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
+import org.isf.encounter.manager.EncounterBrowserManager;
+import org.isf.encounter.model.Encounter;
 import org.isf.examination.dto.PatientExaminationDTO;
 import org.isf.examination.manager.ExaminationBrowserManager;
 import org.isf.examination.mapper.PatientExaminationMapper;
@@ -69,14 +73,17 @@ public class ExaminationController {
 
 	private final PatientBrowserManager patientBrowserManager;
 
+	private final EncounterBrowserManager encounterBrowserManager;
+
 	public ExaminationController(
 		ExaminationBrowserManager examinationBrowserManager,
 		PatientExaminationMapper patientExaminationMapper,
-		PatientBrowserManager patientBrowserManager
+		PatientBrowserManager patientBrowserManager, EncounterBrowserManager encounterBrowserManager
 	) {
 		this.examinationBrowserManager = examinationBrowserManager;
 		this.patientExaminationMapper = patientExaminationMapper;
 		this.patientBrowserManager = patientBrowserManager;
+		this.encounterBrowserManager = encounterBrowserManager;
 	}
 
 	@PostMapping("/examinations")
@@ -90,35 +97,81 @@ public class ExaminationController {
 		}
 
 		validateExamination(newPatientExamination);
+
+		Encounter encounter = encounterBrowserManager.getCurrentEncounter(newPatientExamination.getPatientCode());
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found for patient code " + newPatientExamination.getPatientCode()), HttpStatus.NOT_FOUND);
+		}
+
+		boolean admissionExists = hasAdmissionExamination(encounter);
+
+		if (admissionExists && "admission".equalsIgnoreCase(newPatientExamination.getPex_type())) {
+			throw new OHAPIException(
+				new OHExceptionMessage("An Admission examination already exists for this encounter."),
+				HttpStatus.CONFLICT
+			);
+		}
+
 		PatientExamination patientExamination = patientExaminationMapper.map2Model(newPatientExamination);
 		patientExamination.setPatient(patient);
 		patientExamination.setPex_date(newPatientExamination.getPex_date());
 
-		return patientExaminationMapper.map2DTO(examinationBrowserManager.saveOrUpdate(patientExamination));
+		PatientExamination savedExam = examinationBrowserManager.saveOrUpdate(patientExamination);
+
+		return patientExaminationMapper.map2DTO(savedExam);
 	}
 
 	@PutMapping("/examinations/{id}")
 	public PatientExaminationDTO updateExamination(
 		@PathVariable Integer id, @RequestBody PatientExaminationDTO dto
 	) throws OHServiceException {
-		if (dto.getPex_ID() != id) {
-			throw new OHAPIException(new OHExceptionMessage("Patient examination id mismatch."));
+		if (!Objects.equals(dto.getPex_ID(), id)) {
+			throw new OHAPIException(new OHExceptionMessage("Patient examination ID mismatch."));
 		}
-		if (examinationBrowserManager.getByID(id) == null) {
-			throw new OHAPIException(new OHExceptionMessage("Patient examination not found."), HttpStatus.NOT_FOUND);
+
+		PatientExamination existingExamination = examinationBrowserManager.getByID(id);
+		if (existingExamination == null) {
+			throw new OHAPIException(
+				new OHExceptionMessage("Patient examination not found."),
+				HttpStatus.NOT_FOUND
+			);
 		}
 
 		Patient patient = patientBrowserManager.getPatientById(dto.getPatientCode());
 		if (patient == null) {
-			throw new OHAPIException(new OHExceptionMessage("Patient does not exist."), HttpStatus.NOT_FOUND);
+			throw new OHAPIException(
+				new OHExceptionMessage("Patient does not exist."),
+				HttpStatus.NOT_FOUND
+			);
 		}
 
 		validateExamination(dto);
+
+		Encounter encounter = encounterBrowserManager.getCurrentEncounter(dto.getPatientCode());
+		if (encounter == null) {
+			throw new OHAPIException(
+				new OHExceptionMessage("Encounter not found for patient code " + dto.getPatientCode()),
+				HttpStatus.NOT_FOUND
+			);
+		}
+
+		if ("admission".equalsIgnoreCase(dto.getPex_type())) {
+			boolean hasAdmission = hasAdmissionExamination(encounter);
+
+			if (hasAdmission && !"admission".equalsIgnoreCase(existingExamination.getPex_type())) {
+				throw new OHAPIException(
+					new OHExceptionMessage("Another Admission examination already exists for this encounter."),
+					HttpStatus.CONFLICT
+				);
+			}
+		}
+
 		PatientExamination patientExamination = patientExaminationMapper.map2Model(dto);
 		patientExamination.setPatient(patient);
 		patientExamination.setPex_date(dto.getPex_date());
 
-		return patientExaminationMapper.map2DTO(examinationBrowserManager.saveOrUpdate(patientExamination));
+		PatientExamination savedExamination = examinationBrowserManager.saveOrUpdate(patientExamination);
+		return patientExaminationMapper.map2DTO(savedExamination);
 	}
 
 	@GetMapping("/examinations/defaultPatientExamination")
@@ -279,5 +332,20 @@ public class ExaminationController {
 						throw new OHAPIException(new OHExceptionMessage(
 							"The branchial perimeter should be between " + ExaminationParameters.BRANCHIAL_PERIMETER_MIN + " and " + ExaminationParameters.BRANCHIAL_PERIMETER_MAX));
 					}
+	}
+
+	public boolean hasAdmissionExamination(Encounter encounter) throws OHServiceException {
+
+		List<PatientExamination> examinations = examinationBrowserManager.getPatientExaminationsForEncounter(encounter);
+
+		if (examinations == null || examinations.isEmpty()) {
+			return false;
+		}
+
+		return examinations.stream()
+			.filter(Objects::nonNull)
+			.anyMatch(exam -> "admission".equalsIgnoreCase(
+				Optional.ofNullable(exam.getPex_type()).orElse("")
+			));
 	}
 }
