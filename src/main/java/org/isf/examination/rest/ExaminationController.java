@@ -107,7 +107,7 @@ public class ExaminationController {
 
 		if (admissionExists && "admission".equalsIgnoreCase(newPatientExamination.getPex_type())) {
 			throw new OHAPIException(
-				new OHExceptionMessage("An Admission examination already exists for this encounter."),
+				new OHExceptionMessage("An examination of type Admission already exists for this encounter."),
 				HttpStatus.CONFLICT
 			);
 		}
@@ -160,7 +160,7 @@ public class ExaminationController {
 
 			if (hasAdmission && !"admission".equalsIgnoreCase(existingExamination.getPex_type())) {
 				throw new OHAPIException(
-					new OHExceptionMessage("Another Admission examination already exists for this encounter."),
+					new OHExceptionMessage("Another examination of type Admission already exists for this encounter."),
 					HttpStatus.CONFLICT
 				);
 			}
