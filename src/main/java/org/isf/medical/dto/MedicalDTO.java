@@ -26,7 +26,7 @@ import java.util.List;
 import org.isf.medicalstock.dto.LotDTO;
 import org.isf.medtype.dto.MedicalTypeDTO;
 
-import com.drew.lang.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -36,7 +36,7 @@ public class MedicalDTO {
 	private Integer code;
 
 	@Schema(description = "The product code", example = "PARA")
-	private String prod_code;
+	private String prodCode;
 
 	@Schema(description = "The medical type")
 	private MedicalTypeDTO type;
@@ -59,7 +59,9 @@ public class MedicalDTO {
 	@Schema(description = "The min quantity of the medical", example = "15")
 	private double minqty;
 
-	@NotNull
+	@Schema(description = "The deletad value of the medical", example = "N")
+	private char deleted;
+
 	@Schema(description = "The lots associated to the medical")
 	List<LotDTO> lots;
 
@@ -72,11 +74,11 @@ public class MedicalDTO {
 	/**
 	 * Constructor
 	 */
-	public MedicalDTO(Integer code, MedicalTypeDTO type, String prod_code, String description, double initialqty,
+	public MedicalDTO(Integer code, MedicalTypeDTO type, String prodCode, String description, double initialqty,
 		Integer pcsperpck, double minqty, double inqty, double outqty) {
 		this.code = code;
 		this.type = type;
-		this.prod_code = prod_code;
+		this.prodCode = prodCode;
 		this.description = description;
 		this.initialqty = initialqty;
 		this.pcsperpck = pcsperpck;
@@ -85,10 +87,18 @@ public class MedicalDTO {
 		this.outqty = outqty;
 	}
 
-	public MedicalDTO(Integer code, MedicalTypeDTO type, String prod_code, String description, double initialqty,
+	public MedicalDTO(Integer code, MedicalTypeDTO type, String prodCode, String description, double initialqty,
 		Integer pcsperpck, double minqty, double inqty, double outqty, List<LotDTO> lots) {
-		this(code, type, prod_code, description, initialqty, pcsperpck, minqty, inqty, outqty);
+		this(code, type, prodCode, description, initialqty, pcsperpck, minqty, inqty, outqty);
 		this.lots = lots;
+	}
+
+	public char getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(char deleted) {
+		this.deleted = deleted;
 	}
 
 	public int getLock() {
@@ -103,8 +113,8 @@ public class MedicalDTO {
 		return this.code;
 	}
 
-	public String getProd_code() {
-		return this.prod_code;
+	public String getProdCode() {
+		return this.prodCode;
 	}
 
 	public MedicalTypeDTO getType() {
@@ -139,8 +149,8 @@ public class MedicalDTO {
 		this.code = code;
 	}
 
-	public void setProd_code(String prod_code) {
-		this.prod_code = prod_code;
+	public void setProdCode(String prodCode) {
+		this.prodCode = prodCode;
 	}
 
 	public void setType(MedicalTypeDTO type) {

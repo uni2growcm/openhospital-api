@@ -6468,11 +6468,11 @@ components:
           example: 0
         opd:
           type: boolean
-        pharmacy:
-          type: boolean
         female:
           type: boolean
         male:
+          type: boolean
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -7206,11 +7206,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
@@ -7646,7 +7646,7 @@ components:
           description: The id of the medical
           example: 1
           maxLength: 5
-        prod_code:
+        prodCode:
           type: string
           description: The product code
           example: PARA
@@ -7683,6 +7683,10 @@ components:
           format: double
           description: The min quantity of the medical
           example: 15
+        deleted:
+          type: string
+          description: The deletad value of the medical
+          example: "N"
         lots:
           type: array
           description: The lots associated to the medical
