@@ -41,14 +41,7 @@ import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.ward.model.Ward;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -134,6 +127,19 @@ public class StockMovementController {
 	@GetMapping("/stockmovements")
 	public List<MovementDTO> getMovements() throws OHServiceException {
 		return movMapper.map2DTOList(movManager.getMovements());
+	}
+
+	/**
+	 * ajust the quantity of the specified {@link Movement}.
+	 *
+	 * @param id id of the movement stored.
+	 * @param quantity the new quantity to use.
+	 * @return returns the stored {@link Movement} object.
+	 * @throws OHServiceException if an error occurs storing the movement.
+	 */
+	@PutMapping("/adjust/{id}")
+	public MovementDTO updateQuantity(@PathVariable int id, @RequestParam int quantity) throws OHServiceException {
+		return movMapper.map2DTO(movInsertingManager.adjustQuantity(id, quantity));
 	}
 
 	/**
