@@ -107,6 +107,9 @@ public class PatientExaminationDTO {
 	@Nullable
 	@Schema(description = "IPT", example = "regular")
 	private String pex_ipt;
+	
+	@Schema(description = "Head circumference", example = "23")
+	private Double pex_pc;
 
 	public int getPex_ID() {
 		return this.pex_ID;
@@ -277,4 +280,14 @@ public class PatientExaminationDTO {
 	public void setPex_ipt(String pex_ipt) {
 		this.pex_ipt = pex_ipt;
 	}
+
+	public Double getPex_pc() {
+		return pex_pc;
+	}
+
+	public void setPex_pc(Double pex_pc) {
+		this.pex_pc = pex_pc;
+	}
+	
+	
 }
