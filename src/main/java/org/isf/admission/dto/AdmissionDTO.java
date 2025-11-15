@@ -172,6 +172,9 @@ public class AdmissionDTO {
 	@NotNull
 	@Schema(description = "Flag record deleted, values are 'Y' OR 'N' ", example = "N")
 	private String deleted;
+	
+	@Schema(description = "physical exam made by doctor", example = "The patient appears alert, oriented to person, place, and time, and in no acute distress. Well-nourished and well-hydrated.")
+	private String physicalExam;  
 
 	public int getId() {
 		return this.id;
@@ -493,4 +496,15 @@ public class AdmissionDTO {
 	public void setQualifiedAgent(Boolean qualifiedAgent) {
 		this.qualifiedAgent = qualifiedAgent;
 	}
+
+	
+	public String getPhysicalExam() {
+		return physicalExam;
+	}
+
+	public void setPhysicalExam(String physicalExam) {
+		this.physicalExam = physicalExam;
+	}
+	
+	
 }
