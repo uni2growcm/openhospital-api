@@ -24,12 +24,14 @@ package org.isf;
 import jakarta.annotation.PostConstruct;
 
 import org.isf.generaldata.GeneralData;
+import org.isf.menu.manager.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ImportResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +47,8 @@ public class OpenHospitalApiApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(OpenHospitalApiApplication.class);
 		application.addListeners(new ApplicationPidFileWriter()); // OP-1113 added to control API from scripts
-		application.run(args);
+		ConfigurableApplicationContext context = application.run(args);
+		Context.setApplicationContext(context);
 	}
 
 	@PostConstruct

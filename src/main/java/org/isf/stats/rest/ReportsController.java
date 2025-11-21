@@ -127,9 +127,15 @@ public class ReportsController {
 		@RequestParam(name = "toExcel", defaultValue = "false") boolean toExcel
 	) throws OHServiceException, IOException {
 
-		if (groupBy.isEmpty()) groupBy = null;
-		if (sortBy.isEmpty()) sortBy = null;
-		if (filter.isEmpty()) filter = null;
+		if (groupBy.isEmpty()) {
+			groupBy = "%%";
+		} else {
+			groupBy = '%' + groupBy + '%';
+		}
+		if (sortBy.isEmpty()) {
+			sortBy = "MDSRT_DESC, MDSR_DESC";
+		}
+		filter = '%' + filter + '%';
 
 		Locale locale = request.getLocale();
 
@@ -147,8 +153,7 @@ public class ReportsController {
 				exportPath,
 				filter,
 				groupBy,
-				sortBy,
-				locale
+				sortBy
 			);
 
 			byte[] fileContent = Files.readAllBytes(tempFile.toPath());
