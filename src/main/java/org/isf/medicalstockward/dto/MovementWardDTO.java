@@ -83,8 +83,8 @@ public class MovementWardDTO {
 	}
 
 	public MovementWardDTO(int code, WardDTO ward, LocalDateTime date, boolean isPatient, PatientDTO patient, int age,
-			float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
-			WardDTO wardFrom) {
+		float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
+		WardDTO wardFrom) {
 		this.code = code;
 		this.ward = ward;
 		this.date = date;
@@ -164,7 +164,7 @@ public class MovementWardDTO {
 		this.date = date;
 	}
 
-	public void setPatient(boolean isPatient) {
+	public void setIsPatient(boolean isPatient) {
 		this.isPatient = isPatient;
 	}
 
