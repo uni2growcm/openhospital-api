@@ -21,9 +21,12 @@
  */
 package org.isf.medicalstockward.mapper;
 
+import jakarta.annotation.PostConstruct;
+
 import org.isf.medicalstockward.dto.MovementWardDTO;
 import org.isf.medicalstockward.model.MovementWard;
 import org.isf.shared.GenericMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,4 +36,10 @@ public class MovementWardMapper extends GenericMapper<MovementWard, MovementWard
 		super(MovementWard.class, MovementWardDTO.class);
 	}
 
+	@PostConstruct
+	public void setup() {
+		modelMapper.typeMap(MovementWard.class, MovementWardDTO.class)
+			.addMapping(MovementWard::isPatient, MovementWardDTO::setIsPatient)
+			.addMapping(MovementWard::getPatient, MovementWardDTO::setPatient);
+	}
 }
