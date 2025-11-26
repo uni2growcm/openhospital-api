@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -58,6 +59,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.io.File;
+import java.nio.file.Files;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -113,28 +116,69 @@ public class ReportsController {
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
 	}
-		
-	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
-	public ResponseEntity<byte[]> printPharmaceuticalStockPdf(HttpServletRequest request, @RequestParam String option, @RequestParam LocalDateTime date, @RequestParam(name = "groupBy", defaultValue = "") String groupBy, @RequestParam(name="sortBy", defaultValue = "") String sortBy, @RequestParam(name = "filter", defaultValue = "") String filter)
-		throws OHServiceException, IOException {
+
+	@GetMapping(value = "/reports/pharmaceuticalStock", produces = {
+		MediaType.APPLICATION_PDF_VALUE,
+		MediaType.APPLICATION_OCTET_STREAM_VALUE
+	})
+	public ResponseEntity<?> printPharmaceuticalStockReport(
+		HttpServletRequest request,
+		@RequestParam EnumOption option,
+		@RequestParam LocalDateTime date,
+		@RequestParam(name = "groupBy", defaultValue = "") String groupBy,
+		@RequestParam(name = "sortBy", defaultValue = "") String sortBy,
+		@RequestParam(name = "filter", defaultValue = "") String filter,
+		@RequestParam(name = "toExcel", defaultValue = "false") boolean toExcel
+	) throws OHServiceException, IOException {
+
 		if (groupBy.isEmpty()) {
-			groupBy = null;
+			groupBy = "%%";
+		} else {
+			groupBy = '%' + groupBy + '%';
 		}
 		if (sortBy.isEmpty()) {
-			sortBy = null;
+			sortBy = "MDSRT_DESC, MDSR_DESC";
 		}
-		if (filter.isEmpty()) {
-			filter = null;
-		}
+		filter = '%' + filter + '%';
+
 		Locale locale = request.getLocale();
-		if (EnumOption.ONLY_QUANTITY.toString().equalsIgnoreCase(option)) {
-			return getReport(reportsManager.getGenericReportPharmaceuticalStockPdf(
-				date, GeneralData.PHARMACEUTICALSTOCK, filter, groupBy, sortBy,locale
-			), request);
+
+		String jasperFileName = (option == EnumOption.ONLY_QUANTITY)
+			? GeneralData.PHARMACEUTICALSTOCK
+			: GeneralData.PHARMACEUTICALSTOCKLOT;
+
+		if (toExcel) {
+			File tempFile = File.createTempFile("pharmaStock", ".xlsx");
+			String exportPath = tempFile.getAbsolutePath();
+
+			reportsManager.getGenericReportPharmaceuticalStockExcel(
+				date,
+				jasperFileName,
+				exportPath,
+				filter,
+				groupBy,
+				sortBy
+			);
+
+			byte[] fileContent = Files.readAllBytes(tempFile.toPath());
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			headers.setContentDispositionFormData("attachment", "pharmaceutical_stock.xlsx");
+
+			return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+
 		} else {
-			return getReport(reportsManager.getGenericReportPharmaceuticalStockPdf(
-				date, GeneralData.PHARMACEUTICALSTOCKLOT, filter, groupBy, sortBy,locale
-			), request);
+			return getReport(
+				reportsManager.getGenericReportPharmaceuticalStockPdf(
+					date,
+					jasperFileName,
+					filter,
+					groupBy,
+					sortBy,
+					locale
+				),
+				request
+			);
 		}
 	}
 
