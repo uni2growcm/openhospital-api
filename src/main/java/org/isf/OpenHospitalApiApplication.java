@@ -48,6 +48,7 @@ public class OpenHospitalApiApplication extends SpringBootServletInitializer {
 		SpringApplication application = new SpringApplication(OpenHospitalApiApplication.class);
 		application.addListeners(new ApplicationPidFileWriter()); // OP-1113 added to control API from scripts
 		ConfigurableApplicationContext context = application.run(args);
+
 		Context.setApplicationContext(context);
 	}
 

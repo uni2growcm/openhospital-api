@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2024 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -21,11 +21,15 @@
  */
 package org.isf.stats.rest;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.time.LocalDateTime;
 
@@ -198,6 +202,11 @@ public class ReportsController {
 			.body(pdfBytes);
 	}
 
+	@GetMapping("/reports/pharmaceuticalExpiration")
+	public ResponseEntity<byte[]> printPharmaceuticalExpirationPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request) throws OHServiceException, JRException, IOException {
+		return getReport(reportsManager.getGenericReportFromDateToDate2Pdf(fromDate, toDate, "PharmaceuticalExpiration", request.getLocale()), request);
+	}
+
 	@GetMapping("/reports/pharmaceuticalStockWard")
 	public ResponseEntity<byte[]> printPharmaceuticalStockWardPdf(
 		@RequestParam LocalDateTime date,
@@ -210,6 +219,58 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
+	}
+
+	@GetMapping("/reports/pharmaceuticalStockWardExcel")
+	public ResponseEntity<?> printPharmaceuticalStockWardExcel(
+		@RequestParam String wardCode,
+		@RequestParam(value = "medicalCode", required = false) Integer medicalCode,
+		@RequestParam(value = "medicalTypeCode", required = false) String medicalTypeCode,
+		@RequestParam(value = "sex", required = false, defaultValue = "A") char sex,
+		@RequestParam(value = "ageFrom", required = false, defaultValue = "0") int ageFrom,
+		@RequestParam(value = "ageTo", required = false, defaultValue = "0") int ageTo,
+		@RequestParam(value = "weightFrom", required = false, defaultValue = "0") float weightFrom,
+		@RequestParam(value = "weightTo", required = false, defaultValue = "0") float weightTo,
+		@RequestParam LocalDateTime dateFrom,
+		@RequestParam LocalDateTime dateTo,
+		@RequestParam(value = "index", required = false, defaultValue = "0") int index
+	) throws OHServiceException, IOException {
+		Ward ward = wardBrowserManager.findWard(wardCode);
+		if (ward == null) {
+			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
+		}
+
+		File tempFile = File.createTempFile(PHARMACEUTICAL_STOCK_WARD_REPORT, ".xlsx");
+		String exportPath = tempFile.getAbsolutePath();
+
+		reportsManager.getGenericReportPharmaceuticalStockWardExcel(
+			exportPath,
+			ward,
+			medicalCode,
+			medicalTypeCode,
+			sex,
+			ageFrom,
+			ageTo,
+			weightFrom,
+			weightTo,
+			dateFrom,
+			dateTo,
+			index
+		);
+
+		byte[] fileContent = Files.readAllBytes(tempFile.toPath());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		if (index == 0) {
+			headers.setContentDispositionFormData("attachment", "StockWard" + "_" + ward + "_" + dateFrom.format(formatter) + "_" + dateTo.format(formatter) + "_" + "Outcomes.xlsx");
+		} else if (index == 1) {
+			headers.setContentDispositionFormData("attachment", "StockWard" + "_" + ward + "_" + dateFrom.format(formatter)  + "_" + dateTo.format(formatter) + "_" + "Incomes.xlsx");
+		} else if (index == 2) {
+			headers.setContentDispositionFormData("attachment", "StockWard" + "_" + ward + "_" + dateFrom.format(formatter)  + "_" + dateTo.format(formatter) + "_" + "Drugs.xlsx");
+		}
+
+		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
 	}
 
 	private ResponseEntity<byte[]> getReport(

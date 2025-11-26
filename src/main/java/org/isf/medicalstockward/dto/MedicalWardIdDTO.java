@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2024 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -24,6 +24,7 @@ package org.isf.medicalstockward.dto;
 import jakarta.validation.constraints.NotNull;
 
 import org.isf.medical.dto.MedicalDTO;
+import org.isf.medicalstock.dto.LotDTO;
 import org.isf.ward.dto.WardDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,12 +39,20 @@ public class MedicalWardIdDTO {
 	@Schema(description = "The medical")
 	private MedicalDTO medical;
 
+	@Schema(description = "The medical lot")
+	private LotDTO lot;
+
 	public MedicalWardIdDTO() {
 	}
 
 	public MedicalWardIdDTO(WardDTO ward, MedicalDTO medical) {
 		this.ward = ward;
 		this.medical = medical;
+	}
+
+	public MedicalWardIdDTO(WardDTO ward, MedicalDTO medical, LotDTO lot) {
+		this(ward, medical);
+		this.lot = lot;
 	}
 
 	public WardDTO getWard() {
@@ -60,5 +69,12 @@ public class MedicalWardIdDTO {
 
 	public void setMedical(MedicalDTO medical) {
 		this.medical = medical;
+	}
+
+	public LotDTO getLot() {
+		return lot;
+	}
+	public void setLot(LotDTO lot) {
+		this.lot = lot;
 	}
 }

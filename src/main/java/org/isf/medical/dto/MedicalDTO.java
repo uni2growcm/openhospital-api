@@ -21,7 +21,12 @@
  */
 package org.isf.medical.dto;
 
+import java.util.List;
+
+import org.isf.medicalstock.dto.LotDTO;
 import org.isf.medtype.dto.MedicalTypeDTO;
+
+import com.drew.lang.annotations.NotNull;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -54,6 +59,10 @@ public class MedicalDTO {
 	@Schema(description = "The min quantity of the medical", example = "15")
 	private double minqty;
 
+	@NotNull
+	@Schema(description = "The lots associated to the medical")
+	List<LotDTO> lots;
+
 	@Schema(description = "Lock", example = "0")
 	private int lock;
 
@@ -64,7 +73,7 @@ public class MedicalDTO {
 	 * Constructor
 	 */
 	public MedicalDTO(Integer code, MedicalTypeDTO type, String prod_code, String description, double initialqty,
-			Integer pcsperpck, double minqty, double inqty, double outqty) {
+		Integer pcsperpck, double minqty, double inqty, double outqty) {
 		this.code = code;
 		this.type = type;
 		this.prod_code = prod_code;
@@ -74,6 +83,12 @@ public class MedicalDTO {
 		this.minqty = minqty;
 		this.inqty = inqty;
 		this.outqty = outqty;
+	}
+
+	public MedicalDTO(Integer code, MedicalTypeDTO type, String prod_code, String description, double initialqty,
+		Integer pcsperpck, double minqty, double inqty, double outqty, List<LotDTO> lots) {
+		this(code, type, prod_code, description, initialqty, pcsperpck, minqty, inqty, outqty);
+		this.lots = lots;
 	}
 
 	public int getLock() {
@@ -154,5 +169,13 @@ public class MedicalDTO {
 
 	public void setMinqty(double minqty) {
 		this.minqty = minqty;
+	}
+
+	public List<LotDTO> getLots() {
+		return lots;
+	}
+
+	public void setLots(List<LotDTO> lots) {
+		this.lots = lots;
 	}
 }
