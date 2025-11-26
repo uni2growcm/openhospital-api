@@ -46,6 +46,15 @@ public class LotDTO {
 	@Schema(description = "The lot's code", example = "750")
 	private BigDecimal cost;
 
+	@Schema(description = "The main store quantity", example = "750")
+	private Integer mainStoreQuantity;
+
+	@Schema(description = "The ward store quantity", example = "750")
+	private Double wardsTotalQuantity;
+
+	@Schema(description = "The overall quantity", example = "750")
+	private Double overallQuantity;
+
 	public LotDTO() {
 	}
 
@@ -86,5 +95,29 @@ public class LotDTO {
 
 	public void setCost(BigDecimal cost) {
 		this.cost = cost;
+	}
+
+	public Integer getMainStoreQuantity() {
+		return mainStoreQuantity;
+	}
+
+	public void setMainStoreQuantity(Integer mainStoreQuantity) {
+		this.mainStoreQuantity = mainStoreQuantity;
+	}
+
+	public Double getWardsTotalQuantity() {
+		return wardsTotalQuantity;
+	}
+
+	public void setWardsTotalQuantity(Double wardsTotalQuantity) {
+		this.wardsTotalQuantity = wardsTotalQuantity;
+	}
+
+	public Double getOverallQuantity() {
+		return overallQuantity;
+	}
+
+	public void setOverallQuantity(Double overallQuantity) {
+		this.overallQuantity = overallQuantity;
 	}
 }

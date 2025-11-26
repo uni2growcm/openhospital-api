@@ -21,7 +21,10 @@
  */
 package org.isf.shared.mapper.converter;
 
+import org.isf.medicalstock.dto.LotDTO;
+import org.isf.medicalstock.model.Lot;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.modelmapper.module.jsr310.Jsr310Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +45,16 @@ public class ModelMapperConfig {
 		modelMapper.addConverter(blobToByteArrayConverter);
 		modelMapper.addConverter(byteArrayToBlobConverter);
 		modelMapper.registerModule(new Jsr310Module());
+
+		modelMapper.addMappings(new PropertyMap<Lot, LotDTO>() {
+			@Override
+			protected void configure() {
+				map().setMainStoreQuantity(source.getMainStoreQuantity());
+				map().setWardsTotalQuantity(source.getWardsTotalQuantity());
+				map().setOverallQuantity(source.getOverallQuantity());
+			}
+		});
+
 		return modelMapper;
 	}
 }
