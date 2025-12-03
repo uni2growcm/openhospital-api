@@ -42,6 +42,9 @@ public class ModelMapperConfig {
 		modelMapper.addConverter(blobToByteArrayConverter);
 		modelMapper.addConverter(byteArrayToBlobConverter);
 		modelMapper.registerModule(new Jsr310Module());
+		modelMapper.getConfiguration().setPropertyCondition(ctx ->
+			!(ctx.getSource() instanceof org.hibernate.collection.spi.PersistentCollection)
+		);
 		return modelMapper;
 	}
 }

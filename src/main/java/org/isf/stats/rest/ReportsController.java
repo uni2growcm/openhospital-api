@@ -83,17 +83,17 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/exams-list")
-	public ResponseEntity<byte[]> printExamsListPdf(HttpServletRequest request) throws OHServiceException, IOException {
+	public ResponseEntity<Resource> printExamsListPdf(HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getExamsListPdf(), request);
 	}
 
 	@GetMapping("/reports/diseases-list")
-	public ResponseEntity<byte[]> printDiseasesListPdf(HttpServletRequest request) throws OHServiceException, IOException {
+	public ResponseEntity<Resource> printDiseasesListPdf(HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getDiseasesListPdf(), request);
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockCard")
-	public ResponseEntity<byte[]> printPharmaceuticalStockCardPdf(
+	public ResponseEntity<Resource> printPharmaceuticalStockCardPdf(
 		@RequestParam String exportFileName,
 		@RequestParam LocalDateTime dateFrom,
 		@RequestParam LocalDateTime dateTo,
@@ -115,7 +115,7 @@ public class ReportsController {
 	}
 		
 	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
-	public ResponseEntity<byte[]> printPharmaceuticalStockPdf(HttpServletRequest request, @RequestParam String option, @RequestParam LocalDateTime date, @RequestParam(name = "groupBy", defaultValue = "") String groupBy, @RequestParam(name="sortBy", defaultValue = "") String sortBy, @RequestParam(name = "filter", defaultValue = "") String filter)
+	public ResponseEntity<Resource> printPharmaceuticalStockPdf(HttpServletRequest request, @RequestParam String option, @RequestParam LocalDateTime date, @RequestParam(name = "groupBy", defaultValue = "") String groupBy, @RequestParam(name="sortBy", defaultValue = "") String sortBy, @RequestParam(name = "filter", defaultValue = "") String filter)
 		throws OHServiceException, IOException {
 		if (groupBy.isEmpty()) {
 			groupBy = null;
@@ -139,7 +139,7 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/pharmaceuticalAMC")
-	public ResponseEntity<byte[]> printPharmaceuticalAMC(
+	public ResponseEntity<Resource> printPharmaceuticalAMC(
 		HttpServletRequest request,
 		@RequestParam(required = false) LocalDateTime date
 	) throws OHServiceException, IOException {
@@ -159,12 +159,12 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/pharmaceuticalExpiration")
-	public ResponseEntity<byte[]> printPharmaceuticalExpirationPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request) throws OHServiceException, JRException, IOException {
+	public ResponseEntity<Resource> printPharmaceuticalExpirationPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request) throws OHServiceException, JRException, IOException {
 		return getReport(reportsManager.getGenericReportFromDateToDate2Pdf(fromDate, toDate, "PharmaceuticalExpiration", request.getLocale()), request);
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWard")
-	public ResponseEntity<byte[]> printPharmaceuticalStockWardPdf(
+	public ResponseEntity<Resource> printPharmaceuticalStockWardPdf(
 		@RequestParam LocalDateTime date,
 		@RequestParam String wardCode,
 		HttpServletRequest request
@@ -229,7 +229,7 @@ public class ReportsController {
 		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
 	}
 
-	private ResponseEntity<byte[]> getReport(
+	private ResponseEntity<Resource> getReport(
 		JasperReportResultDto resultDto, HttpServletRequest request
 	) throws OHServiceException, IOException {
 		Path report = Paths.get(resultDto.getFilename()).normalize();
@@ -243,24 +243,10 @@ public class ReportsController {
 			throw new OHAPIException(new OHExceptionMessage("File not found."));
 		}
 
-		String contentType;
-		try {
-			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-		} catch (IOException ex) {
-			throw new OHAPIException(new OHExceptionMessage("Failed to load the file's type."));
-		}
-
-		// Fallback to the default content type if type could not be determined
-		if (contentType == null) {
-			contentType = "application/octet-stream";
-		}
-
-		byte[] out = IOUtils.toByteArray(resource.getInputStream());
-
 		return ResponseEntity.ok()
-			.contentType(MediaType.parseMediaType(contentType))
+			.contentType(MediaType.APPLICATION_OCTET_STREAM)
 			.header(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"" + resource.getFilename() + '"')
-			.body(out);
+			.body(resource);
 	}
 }
