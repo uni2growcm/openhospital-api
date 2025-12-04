@@ -66,6 +66,10 @@ public class MedicalDTO {
 	@Schema(description = "Lock", example = "0")
 	private int lock;
 
+	@NotNull
+	@Schema(description = "The if medical is deleted")
+	private char deleted = 'N';
+
 	public MedicalDTO() {
 	}
 
@@ -89,6 +93,12 @@ public class MedicalDTO {
 		Integer pcsperpck, double minqty, double inqty, double outqty, List<LotDTO> lots) {
 		this(code, type, prod_code, description, initialqty, pcsperpck, minqty, inqty, outqty);
 		this.lots = lots;
+	}
+
+	public MedicalDTO(Integer code, MedicalTypeDTO type, String prod_code, String description, double initialqty,
+					  Integer pcsperpck, double minqty, double inqty, double outqty, List<LotDTO> lots, char deleted) {
+		this(code, type, prod_code, description, initialqty, pcsperpck, minqty, inqty, outqty, lots);
+		this.deleted = deleted;
 	}
 
 	public int getLock() {
@@ -135,6 +145,8 @@ public class MedicalDTO {
 		return this.minqty;
 	}
 
+	public char getDeleted() {return this.deleted;}
+
 	public void setCode(Integer code) {
 		this.code = code;
 	}
@@ -178,4 +190,6 @@ public class MedicalDTO {
 	public void setLots(List<LotDTO> lots) {
 		this.lots = lots;
 	}
+
+	public void setDeleted(char deleted) { this.deleted = deleted; }
 }

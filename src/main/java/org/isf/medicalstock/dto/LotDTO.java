@@ -43,8 +43,17 @@ public class LotDTO {
 	@Schema(description = "The due date", example = "2021-06-24", type = "string")
 	private LocalDateTime dueDate;
 
-	@Schema(description = "The lot's code", example = "750")
+	@Schema(description = "The lot's cost", example = "750")
 	private BigDecimal cost;
+
+	@Schema(description = "The lot's main store quantity", example = "10")
+	private int mainStoreQuantity;
+
+	@Schema(description = "The lot's ward total  quantity", example = "15")
+	private double wardsTotalQuantity;
+
+	@Schema(description = "The lot's overall quantity", example = "35")
+	private double overallQuantity;
 
 	public LotDTO() {
 	}
@@ -54,6 +63,13 @@ public class LotDTO {
 		this.preparationDate = preparationDate;
 		this.dueDate = dueDate;
 		this.cost = cost;
+	}
+
+	public LotDTO(String code, LocalDateTime preparationDate, LocalDateTime dueDate, BigDecimal cost, int mainStoreQuantity, double wardsTotalQuantity, double overallQuantity) {
+		this(code, preparationDate, dueDate,cost);
+		this.mainStoreQuantity = mainStoreQuantity;
+		this.wardsTotalQuantity = wardsTotalQuantity;
+		this.overallQuantity = overallQuantity;
 	}
 
 	public String getCode() {
@@ -72,6 +88,18 @@ public class LotDTO {
 		return this.cost;
 	}
 
+	public Integer getMainStoreQuantity() {
+		return this.mainStoreQuantity;
+	}
+
+	public Double getWardsTotalQuantity() {
+		return this.wardsTotalQuantity;
+	}
+
+	public double getOverallQuantity() {
+		return this.mainStoreQuantity + wardsTotalQuantity;
+	}
+
 	public void setCode(String code) {
 		this.code = code;
 	}
@@ -86,5 +114,13 @@ public class LotDTO {
 
 	public void setCost(BigDecimal cost) {
 		this.cost = cost;
+	}
+
+	public void setMainStoreQuantity(int mainStoreQuantity) {
+		this.mainStoreQuantity = mainStoreQuantity;
+	}
+
+	public void setWardsTotalQuantity(double wardsTotalQuantity) {
+		this.wardsTotalQuantity = wardsTotalQuantity;
 	}
 }

@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import jakarta.validation.constraints.NotNull;
 
 import org.isf.medical.dto.MedicalDTO;
+import org.isf.medicalstock.dto.LotDTO;
 import org.isf.patient.dto.PatientDTO;
 import org.isf.ward.dto.WardDTO;
 
@@ -79,12 +80,15 @@ public class MovementWardDTO {
 	@Schema(description = "The ward from which the movement is done")
 	private WardDTO wardFrom;
 
+	@Schema(description = "The lot of the medical concerned by the movement")
+	private LotDTO lot;
+
 	public MovementWardDTO() {
 	}
 
 	public MovementWardDTO(int code, WardDTO ward, LocalDateTime date, boolean isPatient, PatientDTO patient, int age,
-		float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
-		WardDTO wardFrom) {
+						   float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
+						   WardDTO wardFrom, LotDTO lot) {
 		this.code = code;
 		this.ward = ward;
 		this.date = date;
@@ -98,6 +102,7 @@ public class MovementWardDTO {
 		this.units = units;
 		this.wardTo = wardTo;
 		this.wardFrom = wardFrom;
+		this.lot = lot;
 	}
 
 	public int getCode() {
@@ -152,6 +157,8 @@ public class MovementWardDTO {
 		return this.wardFrom;
 	}
 
+	public LotDTO getLot() { return this.lot; }
+
 	public void setCode(int code) {
 		this.code = code;
 	}
@@ -203,4 +210,6 @@ public class MovementWardDTO {
 	public void setWardFrom(WardDTO wardFrom) {
 		this.wardFrom = wardFrom;
 	}
+
+	public void setLot(LotDTO lot) { this.lot = lot; }
 }
