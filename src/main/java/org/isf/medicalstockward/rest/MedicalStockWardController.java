@@ -189,4 +189,37 @@ public class MedicalStockWardController {
 
 		return true;
 	}
+
+	/**
+	 * Gets a single MedicalWard by ward code, medical code and lot code.
+	 *
+	 * @param wardCode ward identifier
+	 * @param medicalId medical identifier
+	 * @param lotCode lot identifier
+	 * @return the found MedicalWard DTO
+	 * @throws OHServiceException if lookup fails or item not found
+	 */
+	@GetMapping(value = "/medicalstockward/{ward_code}/medical/{medical_id}/lot/{lot_code}")
+	public MedicalWardDTO getMedicalWardByWardMedicalAndLot(
+		@PathVariable("ward_code") String wardCode,
+		@PathVariable("medical_id") int medicalId,
+		@PathVariable("lot_code") String lotCode
+	) throws OHServiceException {
+
+		MedicalWard result = movWardBrowserManager.getMedicalWardByWardMedicalAndLot(
+			wardCode,
+			medicalId,
+			lotCode
+		);
+
+		if (result == null) {
+			throw new OHAPIException(
+				new OHExceptionMessage("Medical ward record not found."),
+				HttpStatus.NOT_FOUND
+			);
+		}
+
+		return medicalWardMapper.map2DTO(result);
+	}
+
 }
