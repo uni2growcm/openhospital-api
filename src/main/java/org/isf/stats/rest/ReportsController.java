@@ -27,9 +27,12 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +43,11 @@ import org.apache.poi.util.IOUtils;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
 import org.isf.generaldata.GeneralData;
+import org.isf.medicalstock.manager.MovBrowserManager;
+import org.isf.medicalstock.model.Movement;
+import org.isf.medicalstockward.manager.MovWardBrowserManager;
+import org.isf.medicalstockward.model.MovementWard;
+import org.isf.serviceprinting.manager.PrintManager;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
@@ -50,17 +58,17 @@ import org.isf.ward.manager.WardBrowserManager;
 import org.isf.ward.model.Ward;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 @RestController
 @Tag(name = "Reports")
@@ -71,15 +79,30 @@ public class ReportsController {
 	private final JasperReportsManager reportsManager;
 	private final MedicalBrowsingManager medicalBrowsingManager;
 	private final WardBrowserManager wardBrowserManager;
+	private final PrintManager printManager;
+	private final MovWardBrowserManager movWardBrowserManager;
+	private final MovBrowserManager movBrowserManager;
 
 	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
 	private static final String PHARMACEUTICAL_AMC_REPORT = "PharmaceuticalAMC";
 	private static final String PHARMACEUTICAL_STOCK_WARD_REPORT = "PharmaceuticalStockWard";
+	private static final String WARD_PHARMACY_INCOMES = "WardPharmacyIncomes";
+	private static final String WARD_PHARMACY_OUTCOMES = "WardPharmacyOutcomes";
 
-	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
+	public ReportsController(
+		JasperReportsManager reportsManager,
+		MedicalBrowsingManager medicalBrowsingManager,
+		WardBrowserManager wardBrowserManager,
+		PrintManager printManager,
+		MovWardBrowserManager movWardBrowserManager,
+		MovBrowserManager movBrowserManager
+	) {
 		this.reportsManager = reportsManager;
 		this.medicalBrowsingManager = medicalBrowsingManager;
 		this.wardBrowserManager = wardBrowserManager;
+		this.printManager = printManager;
+		this.movWardBrowserManager = movWardBrowserManager;
+		this.movBrowserManager = movBrowserManager;
 	}
 
 	@GetMapping("/reports/exams-list")
@@ -95,8 +118,8 @@ public class ReportsController {
 	@GetMapping("/reports/pharmaceuticalStockCard")
 	public ResponseEntity<Resource> printPharmaceuticalStockCardPdf(
 		@RequestParam String exportFileName,
-		@RequestParam LocalDateTime dateFrom,
-		@RequestParam LocalDateTime dateTo,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime dateFrom,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime dateTo,
 		@RequestParam Integer medicalCode,
 		@RequestParam String wardCode,
 		HttpServletRequest request
@@ -115,8 +138,14 @@ public class ReportsController {
 	}
 		
 	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
-	public ResponseEntity<Resource> printPharmaceuticalStockPdf(HttpServletRequest request, @RequestParam String option, @RequestParam LocalDateTime date, @RequestParam(name = "groupBy", defaultValue = "") String groupBy, @RequestParam(name="sortBy", defaultValue = "") String sortBy, @RequestParam(name = "filter", defaultValue = "") String filter)
-		throws OHServiceException, IOException {
+	public ResponseEntity<Resource> printPharmaceuticalStockPdf(
+		HttpServletRequest request,
+		@RequestParam String option,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime date,
+		@RequestParam(name = "groupBy", defaultValue = "") String groupBy,
+		@RequestParam(name="sortBy", defaultValue = "") String sortBy,
+		@RequestParam(name = "filter", defaultValue = "") String filter
+	) throws OHServiceException, IOException {
 		if (groupBy.isEmpty()) {
 			groupBy = null;
 		}
@@ -141,7 +170,7 @@ public class ReportsController {
 	@GetMapping("/reports/pharmaceuticalAMC")
 	public ResponseEntity<Resource> printPharmaceuticalAMC(
 		HttpServletRequest request,
-		@RequestParam(required = false) LocalDateTime date
+		@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime date
 	) throws OHServiceException, IOException {
 		return getReport(reportsManager.GenericReportPharmaceuticalAMCPdf(date, PHARMACEUTICAL_AMC_REPORT, request.getLocale()), request);
 	}
@@ -159,16 +188,22 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/pharmaceuticalExpiration")
-	public ResponseEntity<Resource> printPharmaceuticalExpirationPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request) throws OHServiceException, JRException, IOException {
+	public ResponseEntity<Resource> printPharmaceuticalExpirationPdf(
+		@RequestParam LocalDate fromDate,
+		@RequestParam LocalDate toDate,
+		HttpServletRequest request) throws OHServiceException, JRException, IOException {
 		return getReport(reportsManager.getGenericReportFromDateToDate2Pdf(fromDate, toDate, "PharmaceuticalExpiration", request.getLocale()), request);
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWard")
 	public ResponseEntity<Resource> printPharmaceuticalStockWardPdf(
-		@RequestParam LocalDateTime date,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime date,
 		@RequestParam String wardCode,
+		@RequestParam(value = "index", required = false, defaultValue = "0") int index,
+		@RequestParam(required = false) LocalDateTime dateForm,
+		@RequestParam(required = false) LocalDateTime dateTo,
 		HttpServletRequest request
-	) throws OHServiceException, IOException {
+	) throws OHServiceException, IOException, JRException, SQLException {
 		Ward ward = wardBrowserManager.findWard(wardCode);
 		if (ward == null) {
 			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
