@@ -22,6 +22,7 @@
 package org.isf.shared.mapper.converter;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.module.jsr310.Jsr310Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +43,13 @@ public class ModelMapperConfig {
 		modelMapper.addConverter(blobToByteArrayConverter);
 		modelMapper.addConverter(byteArrayToBlobConverter);
 		modelMapper.registerModule(new Jsr310Module());
+		modelMapper.getConfiguration().setPropertyCondition(
+			ctx -> !(
+				ctx.getSource() instanceof org.hibernate.collection.spi.PersistentCollection
+			)
+		);
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
 		return modelMapper;
 	}
 }
