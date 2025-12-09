@@ -30,6 +30,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +42,11 @@ import org.apache.poi.util.IOUtils;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
 import org.isf.generaldata.GeneralData;
+import org.isf.medicalstock.manager.MovBrowserManager;
+import org.isf.medicalstock.model.Movement;
+import org.isf.medicalstockward.manager.MovWardBrowserManager;
+import org.isf.medicalstockward.model.MovementWard;
+import org.isf.medstockmovtype.model.MovementType;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
@@ -71,15 +78,27 @@ public class ReportsController {
 	private final JasperReportsManager reportsManager;
 	private final MedicalBrowsingManager medicalBrowsingManager;
 	private final WardBrowserManager wardBrowserManager;
+	private final MovWardBrowserManager movWardBrowserManager;
+	private final MovBrowserManager movBrowserManager;
 
 	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
 	private static final String PHARMACEUTICAL_AMC_REPORT = "PharmaceuticalAMC";
 	private static final String PHARMACEUTICAL_STOCK_WARD_REPORT = "PharmaceuticalStockWard";
+	private static final String WARD_PHARMACY_INCOMES = "WardPharmacyIncomes";
+	private static final String WARD_PHARMACY_OUTCOMES = "WardPharmacyOutcomes";
 
-	public ReportsController(JasperReportsManager reportsManager, MedicalBrowsingManager medicalBrowsingManager, WardBrowserManager wardBrowserManager) {
+	public ReportsController(
+		JasperReportsManager reportsManager,
+		MedicalBrowsingManager medicalBrowsingManager,
+		WardBrowserManager wardBrowserManager,
+		MovWardBrowserManager movWardBrowserManager,
+		MovBrowserManager movBrowserManager
+	) {
 		this.reportsManager = reportsManager;
 		this.medicalBrowsingManager = medicalBrowsingManager;
 		this.wardBrowserManager = wardBrowserManager;
+		this.movBrowserManager = movBrowserManager;
+		this.movWardBrowserManager = movWardBrowserManager;
 	}
 
 	@GetMapping("/reports/exams-list")
@@ -113,7 +132,7 @@ public class ReportsController {
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
 	}
-		
+
 	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
 	public ResponseEntity<byte[]> printPharmaceuticalStockPdf(HttpServletRequest request, @RequestParam String option, @RequestParam LocalDateTime date, @RequestParam(name = "groupBy", defaultValue = "") String groupBy, @RequestParam(name="sortBy", defaultValue = "") String sortBy, @RequestParam(name = "filter", defaultValue = "") String filter)
 		throws OHServiceException, IOException {
@@ -145,7 +164,7 @@ public class ReportsController {
 	) throws OHServiceException, IOException {
 		return getReport(reportsManager.GenericReportPharmaceuticalAMCPdf(date, PHARMACEUTICAL_AMC_REPORT, request.getLocale()), request);
 	}
-	
+
 	@GetMapping("/reports/pharmaceuticalOrder")
 	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
 		JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", request.getLocale());
@@ -167,6 +186,9 @@ public class ReportsController {
 	public ResponseEntity<byte[]> printPharmaceuticalStockWardPdf(
 		@RequestParam LocalDateTime date,
 		@RequestParam String wardCode,
+		@RequestParam(value = "dateFrom", required = false) LocalDateTime dateFrom,
+		@RequestParam(value = "dateTo", required = false) LocalDateTime dateTo,
+		@RequestParam(value = "index", required = false, defaultValue = "0") int index,
 		HttpServletRequest request
 	) throws OHServiceException, IOException {
 		Ward ward = wardBrowserManager.findWard(wardCode);
@@ -174,7 +196,24 @@ public class ReportsController {
 			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
 		}
 
-		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
+		if (dateFrom == null) {
+			dateFrom = LocalDateTime.now();
+		}
+
+		if (dateTo == null) {
+			dateTo = LocalDateTime.now();
+		}
+
+		if (index == 0) {
+			List<MovementWard> movementWardList = movWardBrowserManager.getMovementWard(wardCode, dateFrom, dateTo);
+			return getReport(reportsManager.printIncomesOrOutComes(WARD_PHARMACY_OUTCOMES, movWardBrowserManager.convertMovementWardForPrint(movementWardList)), request); //$NON-NLS-1$
+
+		} else if (index == 1) {
+			List<Movement> movementList = getIncomesMov(ward, dateFrom, dateTo);
+			return getReport(reportsManager.printIncomesOrOutComes(WARD_PHARMACY_INCOMES, movWardBrowserManager.convertMovementForPrint((List<Movement>) movementList)), request);
+		} else {
+			return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
+		}
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWardExcel")
@@ -262,5 +301,42 @@ public class ReportsController {
 			.header(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"" + resource.getFilename() + '"')
 			.body(out);
+	}
+
+	private List<Movement> getIncomesMov(Ward ward, LocalDateTime dateFrom, LocalDateTime dateTo) throws OHAPIException {
+
+		List<Movement> wardIncomes = new ArrayList<>();
+		try {
+			List<Movement> listMovementCentral = movBrowserManager.getMovements(ward.getCode(), dateFrom, dateTo);
+
+			for (Movement mov : listMovementCentral) {
+				if (mov.getWard().getDescription() != null) {
+					if (mov.getWard().equals(ward)) {
+						wardIncomes.add(mov);
+					}
+				}
+			}
+
+			// List movements from other wards
+			for (MovementWard wMvnt : movWardBrowserManager.getWardMovementsToWard(ward.getCode(), dateFrom, dateTo)) {
+				if (wMvnt.getWardTo().getDescription() != null) {
+					if (wMvnt.getWardTo().equals(ward)) {
+						MovementType typeCharge = new MovementType("fromward", wMvnt.getWard().getDescription(), "*", "*");
+						wardIncomes.add(new Movement(
+							wMvnt.getMedical(),
+							typeCharge,
+							ward,
+							wMvnt.getLot(),
+							wMvnt.getDate(),
+							wMvnt.getQuantity().intValue(),
+							null,
+							null));
+					}
+				}
+			}
+		} catch (OHServiceException ohServiceException) {
+			throw new OHAPIException(new OHExceptionMessage(ohServiceException.getMessage()));
+		}
+		return wardIncomes;
 	}
 }
