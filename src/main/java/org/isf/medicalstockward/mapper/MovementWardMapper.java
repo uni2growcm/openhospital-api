@@ -35,11 +35,8 @@ import java.util.Objects;
 
 @Component
 public class MovementWardMapper extends GenericMapper<MovementWard, MovementWardDTO> {
-	final PatientBrowserManager patientBrowserManager;
-
 	public MovementWardMapper(PatientBrowserManager patientBrowserManager) {
 		super(MovementWard.class, MovementWardDTO.class);
-		this.patientBrowserManager = patientBrowserManager;
 	}
 
 	@PostConstruct
