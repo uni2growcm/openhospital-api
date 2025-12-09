@@ -29,7 +29,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExamRowMapper extends GenericMapper<ExamRow, ExamRowDTO> {
 
-    public ExamRowMapper() {
-        super(ExamRow.class, ExamRowDTO.class);
-    }
+	private final ExamMapper examMapper;
+
+	public ExamRowMapper(ExamMapper examMapper) {
+		super(ExamRow.class, ExamRowDTO.class);
+		this.examMapper = examMapper;
+	}
+
+	@Override
+	public ExamRowDTO map2DTO(ExamRow model) {
+		ExamRowDTO dto = super.map2DTO(model);
+		if (model.getExamCode() != null) {
+			dto.setExam(examMapper.map2DTO(model.getExamCode()));
+		}
+		return dto;
+	}
+
+	@Override
+	public ExamRow map2Model(ExamRowDTO dto) {
+		ExamRow model = super.map2Model(dto);
+		if (dto.getExam() != null) {
+			model.setExamCode(examMapper.map2Model(dto.getExam()));
+		}
+		return model;
+	}
 }
