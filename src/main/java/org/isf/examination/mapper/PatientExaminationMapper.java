@@ -23,13 +23,38 @@ package org.isf.examination.mapper;
 
 import org.isf.examination.dto.PatientExaminationDTO;
 import org.isf.examination.model.PatientExamination;
+import org.isf.patient.model.Patient;
 import org.isf.shared.GenericMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PatientExaminationMapper extends GenericMapper<PatientExamination, PatientExaminationDTO> {
 
-    public PatientExaminationMapper() {
-        super(PatientExamination.class, PatientExaminationDTO.class);
-    }
+	public PatientExaminationMapper() {
+		super(PatientExamination.class, PatientExaminationDTO.class);
+	}
+
+	@Override
+	public PatientExaminationDTO map2DTO(PatientExamination model) {
+		PatientExaminationDTO dto = super.map2DTO(model);
+
+		if (model.getPatient() != null) {
+			dto.setPatientCode(model.getPatient().getCode());
+		}
+
+		return dto;
+	}
+
+	@Override
+	public PatientExamination map2Model(PatientExaminationDTO dto) {
+		PatientExamination model = super.map2Model(dto);
+
+		if (dto.getPatientCode() != null) {
+			Patient p = new Patient();
+			p.setCode(dto.getPatientCode());
+			model.setPatient(p);
+		}
+
+		return model;
+	}
 }

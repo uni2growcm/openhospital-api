@@ -37,12 +37,12 @@ public class PatientMapping {
 		});
 
 		modelMapper.typeMap(PatientDTO.class, Patient.class).addMappings(mapper -> {
-			mapper.<Boolean> map(src -> src.isConsensusFlag(), (db, value) -> db.getPatientConsensus().setConsensusFlag(value));
-			mapper.<Boolean> map(src -> src.isConsensusServiceFlag(), (db, value) -> db.getPatientConsensus().setServiceFlag(value));
+			mapper.<Boolean> map(PatientDTO::isConsensusFlag, (db, value) -> db.getPatientConsensus().setConsensusFlag(value));
+			mapper.<Boolean> map(PatientDTO::isConsensusServiceFlag, (db, value) -> db.getPatientConsensus().setServiceFlag(value));
 			mapper.<Patient> map(src -> src, (db, value) -> {
 				db.getPatientConsensus().setPatient(value);
 			});
-			mapper.map(src -> src.getBlobPhoto(), (destination, value) -> {
+			mapper.map(PatientDTO::getBlobPhoto, (destination, value) -> {
 				destination.getPatientProfilePhoto().setPhoto((byte[]) value);
 			});
 		});

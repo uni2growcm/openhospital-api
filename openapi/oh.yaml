@@ -3883,6 +3883,90 @@ paths:
                 format: byte
       security:
       - bearerAuth: []
+  /reports/pharmaceuticalStockWardExcel:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalStockWardExcel
+      parameters:
+      - name: wardCode
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: medicalCode
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: medicalTypeCode
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sex
+        in: query
+        required: false
+        schema:
+          type: string
+          default: A
+      - name: ageFrom
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: ageTo
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: weightFrom
+        in: query
+        required: false
+        schema:
+          type: number
+          format: float
+          default: 0.0
+      - name: weightTo
+        in: query
+        required: false
+        schema:
+          type: number
+          format: float
+          default: 0.0
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: index
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+      security:
+      - bearerAuth: []
   /reports/pharmaceuticalStockCard:
     get:
       tags:
@@ -6466,13 +6550,13 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
-          type: boolean
-        male:
+        opd:
           type: boolean
         female:
           type: boolean
-        opd:
+        male:
+          type: boolean
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -7206,11 +7290,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
@@ -7616,8 +7700,23 @@ components:
           example: 2021-06-24
         cost:
           type: number
-          description: The lot's code
+          description: The lot's cost
           example: 750
+        mainStoreQuantity:
+          type: integer
+          format: int32
+          description: The lot's main store quantity
+          example: 10
+        wardsTotalQuantity:
+          type: number
+          format: double
+          description: The lot's ward total  quantity
+          example: 15
+        overallQuantity:
+          type: number
+          format: double
+          description: The lot's overall quantity
+          example: 35
       required:
       - code
       - dueDate
@@ -7678,6 +7777,9 @@ components:
           format: int32
           description: Lock
           example: 0
+        deleted:
+          type: string
+          description: The if medical is deleted
     MalnutritionDTO:
       type: object
       properties:
@@ -8368,9 +8470,13 @@ components:
           format: LocalDate
           description: The movement ward's date
           example: 2020-06-07
-        patient:
-          $ref: "#/components/schemas/PatientDTO"
-          description: The patient in case the movement is associated to a patient
+        isPatient:
+          type: boolean
+          writeOnly: true
+        patientId:
+          type: integer
+          format: int32
+          description: The patient id in case the movement is associated to a patient
         age:
           type: integer
           format: int32
@@ -8404,6 +8510,11 @@ components:
         wardFrom:
           $ref: "#/components/schemas/WardDTO"
           description: The ward from which the movement is done
+        lot:
+          $ref: "#/components/schemas/LotDTO"
+          description: The lot of the medical concerned by the movement
+        patient:
+          type: boolean
       required:
       - date
       - description
