@@ -88,11 +88,11 @@ public class LotDTO {
 		return this.cost;
 	}
 
-	public Integer getMainStoreQuantity() {
+	public int getMainStoreQuantity() {
 		return this.mainStoreQuantity;
 	}
 
-	public Double getWardsTotalQuantity() {
+	public double getWardsTotalQuantity() {
 		return this.wardsTotalQuantity;
 	}
 
