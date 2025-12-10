@@ -3862,12 +3862,6 @@ paths:
       - Reports
       operationId: printPharmaceuticalStockWardPdf
       parameters:
-      - name: date
-        in: query
-        required: true
-        schema:
-          type: string
-          format: date-time
       - name: wardCode
         in: query
         required: true
@@ -3885,13 +3879,16 @@ paths:
         schema:
           type: string
           format: date-time
-      - name: index
+      - name: Stock ward report model
         in: query
         required: false
         schema:
-          type: integer
-          format: int32
-          default: 0
+          type: string
+          default: OUT_COMES
+          enum:
+          - IN_COMES
+          - OUT_COMES
+          - DRUGS
       responses:
         "200":
           description: OK
@@ -6569,13 +6566,13 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
-          type: boolean
-        female:
+        opd:
           type: boolean
         male:
           type: boolean
-        opd:
+        female:
+          type: boolean
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -7309,11 +7306,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
