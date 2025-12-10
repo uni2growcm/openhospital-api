@@ -184,7 +184,6 @@ public class ReportsController {
 
 	@GetMapping("/reports/pharmaceuticalStockWard")
 	public ResponseEntity<byte[]> printPharmaceuticalStockWardPdf(
-		@RequestParam LocalDateTime date,
 		@RequestParam String wardCode,
 		@RequestParam(value = "dateFrom", required = false) LocalDateTime dateFrom,
 		@RequestParam(value = "dateTo", required = false) LocalDateTime dateTo,
@@ -211,7 +210,7 @@ public class ReportsController {
 			List<Movement> movementList = getIncomesMov(ward, dateFrom, dateTo);
 			return getReport(reportsManager.getIncomesOrOutComesStockWardPdf(WARD_PHARMACY_INCOMES, movWardBrowserManager.convertMovementForPrint((List<Movement>) movementList)), request);
 		} else {
-			return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
+			return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(dateFrom, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
 		}
 	}
 
