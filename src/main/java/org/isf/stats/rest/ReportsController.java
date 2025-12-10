@@ -187,7 +187,7 @@ public class ReportsController {
 		@RequestParam String wardCode,
 		@RequestParam(value = "dateFrom", required = false) LocalDateTime dateFrom,
 		@RequestParam(value = "dateTo", required = false) LocalDateTime dateTo,
-		@RequestParam(value = "index", required = false, defaultValue = "0") int index,
+		@RequestParam(value = "Stock ward report model", required = false, defaultValue = "OUT_COMES") StockWardReportModel stockWardReportModel,
 		HttpServletRequest request
 	) throws OHServiceException, IOException {
 		Ward ward = wardBrowserManager.findWard(wardCode);
@@ -203,15 +203,15 @@ public class ReportsController {
 			dateTo = LocalDateTime.now();
 		}
 
-		if (index == 0) {
+		if (stockWardReportModel == StockWardReportModel.OUT_COMES) {
 			List<MovementWard> movementWardList = movWardBrowserManager.getMovementWard(wardCode, dateFrom, dateTo);
 			return getReport(reportsManager.getIncomesOrOutComesStockWardPdf(WARD_PHARMACY_OUTCOMES, movWardBrowserManager.convertMovementWardForPrint(movementWardList)), request); //$NON-NLS-1$
-		} else if (index == 1) {
+		} else if (stockWardReportModel == StockWardReportModel.IN_COMES) {
 			List<Movement> movementList = getIncomesMov(ward, dateFrom, dateTo);
 			return getReport(reportsManager.getIncomesOrOutComesStockWardPdf(WARD_PHARMACY_INCOMES, movWardBrowserManager.convertMovementForPrint((List<Movement>) movementList)), request);
-		} else {
-			return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(dateFrom, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
 		}
+
+		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(dateFrom, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWardExcel")
