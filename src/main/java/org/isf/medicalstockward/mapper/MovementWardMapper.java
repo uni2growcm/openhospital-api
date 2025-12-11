@@ -25,18 +25,18 @@ import jakarta.annotation.PostConstruct;
 
 import org.isf.medicalstockward.dto.MovementWardDTO;
 import org.isf.medicalstockward.model.MovementWard;
-import org.isf.patient.manager.PatientBrowserManager;
-import org.isf.patient.model.Patient;
+import org.isf.patient.mapper.PatientMapper;
 import org.isf.shared.GenericMapper;
-import org.isf.utils.exception.OHServiceException;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
 public class MovementWardMapper extends GenericMapper<MovementWard, MovementWardDTO> {
-	public MovementWardMapper(PatientBrowserManager patientBrowserManager) {
+	final PatientMapper patientMapper;
+	public MovementWardMapper(PatientMapper patientMapper) {
 		super(MovementWard.class, MovementWardDTO.class);
+		this.patientMapper = patientMapper;
 	}
 
 	@PostConstruct
@@ -48,7 +48,7 @@ public class MovementWardMapper extends GenericMapper<MovementWard, MovementWard
 
 		modelMapper.typeMap(MovementWardDTO.class, MovementWard.class)
 			.addMappings(mapper -> {
-				mapper.map(MovementWardDTO::getPatientId, MovementWard::setIsPatient);
+				mapper.map(MovementWardDTO::isPatient, MovementWard::setIsPatient);
 			});
 	}
 
@@ -56,7 +56,7 @@ public class MovementWardMapper extends GenericMapper<MovementWard, MovementWard
 	public MovementWardDTO map2DTO(MovementWard model) {
 		var dto = super.map2DTO(model);
 		if(!Objects.isNull(dto) && !Objects.isNull(model)) {
-			dto.setPatientId(model.getCode());
+			dto.setFullPatient(patientMapper.map2DTO(model.getPatient()));
 		}
 		return dto;
 	}
@@ -64,10 +64,8 @@ public class MovementWardMapper extends GenericMapper<MovementWard, MovementWard
 	@Override
 	public MovementWard map2Model(MovementWardDTO dto) {
 		var model = super.map2Model(dto);
-		if(!Objects.isNull(model) && !Objects.isNull(dto) && !Objects.isNull(dto.getPatientId())) {
-			var patient = new Patient();
-			patient.setCode(dto.getPatientId());
-			model.setPatient(patient);
+		if(!Objects.isNull(model) && !Objects.isNull(dto) && !Objects.isNull(dto.getFullPatient())) {
+			model.setFullPatient(patientMapper.map2Model(dto.getFullPatient()));
 		}
 		return  model;
 	}
