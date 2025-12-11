@@ -3879,15 +3879,15 @@ paths:
         schema:
           type: string
           format: date-time
-      - name: Stock ward report model
+      - name: stockWardReportModel
         in: query
         required: false
         schema:
           type: string
-          default: OUT_COMES
+          default: OUTCOMING
           enum:
-          - IN_COMES
-          - OUT_COMES
+          - INCOMING
+          - OUTCOMING
           - DRUGS
       responses:
         "200":
