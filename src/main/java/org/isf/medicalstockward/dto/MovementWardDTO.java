@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.isf.medical.dto.MedicalDTO;
 import org.isf.medicalstock.dto.LotDTO;
+import org.isf.patient.dto.PatientDTO;
 import org.isf.ward.dto.WardDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,8 +49,8 @@ public class MovementWardDTO {
 	@Schema(description = "Indicates if the movement is associated to a patient or no ", example = "false")
 	private boolean isPatient;
 
-	@Schema(description = "The patient id in case the movement is associated to a patient")
-	private Integer patientId;
+	@Schema(description = "The patient in case the movement is associated to a patient")
+	private PatientDTO fullPatient;
 
 	@Schema(description = "The patient's age in case the movement is associated to a patient", example = "21")
 	private int age;
@@ -85,14 +86,14 @@ public class MovementWardDTO {
 	public MovementWardDTO() {
 	}
 
-	public MovementWardDTO(int code, WardDTO ward, LocalDateTime date, boolean isPatient, Integer patientId, int age,
-	   float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
-	   WardDTO wardFrom, LotDTO lot) {
+	public MovementWardDTO(int code, WardDTO ward, LocalDateTime date, boolean isPatient, PatientDTO fullPatient, int age,
+						   float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
+						   WardDTO wardFrom, LotDTO lot) {
 		this.code = code;
 		this.ward = ward;
 		this.date = date;
 		this.isPatient = isPatient;
-		this.patientId = patientId;
+		this.fullPatient = fullPatient;
 		this.age = age;
 		this.weight = weight;
 		this.description = description;
@@ -120,8 +121,8 @@ public class MovementWardDTO {
 		return this.isPatient;
 	}
 
-	public Integer getPatientId() {
-		return this.patientId;
+	public PatientDTO getFullPatient() {
+		return this.fullPatient;
 	}
 
 	public int getAge() {
@@ -174,8 +175,8 @@ public class MovementWardDTO {
 		this.isPatient = isPatient;
 	}
 
-	public void setPatientId(Integer patientId) {
-		this.patientId = patientId;
+	public void setFullPatient(PatientDTO fullPatient) {
+		this.fullPatient = fullPatient;
 	}
 
 	public void setAge(int age) {
