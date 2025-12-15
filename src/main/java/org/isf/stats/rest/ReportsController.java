@@ -32,6 +32,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,6 +44,11 @@ import org.apache.poi.util.IOUtils;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
 import org.isf.generaldata.GeneralData;
+import org.isf.medicalstock.manager.MovBrowserManager;
+import org.isf.medicalstock.model.Movement;
+import org.isf.medicalstockward.manager.MovWardBrowserManager;
+import org.isf.medicalstockward.model.MovementWard;
+import org.isf.medstockmovtype.model.MovementType;
 import org.isf.medicalstock.manager.MovBrowserManager;
 import org.isf.medicalstock.model.Movement;
 import org.isf.medicalstockward.manager.MovWardBrowserManager;
@@ -100,9 +106,9 @@ public class ReportsController {
 		this.reportsManager = reportsManager;
 		this.medicalBrowsingManager = medicalBrowsingManager;
 		this.wardBrowserManager = wardBrowserManager;
-		this.printManager = printManager;
-		this.movWardBrowserManager = movWardBrowserManager;
 		this.movBrowserManager = movBrowserManager;
+		this.movWardBrowserManager = movWardBrowserManager;
+		this.printManager = printManager;
 	}
 
 	@GetMapping("/reports/exams-list")
@@ -136,7 +142,7 @@ public class ReportsController {
 
 		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
 	}
-		
+
 	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
 	public ResponseEntity<Resource> printPharmaceuticalStockPdf(
 		HttpServletRequest request,
@@ -174,7 +180,7 @@ public class ReportsController {
 	) throws OHServiceException, IOException {
 		return getReport(reportsManager.GenericReportPharmaceuticalAMCPdf(date, PHARMACEUTICAL_AMC_REPORT, request.getLocale()), request);
 	}
-	
+
 	@GetMapping("/reports/pharmaceuticalOrder")
 	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
 		JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", request.getLocale());
@@ -197,11 +203,10 @@ public class ReportsController {
 
 	@GetMapping("/reports/pharmaceuticalStockWard")
 	public ResponseEntity<Resource> printPharmaceuticalStockWardPdf(
-		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime date,
 		@RequestParam String wardCode,
-		@RequestParam(value = "index", required = false, defaultValue = "0") int index,
-		@RequestParam(required = false) LocalDateTime dateForm,
-		@RequestParam(required = false) LocalDateTime dateTo,
+		@RequestParam(value = "dateFrom", required = false) LocalDateTime dateFrom,
+		@RequestParam(value = "dateTo", required = false) LocalDateTime dateTo,
+		@RequestParam(value = "stockWardReportModel", required = false, defaultValue = "OUTCOMING") StockWardReportModel stockWardReportModel,
 		HttpServletRequest request
 	) throws OHServiceException, IOException, JRException, SQLException {
 		Ward ward = wardBrowserManager.findWard(wardCode);
@@ -209,7 +214,23 @@ public class ReportsController {
 			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
 		}
 
-		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(date, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
+		if (dateFrom == null) {
+			dateFrom = LocalDateTime.now();
+		}
+
+		if (dateTo == null) {
+			dateTo = LocalDateTime.now();
+		}
+
+		if (stockWardReportModel == StockWardReportModel.OUTCOMING) {
+			List<MovementWard> movementWardList = movWardBrowserManager.getMovementWard(wardCode, dateFrom, dateTo);
+			return getReport(reportsManager.getIncomesOrOutComesStockWardPdf(WARD_PHARMACY_OUTCOMES, movWardBrowserManager.convertMovementWardForPrint(movementWardList)), request); //$NON-NLS-1$
+		} else if (stockWardReportModel == StockWardReportModel.INCOMING) {
+			List<Movement> movementList = getIncomesMov(ward, dateFrom, dateTo);
+			return getReport(reportsManager.getIncomesOrOutComesStockWardPdf(WARD_PHARMACY_INCOMES, movWardBrowserManager.convertMovementForPrint((List<Movement>) movementList)), request);
+		}
+
+		return getReport(reportsManager.getGenericReportPharmaceuticalStockWardPdf(dateFrom, PHARMACEUTICAL_STOCK_WARD_REPORT, ward, request.getLocale()), request);
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWardExcel")
@@ -283,5 +304,42 @@ public class ReportsController {
 			.header(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"" + resource.getFilename() + '"')
 			.body(resource);
+	}
+
+	private List<Movement> getIncomesMov(Ward ward, LocalDateTime dateFrom, LocalDateTime dateTo) throws OHAPIException {
+
+		List<Movement> wardIncomes = new ArrayList<>();
+		try {
+			List<Movement> listMovementCentral = movBrowserManager.getMovements(ward.getCode(), dateFrom, dateTo);
+
+			for (Movement mov : listMovementCentral) {
+				if (mov.getWard().getDescription() != null) {
+					if (mov.getWard().equals(ward)) {
+						wardIncomes.add(mov);
+					}
+				}
+			}
+
+			// List movements from other wards
+			for (MovementWard wMvnt : movWardBrowserManager.getWardMovementsToWard(ward.getCode(), dateFrom, dateTo)) {
+				if (wMvnt.getWardTo().getDescription() != null) {
+					if (wMvnt.getWardTo().equals(ward)) {
+						MovementType typeCharge = new MovementType("fromward", wMvnt.getWard().getDescription(), "*", "*");
+						wardIncomes.add(new Movement(
+							wMvnt.getMedical(),
+							typeCharge,
+							ward,
+							wMvnt.getLot(),
+							wMvnt.getDate(),
+							wMvnt.getQuantity().intValue(),
+							null,
+							null));
+					}
+				}
+			}
+		} catch (OHServiceException ohServiceException) {
+			throw new OHAPIException(new OHExceptionMessage(ohServiceException.getMessage()));
+		}
+		return wardIncomes;
 	}
 }

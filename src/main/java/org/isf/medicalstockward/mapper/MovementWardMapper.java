@@ -25,21 +25,48 @@ import jakarta.annotation.PostConstruct;
 
 import org.isf.medicalstockward.dto.MovementWardDTO;
 import org.isf.medicalstockward.model.MovementWard;
+import org.isf.patient.mapper.PatientMapper;
 import org.isf.shared.GenericMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 @Component
 public class MovementWardMapper extends GenericMapper<MovementWard, MovementWardDTO> {
-
-	public MovementWardMapper() {
+	final PatientMapper patientMapper;
+	public MovementWardMapper(PatientMapper patientMapper) {
 		super(MovementWard.class, MovementWardDTO.class);
+		this.patientMapper = patientMapper;
 	}
 
 	@PostConstruct
 	public void setup() {
 		modelMapper.typeMap(MovementWard.class, MovementWardDTO.class)
-			.addMapping(MovementWard::isPatient, MovementWardDTO::setIsPatient)
-			.addMapping(MovementWard::getPatient, MovementWardDTO::setPatient);
+			.addMappings(mapper -> {
+				mapper.map(MovementWard::isPatient, MovementWardDTO::setIsPatient);
+			});
+
+		modelMapper.typeMap(MovementWardDTO.class, MovementWard.class)
+			.addMappings(mapper -> {
+				mapper.map(MovementWardDTO::isPatient, MovementWard::setIsPatient);
+			});
+	}
+
+	@Override
+	public MovementWardDTO map2DTO(MovementWard model) {
+		var dto = super.map2DTO(model);
+		if(!Objects.isNull(dto) && !Objects.isNull(model)) {
+			dto.setFullPatient(patientMapper.map2DTO(model.getPatient()));
+		}
+		return dto;
+	}
+
+	@Override
+	public MovementWard map2Model(MovementWardDTO dto) {
+		var model = super.map2Model(dto);
+		if(!Objects.isNull(model) && !Objects.isNull(dto) && !Objects.isNull(dto.getFullPatient())) {
+			model.setFullPatient(patientMapper.map2Model(dto.getFullPatient()));
+		}
+		return  model;
 	}
 }

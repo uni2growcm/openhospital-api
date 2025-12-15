@@ -43,16 +43,16 @@ public class LotDTO {
 	@Schema(description = "The due date", example = "2021-06-24", type = "string")
 	private LocalDateTime dueDate;
 
-	@Schema(description = "The lot's code", example = "750")
+	@Schema(description = "The lot's cost", example = "750")
 	private BigDecimal cost;
 
-	@Schema(description = "Main store quantity", example = "22")
+	@Schema(description = "The lot's main store quantity", example = "10")
 	private int mainStoreQuantity;
 
-	@Schema(description = "Wards total quantity", example = "40")
+	@Schema(description = "The lot's ward total  quantity", example = "15")
 	private double wardsTotalQuantity;
 
-	@Schema(description = "over all quantity", example = "62")
+	@Schema(description = "The lot's overall quantity", example = "35")
 	private double overallQuantity;
 
 	public LotDTO() {
@@ -65,19 +65,8 @@ public class LotDTO {
 		this.cost = cost;
 	}
 
-	public LotDTO(
-		String code,
-		LocalDateTime preparationDate,
-		LocalDateTime dueDate,
-		BigDecimal cost,
-		int mainStoreQuantity,
-		double wardsTotalQuantity,
-		double overallQuantity
-	) {
-		this.code = code;
-		this.preparationDate = preparationDate;
-		this.dueDate = dueDate;
-		this.cost = cost;
+	public LotDTO(String code, LocalDateTime preparationDate, LocalDateTime dueDate, BigDecimal cost, int mainStoreQuantity, double wardsTotalQuantity, double overallQuantity) {
+		this(code, preparationDate, dueDate,cost);
 		this.mainStoreQuantity = mainStoreQuantity;
 		this.wardsTotalQuantity = wardsTotalQuantity;
 		this.overallQuantity = overallQuantity;
@@ -99,6 +88,18 @@ public class LotDTO {
 		return this.cost;
 	}
 
+	public int getMainStoreQuantity() {
+		return this.mainStoreQuantity;
+	}
+
+	public double getWardsTotalQuantity() {
+		return this.wardsTotalQuantity;
+	}
+
+	public double getOverallQuantity() {
+		return this.mainStoreQuantity + wardsTotalQuantity;
+	}
+
 	public void setCode(String code) {
 		this.code = code;
 	}
@@ -115,24 +116,12 @@ public class LotDTO {
 		this.cost = cost;
 	}
 
-	public int getMainStoreQuantity() {
-		return mainStoreQuantity;
-	}
-
 	public void setMainStoreQuantity(int mainStoreQuantity) {
 		this.mainStoreQuantity = mainStoreQuantity;
 	}
 
-	public double getWardsTotalQuantity() {
-		return wardsTotalQuantity;
-	}
-
 	public void setWardsTotalQuantity(double wardsTotalQuantity) {
 		this.wardsTotalQuantity = wardsTotalQuantity;
-	}
-
-	public double getOverallQuantity() {
-		return overallQuantity;
 	}
 
 	public void setOverallQuantity(double overallQuantity) {
