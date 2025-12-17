@@ -6251,10 +6251,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PluginsManifest'
+                $ref: '#/components/schemas/PluginsManifestDTO'
         "400":
           description: Bad Request
-  /plugins/{id}:
+  /plugins/{pluginId}:
     get:
       summary: Retrieve a specific plugin resource (JavaScript bundle) by id.
       tags:
@@ -6262,7 +6262,7 @@ paths:
       operationId: getPluginResource
       parameters:
         - name: pluginId
-          in: query
+          in: path
           description: Unique id of the plugin.
           required: true
           schema:
@@ -6332,7 +6332,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DocumentListResponse'
+                $ref: '#/components/schemas/DocumentListResponseDTO'
         '400':
           description: Bad Request (Invalid parameters supplied).
         '404':
@@ -6366,11 +6366,6 @@ paths:
           schema:
             type: string
             format: date
-        - name: file
-          schema:
-            image/jpeg:
-              schema:
-                $ref: '#/components/schemas/BinaryFile'
       requestBody:
         required: true
         content:
@@ -6390,7 +6385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Document'
+                $ref: '#/components/schemas/DocumentDTO'
         '400':
           description: Bad Request (Invalid parameters or file format).
         '403':
@@ -6417,7 +6412,7 @@ paths:
           content:
             image/jpeg:
               schema:
-                $ref: '#/components/schemas/BinaryFile'
+                $ref: '#/components/schemas/BinaryFileDTO'
           headers:
             Content-Type:
               description: MIME type of the returned file.
@@ -8616,15 +8611,15 @@ components:
           $ref: "#/components/schemas/PatientDTO"
         admission:
           $ref: "#/components/schemas/AdmissionDTO"
-    PluginsManifest:
+    PluginsManifestDTO:
       type: object
       description: Manifest listing available plugins.
       properties:
         plugins:
           type: array
           items:
-            $ref: '#/components/schemas/PluginEntry'
-    PluginEntry:
+            $ref: '#/components/schemas/PluginEntryDTO'
+    PluginEntryDTO:
       type: object
       description: Metadata of a plugin.
       properties:
@@ -8634,7 +8629,7 @@ components:
         name:
           type: string
           description: Display name of the plugin.
-    Document:
+    DocumentDTO:
       type: object
       description: Detailed information about a single document.
       properties:
@@ -8657,7 +8652,7 @@ components:
           type: string
           format: date
           description: The clinical date extracted from the file name.
-    DocumentListResponse:
+    DocumentListResponseDTO:
       type: object
       description: Paginated response body for document listings.
       properties:
@@ -8671,11 +8666,15 @@ components:
         documents:
           type: array
           items:
-            $ref: '#/components/schemas/Document'
-    BinaryFile:
+            $ref: '#/components/schemas/DocumentDTO'
+    BinaryFileDTO:
       type: string
       format: binary
       description: Representation of a binary file (e.g., image content).
+    securitySchemes:
+      basicAuth:
+        type: http
+        scheme: basic
   securitySchemes:
     bearerAuth:
       type: http
