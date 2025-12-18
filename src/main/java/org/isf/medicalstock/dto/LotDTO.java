@@ -123,4 +123,8 @@ public class LotDTO {
 	public void setWardsTotalQuantity(double wardsTotalQuantity) {
 		this.wardsTotalQuantity = wardsTotalQuantity;
 	}
+
+	public void setOverallQuantity(double overallQuantity) {
+		this.overallQuantity = overallQuantity;
+	}
 }
