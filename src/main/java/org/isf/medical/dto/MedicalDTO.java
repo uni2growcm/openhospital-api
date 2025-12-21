@@ -36,7 +36,7 @@ public class MedicalDTO {
 	private Integer code;
 
 	@Schema(description = "The product code", example = "PARA")
-	private String prod_code;
+	private String prodCode;
 
 	@Schema(description = "The medical type")
 	private MedicalTypeDTO type;
@@ -80,7 +80,7 @@ public class MedicalDTO {
 		Integer pcsperpck, double minqty, double inqty, double outqty) {
 		this.code = code;
 		this.type = type;
-		this.prod_code = prod_code;
+		this.prodCode = prod_code;
 		this.description = description;
 		this.initialqty = initialqty;
 		this.pcsperpck = pcsperpck;
@@ -113,8 +113,8 @@ public class MedicalDTO {
 		return this.code;
 	}
 
-	public String getProd_code() {
-		return this.prod_code;
+	public String getProdCode() {
+		return this.prodCode;
 	}
 
 	public MedicalTypeDTO getType() {
@@ -151,8 +151,8 @@ public class MedicalDTO {
 		this.code = code;
 	}
 
-	public void setProd_code(String prod_code) {
-		this.prod_code = prod_code;
+	public void setProdCode(String prod_code) {
+		this.prodCode = prod_code;
 	}
 
 	public void setType(MedicalTypeDTO type) {
