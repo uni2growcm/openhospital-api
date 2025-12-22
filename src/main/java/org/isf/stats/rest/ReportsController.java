@@ -62,6 +62,7 @@ import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.ward.manager.WardBrowserManager;
 import org.isf.ward.model.Ward;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -197,7 +198,7 @@ public class ReportsController {
 	public ResponseEntity<Resource> printPharmaceuticalExpirationPdf(
 		@RequestParam LocalDate fromDate,
 		@RequestParam LocalDate toDate,
-		HttpServletRequest request) throws OHServiceException, JRException, IOException {
+		HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getGenericReportFromDateToDate2Pdf(fromDate, toDate, "PharmaceuticalExpiration", request.getLocale()), request);
 	}
 
@@ -208,7 +209,7 @@ public class ReportsController {
 		@RequestParam(value = "dateTo", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime dateTo,
 		@RequestParam(value = "stockWardReportModel", required = false, defaultValue = "OUTCOMING") StockWardReportModel stockWardReportModel,
 		HttpServletRequest request
-	) throws OHServiceException, IOException, JRException, SQLException {
+	) throws OHServiceException, IOException {
 		Ward ward = wardBrowserManager.findWard(wardCode);
 		if (ward == null) {
 			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
@@ -234,7 +235,7 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/pharmaceuticalStockWardExcel")
-	public ResponseEntity<?> printPharmaceuticalStockWardExcel(
+	public ResponseEntity<Resource> printPharmaceuticalStockWardExcel(
 		@RequestParam String wardCode,
 		@RequestParam(value = "medicalCode", required = false) Integer medicalCode,
 		@RequestParam(value = "medicalTypeCode", required = false) String medicalTypeCode,
@@ -243,10 +244,10 @@ public class ReportsController {
 		@RequestParam(value = "ageTo", required = false, defaultValue = "0") int ageTo,
 		@RequestParam(value = "weightFrom", required = false, defaultValue = "0") float weightFrom,
 		@RequestParam(value = "weightTo", required = false, defaultValue = "0") float weightTo,
-		@RequestParam LocalDateTime dateFrom,
-		@RequestParam LocalDateTime dateTo,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime dateFrom,
+		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime dateTo,
 		@RequestParam(value = "index", required = false, defaultValue = "0") int index
-	) throws OHServiceException, IOException {
+	) throws OHServiceException, IOException, SQLException {
 		Ward ward = wardBrowserManager.findWard(wardCode);
 		if (ward == null) {
 			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
@@ -271,18 +272,14 @@ public class ReportsController {
 		);
 
 		byte[] fileContent = Files.readAllBytes(tempFile.toPath());
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		if (index == 0) {
-			headers.setContentDispositionFormData("attachment", "StockWard" + "_" + ward + "_" + dateFrom.format(formatter) + "_" + dateTo.format(formatter) + "_" + "Outcomes.xlsx");
-		} else if (index == 1) {
-			headers.setContentDispositionFormData("attachment", "StockWard" + "_" + ward + "_" + dateFrom.format(formatter)  + "_" + dateTo.format(formatter) + "_" + "Incomes.xlsx");
-		} else if (index == 2) {
-			headers.setContentDispositionFormData("attachment", "StockWard" + "_" + ward + "_" + dateFrom.format(formatter)  + "_" + dateTo.format(formatter) + "_" + "Drugs.xlsx");
-		}
+		Blob blob = new SerialBlob(fileContent);
+		ByteArrayResource resource = new ByteArrayResource(blob.getBinaryStream().readAllBytes());
 
-		return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+		return ResponseEntity.ok()
+			.contentType(MediaType.APPLICATION_OCTET_STREAM)
+			.header(HttpHeaders.CONTENT_DISPOSITION,
+				"attachment; filename=\"" + resource.getFilename() + '"')
+			.body(resource);
 	}
 
 	private ResponseEntity<Resource> getReport(
