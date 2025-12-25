@@ -6566,11 +6566,11 @@ components:
           format: int32
           description: lock
           example: 0
+        pharmacy:
+          type: boolean
         male:
           type: boolean
         female:
-          type: boolean
-        pharmacy:
           type: boolean
         opd:
           type: boolean
@@ -7306,11 +7306,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
+        fhu:
+          type: string
         yprog:
           type: integer
           format: int32
-        fhu:
-          type: string
       required:
       - admDate
       - admitted
@@ -7746,6 +7746,10 @@ components:
           description: The id of the medical
           example: 1
           maxLength: 5
+        prodCode:
+          type: string
+          description: The product code
+          example: PARA
         type:
           $ref: "#/components/schemas/MedicalTypeDTO"
           description: The medical type
@@ -7792,8 +7796,6 @@ components:
         deleted:
           type: string
           description: The if medical is deleted
-        prodCode:
-          type: string
     MalnutritionDTO:
       type: object
       properties:

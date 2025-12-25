@@ -76,11 +76,11 @@ public class MedicalDTO {
 	/**
 	 * Constructor
 	 */
-	public MedicalDTO(Integer code, MedicalTypeDTO type, String prod_code, String description, double initialqty,
+	public MedicalDTO(Integer code, MedicalTypeDTO type, String prodCode, String description, double initialqty,
 		Integer pcsperpck, double minqty, double inqty, double outqty) {
 		this.code = code;
 		this.type = type;
-		this.prodCode = prod_code;
+		this.prodCode = prodCode;
 		this.description = description;
 		this.initialqty = initialqty;
 		this.pcsperpck = pcsperpck;
@@ -151,8 +151,8 @@ public class MedicalDTO {
 		this.code = code;
 	}
 
-	public void setProdCode(String prod_code) {
-		this.prodCode = prod_code;
+	public void setProdCode(String prodCode) {
+		this.prodCode = prodCode;
 	}
 
 	public void setType(MedicalTypeDTO type) {
