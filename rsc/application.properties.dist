@@ -36,8 +36,8 @@ spring.mvc.pathmatch.matching-strategy=ANT_PATH_MATCHER
 ### Security token secret (JWT)
 jwt.token.secret=JWT_TOKEN_SECRET
 
-### JWT token validity, 30 minutes (1,800 seconds)
-jwt.token.validityInSeconds=1800
+### JWT token validity, 1 hour (3,600 seconds)
+jwt.token.validityInSeconds=3600
 
 ### JWT token validity for remember me, 3 days (259,200 seconds)
 jwt.token.validityInSecondsForRememberMe=259200
