@@ -56,6 +56,15 @@ public class PatientDTO {
 	@Schema(description = "Age type", example = "null")
 	private String agetype;
 
+	@Schema(description = "Age in days (used when ageUnit = DAY)", example = "12")
+	private Integer ageDays;
+
+	@Schema(description = "Age in weeks (used when ageUnit = WEEK)", example = "3")
+	private Integer ageWeeks;
+
+	@Schema(description = "Age in months (used when ageUnit = MONTH)", example = "8")
+	private Integer ageMonths;
+
 	@NotNull
 	@Schema(description = "Sex", allowableValues = { "M", "F" }, example = "M")
 	private char sex;
@@ -311,6 +320,30 @@ public class PatientDTO {
 
 	public void setAgetype(String agetype) {
 		this.agetype = agetype;
+	}
+
+	public Integer getAgeDays() {
+		return ageDays;
+	}
+
+	public void setAgeDays(Integer ageDays) {
+		this.ageDays = ageDays;
+	}
+
+	public Integer getAgeWeeks() {
+		return ageWeeks;
+	}
+
+	public void setAgeWeeks(Integer ageWeeks) {
+		this.ageWeeks = ageWeeks;
+	}
+
+	public Integer getAgeMonths() {
+		return ageMonths;
+	}
+
+	public void setAgeMonths(Integer ageMonths) {
+		this.ageMonths = ageMonths;
 	}
 
 	public void setSex(char sex) {
