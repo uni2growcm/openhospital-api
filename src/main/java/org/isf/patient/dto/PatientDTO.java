@@ -56,13 +56,13 @@ public class PatientDTO {
 	@Schema(description = "Age type", example = "null")
 	private String agetype;
 
-	@Schema(description = "Age in days (used when ageUnit = DAY)", example = "12")
+	@Schema(description = "Number of days after the child's birth", example = "12")
 	private Integer ageDays;
 
-	@Schema(description = "Age in weeks (used when ageUnit = WEEK)", example = "3")
+	@Schema(description = "Number of weeks after the child's birth", example = "3")
 	private Integer ageWeeks;
 
-	@Schema(description = "Age in months (used when ageUnit = MONTH)", example = "8")
+	@Schema(description = "Number of months  after the child's birth", example = "8")
 	private Integer ageMonths;
 
 	@NotNull
