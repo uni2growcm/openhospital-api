@@ -46,6 +46,7 @@ import org.isf.menu.model.UserGroup;
 import org.isf.permissions.manager.PermissionManager;
 import org.isf.permissions.model.Permission;
 import org.isf.users.data.UserHelper;
+import org.isf.users.dto.PasswordDTO;
 import org.isf.users.dto.UserDTO;
 import org.isf.users.mapper.UserMapper;
 import org.isf.utils.exception.OHServiceException;
@@ -371,6 +372,73 @@ class UserControllerTest {
 			verify(userManager, never()).updatePassword(any());
 			verify(userManager).updateUser(any());
 		}
+	}
+
+	@Test
+	@DisplayName("Should update password successfully when user is authorized and old password is correct")
+	@WithMockUser(username = "john", authorities = { "users.update" })
+	void shouldUpdatePasswordSuccessfully() throws Exception {
+		String username = "john";
+		String oldPass = "oldSecret";
+		String newPass = "newSecret123";
+
+		User user = UserHelper.generateUser();
+		user.setUserName(username);
+		user.setPasswd(oldPass);
+
+		PasswordDTO passwordDTO = new PasswordDTO(username, oldPass, newPass);
+
+		when(userManager.getUserByName(username)).thenReturn(user);
+
+		User updatedUser = UserHelper.generateUser();
+		updatedUser.setUserName(username);
+		updatedUser.setPasswd(newPass);
+
+		when(userManager.updatePassword(any(User.class))).thenReturn(updatedUser);
+
+		mvc.perform(put("/users/updatepassword")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(passwordDTO)))
+			.andDo(log())
+			.andExpect(status().isOk());
+
+		verify(userManager).updatePassword(any(User.class));
+	}
+
+	@Test
+	@DisplayName("Should fail when user tries to update another user's password")
+	@WithMockUser(username = "hacker")
+	void shouldFailWhenUpdatingOtherUserPassword() throws Exception {
+		PasswordDTO passwordDTO = new PasswordDTO("victimUser", "oldPass", "newPass");
+
+		mvc.perform(put("/users/updatepassword")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(passwordDTO)))
+			.andDo(log())
+			.andExpect(status().isForbidden());
+
+		verify(userManager, never()).updatePassword(any());
+	}
+
+	@Test
+	@DisplayName("Should return original user (no update) when old password is incorrect")
+	@WithMockUser(username = "john", authorities = { "users.update" }) // Added authority
+	void shouldNotUpdateWhenOldPasswordIsIncorrect() throws Exception {
+		User user = UserHelper.generateUser();
+		user.setUserName("john");
+		user.setPasswd("actualPassword");
+
+		PasswordDTO passwordDTO = new PasswordDTO("john", "wrongPassword", "newPass");
+
+		when(userManager.getUserByName("john")).thenReturn(user);
+
+		mvc.perform(put("/users/updatepassword")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(passwordDTO)))
+			.andDo(log())
+			.andExpect(status().isOk());
+
+		verify(userManager, never()).updatePassword(any());
 	}
 
 	@Nested
