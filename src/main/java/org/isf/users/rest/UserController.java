@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -287,6 +288,7 @@ public class UserController {
 	@PutMapping("/users/updatepassword")
 	public UserDTO updatePassword(@Valid @RequestBody PasswordDTO passwordDTO) throws OHServiceException {
 		String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		LOGGER.info("Attempting password update for user: {}", passwordDTO.getUsername());
 
 		if (!passwordDTO.getUsername().equals(currentUser)) {
@@ -300,7 +302,7 @@ public class UserController {
 		}
 
 		try {
-			if (user.getPasswd().equals(passwordDTO.getOldPasswd())) {
+			if (passwordEncoder.matches(passwordDTO.getOldPasswd(), user.getPasswd())) {
 				user.setPasswd(passwordDTO.getNewPasswd());
 				User updatedUser = userManager.updatePassword(user);
 
@@ -309,8 +311,10 @@ public class UserController {
 				return userMapper.map2DTO(updatedUser);
 			} else {
 				LOGGER.info("Password not successfully updated for user: {}", currentUser);
-				user.setPasswd(null); // Clear password for the response
-				return userMapper.map2DTO(user);
+				throw new OHAPIException(
+					new OHExceptionMessage("Invalid old password"),
+					HttpStatus.BAD_REQUEST
+				);
 			}
 		} catch (OHServiceException e) {
 			LOGGER.error("Password update failed: {}", e.getMessage());

@@ -60,6 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -382,9 +383,11 @@ class UserControllerTest {
 		String oldPass = "oldSecret";
 		String newPass = "newSecret123";
 
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
 		User user = UserHelper.generateUser();
 		user.setUserName(username);
-		user.setPasswd(oldPass);
+		user.setPasswd(encoder.encode(oldPass)); // hashed old password
 
 		PasswordDTO passwordDTO = new PasswordDTO(username, oldPass, newPass);
 
@@ -392,7 +395,7 @@ class UserControllerTest {
 
 		User updatedUser = UserHelper.generateUser();
 		updatedUser.setUserName(username);
-		updatedUser.setPasswd(newPass);
+		updatedUser.setPasswd(encoder.encode(newPass));
 
 		when(userManager.updatePassword(any(User.class))).thenReturn(updatedUser);
 
@@ -421,12 +424,14 @@ class UserControllerTest {
 	}
 
 	@Test
-	@DisplayName("Should return original user (no update) when old password is incorrect")
-	@WithMockUser(username = "john", authorities = { "users.update" }) // Added authority
+	@DisplayName("Should return BAD_REQUEST when old password is incorrect")
+	@WithMockUser(username = "john", authorities = { "users.update" })
 	void shouldNotUpdateWhenOldPasswordIsIncorrect() throws Exception {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
 		User user = UserHelper.generateUser();
 		user.setUserName("john");
-		user.setPasswd("actualPassword");
+		user.setPasswd(encoder.encode("actualPassword")); // hashed actual password
 
 		PasswordDTO passwordDTO = new PasswordDTO("john", "wrongPassword", "newPass");
 
@@ -436,7 +441,7 @@ class UserControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(passwordDTO)))
 			.andDo(log())
-			.andExpect(status().isOk());
+			.andExpect(status().isBadRequest());
 
 		verify(userManager, never()).updatePassword(any());
 	}
