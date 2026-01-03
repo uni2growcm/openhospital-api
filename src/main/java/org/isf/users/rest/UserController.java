@@ -303,11 +303,11 @@ public class UserController {
 
 		try {
 			if (passwordEncoder.matches(passwordDTO.getOldPasswd(), user.getPasswd())) {
-				user.setPasswd(passwordDTO.getNewPasswd());
+				user.setPasswd(passwordEncoder.encode(passwordDTO.getNewPasswd()));
 				User updatedUser = userManager.updatePassword(user);
 
 				LOGGER.info("Password successfully updated for user: {}", currentUser);
-				updatedUser.setPasswd(null); // Clear password for the response
+				updatedUser.setPasswd(null);
 				return userMapper.map2DTO(updatedUser);
 			} else {
 				LOGGER.info("Password not successfully updated for user: {}", currentUser);
