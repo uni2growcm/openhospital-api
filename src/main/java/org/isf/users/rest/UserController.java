@@ -35,6 +35,7 @@ import org.isf.permissions.mapper.PermissionMapper;
 import org.isf.permissions.model.Permission;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.usergroups.mapper.UserGroupMapper;
+import org.isf.users.dto.PasswordDTO;
 import org.isf.users.dto.UserDTO;
 import org.isf.users.dto.UserProfileDTO;
 import org.isf.users.mapper.UserMapper;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -275,5 +277,48 @@ public class UserController {
 		userProfileDTO.setUserName(currentUser);
 		userProfileDTO.setPermissions(permissionsCode);
 		return userProfileDTO;
+	}
+
+	/**
+	 * Updates the password for the currently logged-in user.
+	 * @param passwordDTO - contains username, old password, and new password
+	 * @return the updated {@link UserDTO}
+	 * @throws OHServiceException if verification fails or update fails
+	 */
+	@PutMapping("/users/updatepassword")
+	public UserDTO updatePassword(@Valid @RequestBody PasswordDTO passwordDTO) throws OHServiceException {
+		String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		LOGGER.info("Attempting password update for user: {}", passwordDTO.getUsername());
+
+		if (!passwordDTO.getUsername().equals(currentUser)) {
+			LOGGER.warn("User {} tried to update password for {}", currentUser, passwordDTO.getUsername());
+			throw new OHAPIException(new OHExceptionMessage("You are not authorized to update this password."), HttpStatus.FORBIDDEN);
+		}
+
+		User user = userManager.getUserByName(passwordDTO.getUsername());
+		if (user == null) {
+			throw new OHAPIException(new OHExceptionMessage("User not found."), HttpStatus.NOT_FOUND);
+		}
+
+		try {
+			if (passwordEncoder.matches(passwordDTO.getOldPasswd(), user.getPasswd())) {
+				user.setPasswd(passwordEncoder.encode(passwordDTO.getNewPasswd()));
+				User updatedUser = userManager.updatePassword(user);
+
+				LOGGER.info("Password successfully updated for user: {}", currentUser);
+				updatedUser.setPasswd(null);
+				return userMapper.map2DTO(updatedUser);
+			} else {
+				LOGGER.info("Password not successfully updated for user: {}", currentUser);
+				throw new OHAPIException(
+					new OHExceptionMessage("Invalid old password"),
+					HttpStatus.BAD_REQUEST
+				);
+			}
+		} catch (OHServiceException e) {
+			LOGGER.error("Password update failed: {}", e.getMessage());
+			throw new OHAPIException(new OHExceptionMessage("Invalid old password or update failed."), HttpStatus.BAD_REQUEST);
+		}
 	}
 }
