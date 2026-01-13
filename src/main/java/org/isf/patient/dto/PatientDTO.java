@@ -372,7 +372,7 @@ public class PatientDTO {
 		this.blobPhoto = blobPhoto;
 	}
 
-	public void setUpdatedFrom(String updateFrom) {
-		this.updatedFrom = updateFrom;
+	public void setUpdatedFrom(String updatedFrom) {
+		this.updatedFrom = updatedFrom;
 	}
 }

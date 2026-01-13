@@ -156,15 +156,10 @@ public class PatientController {
 			);
 		}
 
-		// PATCH must NOT require code match
-		// (client may omit code in PATCH payload)
-
-		// Validate blob photo only if provided
 		if (patchPatient.getBlobPhoto() != null && patchPatient.getBlobPhoto().length == 0) {
 			throw new OHAPIException(new OHExceptionMessage("Malformed picture."));
 		}
 
-		// Apply partial updates
 		applyPatch(patientRead, patchPatient);
 
 		Patient patient = patientManager.savePatient(patientRead);
@@ -318,7 +313,6 @@ public class PatientController {
 
 	private void applyPatch(Patient patient, PatientDTO patch) throws OHAPIException {
 
-		// -------- Strings --------
 		if (patch.getFirstName() != null) {
 			patient.setFirstName(patch.getFirstName());
 		}
@@ -375,12 +369,10 @@ public class PatientController {
 			patient.setAnamnesis(patch.getAnamnesis());
 		}
 
-		// -------- Numeric --------
 		if (patch.getAge() > 0) {
 			patient.setAge(patch.getAge());
 		}
 
-		// -------- Char fields (domain uses ' ' as empty) --------
 		if (patch.getSex() != ' ') {
 			patient.setSex(patch.getSex());
 		}
@@ -401,7 +393,6 @@ public class PatientController {
 			patient.setParentTogether(patch.getParentTogether());
 		}
 
-		// -------- updatedFrom (audit field) --------
 		if (patch.getUpdatedFrom() != null) {
 
 			if (patient.getUpdatedFrom() != null) {
