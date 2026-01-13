@@ -141,7 +141,7 @@ public class PatientController {
 	}
 
 	@PatchMapping(value = "/patients/{code}")
-	public PatientDTO patchPatient(
+	public PatientDTO updatePatientPatch(
 		@PathVariable int code,
 		@RequestBody PatientDTO patchPatient
 	) throws OHServiceException {
