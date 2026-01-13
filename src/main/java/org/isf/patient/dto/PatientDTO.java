@@ -129,6 +129,9 @@ public class PatientDTO {
 	@Schema(description = "Consensus service flag", example = "true")
 	private boolean consensusServiceFlag;
 
+	@Schema(description = "the source from which the patient was updated", example = "OH")
+	private String updatedFrom;
+
 	public boolean isConsensusFlag() {
 		return consensusFlag;
 	}
@@ -249,6 +252,10 @@ public class PatientDTO {
 		return this.taxCode;
 	}
 
+	public String getUpdatedFrom() {
+		return this.updatedFrom;
+	}
+
 	public void setCode(Integer code) {
 		this.code = code;
 	}
@@ -365,4 +372,7 @@ public class PatientDTO {
 		this.blobPhoto = blobPhoto;
 	}
 
+	public void setUpdatedFrom(String updateFrom) {
+		this.updatedFrom = updateFrom;
+	}
 }

@@ -46,16 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -142,6 +133,41 @@ public class PatientController {
 		updatePatientModel.getPatientConsensus().setId(patientConsensus.get().getId());
 		updatePatientModel.setLock(patientRead.getLock());
 		Patient patient = patientManager.savePatient(updatePatientModel);
+		if (patient == null) {
+			throw new OHAPIException(new OHExceptionMessage("Patient not updated."));
+		}
+
+		return patientMapper.map2DTO(patient);
+	}
+
+	@PatchMapping(value = "/patients/{code}")
+	public PatientDTO patchPatient(
+		@PathVariable int code,
+		@RequestBody PatientDTO patchPatient
+	) throws OHServiceException {
+
+		LOGGER.info("Patch patient code: '{}'.", code);
+
+		Patient patientRead = patientManager.getPatientById(code);
+		if (patientRead == null) {
+			throw new OHAPIException(
+				new OHExceptionMessage("Patient not found."),
+				HttpStatus.NOT_FOUND
+			);
+		}
+
+		// PATCH must NOT require code match
+		// (client may omit code in PATCH payload)
+
+		// Validate blob photo only if provided
+		if (patchPatient.getBlobPhoto() != null && patchPatient.getBlobPhoto().length == 0) {
+			throw new OHAPIException(new OHExceptionMessage("Malformed picture."));
+		}
+
+		// Apply partial updates
+		applyPatch(patientRead, patchPatient);
+
+		Patient patient = patientManager.savePatient(patientRead);
 		if (patient == null) {
 			throw new OHAPIException(new OHExceptionMessage("Patient not updated."));
 		}
@@ -289,4 +315,109 @@ public class PatientController {
 		List<PatientDTO> patientsDTO = patientMapper.map2DTOList(patients);
         return patientsDTO;
     }
+
+	private void applyPatch(Patient patient, PatientDTO patch) throws OHAPIException {
+
+		// -------- Strings --------
+		if (patch.getFirstName() != null) {
+			patient.setFirstName(patch.getFirstName());
+		}
+
+		if (patch.getSecondName() != null) {
+			patient.setSecondName(patch.getSecondName());
+		}
+
+		if (patch.getBirthDate() != null) {
+			patient.setBirthDate(patch.getBirthDate());
+		}
+
+		if (patch.getAgetype() != null) {
+			patient.setAgetype(patch.getAgetype());
+		}
+
+		if (patch.getAddress() != null) {
+			patient.setAddress(patch.getAddress());
+		}
+
+		if (patch.getCity() != null) {
+			patient.setCity(patch.getCity());
+		}
+
+		if (patch.getTelephone() != null) {
+			patient.setTelephone(patch.getTelephone());
+		}
+
+		if (patch.getNote() != null) {
+			patient.setNote(patch.getNote());
+		}
+
+		if (patch.getMotherName() != null) {
+			patient.setMotherName(patch.getMotherName());
+		}
+
+		if (patch.getFatherName() != null) {
+			patient.setFatherName(patch.getFatherName());
+		}
+
+		if (patch.getBloodType() != null) {
+			patient.setBloodType(patch.getBloodType());
+		}
+
+		if (patch.getTaxCode() != null) {
+			patient.setTaxCode(patch.getTaxCode());
+		}
+
+		if (patch.getAllergies() != null) {
+			patient.setAllergies(patch.getAllergies());
+		}
+
+		if (patch.getAnamnesis() != null) {
+			patient.setAnamnesis(patch.getAnamnesis());
+		}
+
+		// -------- Numeric --------
+		if (patch.getAge() > 0) {
+			patient.setAge(patch.getAge());
+		}
+
+		// -------- Char fields (domain uses ' ' as empty) --------
+		if (patch.getSex() != ' ') {
+			patient.setSex(patch.getSex());
+		}
+
+		if (patch.getMother() != ' ') {
+			patient.setMother(patch.getMother());
+		}
+
+		if (patch.getFather() != ' ') {
+			patient.setFather(patch.getFather());
+		}
+
+		if (patch.getHasInsurance() != ' ') {
+			patient.setHasInsurance(patch.getHasInsurance());
+		}
+
+		if (patch.getParentTogether() != ' ') {
+			patient.setParentTogether(patch.getParentTogether());
+		}
+
+		// -------- updatedFrom (audit field) --------
+		if (patch.getUpdatedFrom() != null) {
+
+			if (patient.getUpdatedFrom() != null) {
+				throw new OHAPIException(
+					new OHExceptionMessage("updatedFrom cannot be changed once set.")
+				);
+			}
+
+			if (!"OH".equals(patch.getUpdatedFrom())
+				&& !"SEITU".equals(patch.getUpdatedFrom())) {
+				throw new OHAPIException(
+					new OHExceptionMessage("Invalid updatedFrom value.")
+				);
+			}
+
+			patient.setUpdatedFrom(patch.getUpdatedFrom());
+		}
+	}
 }
