@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -293,6 +293,10 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/reports/**").hasAnyAuthority("reports.read")
 				.requestMatchers(HttpMethod.PUT, "/reports/**").hasAuthority("reports.update")
 				.requestMatchers(HttpMethod.DELETE, "/reports/**").hasAuthority("reports.delete")
+				// settings
+				.requestMatchers(HttpMethod.GET, "/settings/**").hasAuthority("settings.read")
+				.requestMatchers(HttpMethod.PUT, "/settings/**").hasAuthority("settings.update")
+				.requestMatchers(HttpMethod.POST, "/settings/reset").hasAuthority("settings.update")
 				// sms
 				.requestMatchers(HttpMethod.POST, "/sms/**").hasAuthority("sms.create")
 				.requestMatchers(HttpMethod.GET, "/sms/**").hasAnyAuthority("sms.read")
