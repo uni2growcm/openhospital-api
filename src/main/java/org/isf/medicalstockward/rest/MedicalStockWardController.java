@@ -103,7 +103,7 @@ public class MedicalStockWardController {
 	/**
 	 * Gets the current quantity for the specified {@link Medical} and specified {@link Ward}.
 	 *
-	 * @param wardId - if {@code null} the quantity is counted for the whole hospital
+	 * @param wardId    - if {@code null} the quantity is counted for the whole hospital
 	 * @param medicalId - the {@link Medical} to check.
 	 * @return the total quantity.
 	 * @throws OHServiceException if an error occurs retrieving the quantity.
@@ -129,17 +129,17 @@ public class MedicalStockWardController {
 	/**
 	 * Gets all the movement ward with the specified criteria.
 	 *
-	 * @param wardId the ward id.
+	 * @param wardId   the ward id.
 	 * @param dateFrom the lower bound for the movement date range.
-	 * @param dateTo the upper bound for the movement date range.
+	 * @param dateTo   the upper bound for the movement date range.
 	 * @return all the retrieved movements.
 	 * @throws OHServiceException When failed to get ward movements
 	 */
 	@GetMapping("/medicalstockward/movements/{ward_code}")
 	public List<MovementWardDTO> getMovementWard(
 		@PathVariable("ward_code") String wardId,
-		@RequestParam("from") LocalDate dateFrom,
-		@RequestParam("to") LocalDate dateTo
+		@RequestParam(value = "from", required = false) LocalDate dateFrom,
+		@RequestParam(value = "to", required = false) LocalDate dateTo
 	) throws OHServiceException {
 		LocalDateTime dateFromTime = null;
 		if (dateFrom != null) {
@@ -159,7 +159,7 @@ public class MedicalStockWardController {
 	 *
 	 * @param idWardTo the target ward id.
 	 * @param dateFrom the lower bound for the movement date range.
-	 * @param dateTo the upper bound for the movement date range.
+	 * @param dateTo   the upper bound for the movement date range.
 	 * @return all the retrieved movements.
 	 * @throws OHServiceException When failed to get ward movements
 	 */
