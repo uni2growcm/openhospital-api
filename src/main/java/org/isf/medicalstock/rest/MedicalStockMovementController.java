@@ -21,6 +21,7 @@
  */
 package org.isf.medicalstock.rest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -148,10 +149,19 @@ public class MedicalStockMovementController {
 	@GetMapping("/medicalstockmovements/filter/v1")
 	public List<MovementDTO> getMovements(
 		@RequestParam("ward_id") String wardId,
-		@RequestParam("from") LocalDateTime dateFrom,
-		@RequestParam("to") LocalDateTime dateTo
+		@RequestParam("from") LocalDate dateFrom,
+		@RequestParam("to") LocalDate dateTo
 	) throws OHServiceException {
-		return movMapper.map2DTOList(movManager.getMovements(wardId, dateFrom, dateTo));
+		LocalDateTime dateFromTime = null;
+		if (dateFrom != null) {
+			dateFromTime = dateFrom.atStartOfDay();
+		}
+
+		LocalDateTime dateToTime = null;
+		if (dateTo != null) {
+			dateToTime = dateTo.atStartOfDay();
+		}
+		return movMapper.map2DTOList(movManager.getMovements(wardId, dateFromTime, dateToTime));
 	}
 
 	/**
