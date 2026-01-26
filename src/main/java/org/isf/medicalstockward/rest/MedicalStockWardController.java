@@ -166,10 +166,19 @@ public class MedicalStockWardController {
 	@GetMapping(value = "/medicalstockward/movements/to/{target_ward_code}")
 	public List<MovementWardDTO> getWardMovementsToWard(
 		@PathVariable("target_ward_code") String idWardTo,
-		@RequestParam("from") LocalDateTime dateFrom,
-		@RequestParam("to") LocalDateTime dateTo
+		@RequestParam("from") LocalDate dateFrom,
+		@RequestParam("to") LocalDate dateTo
 	) throws OHServiceException {
-		return movementWardMapper.map2DTOList(movWardBrowserManager.getWardMovementsToWard(idWardTo, dateFrom, dateTo));
+		LocalDateTime dateFromTime = null;
+		if (dateFrom != null) {
+			dateFromTime = dateFrom.atStartOfDay();
+		}
+
+		LocalDateTime dateToTime = null;
+		if (dateTo != null) {
+			dateToTime = dateTo.atStartOfDay();
+		}
+		return movementWardMapper.map2DTOList(movWardBrowserManager.getWardMovementsToWard(idWardTo, dateFromTime, dateToTime));
 	}
 
 	/**
