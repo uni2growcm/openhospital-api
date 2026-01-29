@@ -793,6 +793,32 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
+    patch:
+      tags:
+      - Patients
+      operationId: updatePatientPatch
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientDTO"
+      security:
+      - bearerAuth: []
   /patientconsensus/{patientId}:
     get:
       tags:
@@ -6678,6 +6704,10 @@ components:
           type: boolean
           description: Consensus service flag
           example: true
+        updatedFrom:
+          type: string
+          description: the source from which the patient was updated
+          example: OH
       required:
       - age
       - bloodType
@@ -6975,6 +7005,7 @@ components:
           - pharmacy
           - gui
           - application
+          - integration
           example: application
         type:
           type: string
