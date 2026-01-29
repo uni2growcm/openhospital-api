@@ -21,12 +21,13 @@
  */
 package org.isf.patient.rest;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.model.Admission;
@@ -40,9 +41,11 @@ import org.isf.shared.exceptions.OHAPIException;
 import org.isf.shared.pagination.Page;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.isf.utils.pagination.PageInfo;
 import org.isf.utils.pagination.PagedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -183,11 +186,16 @@ public class PatientController {
 	}
 
 	@GetMapping(value = "/patients/search")
-	public List<PatientDTO> searchPatient(
+	public Page<PatientDTO> searchPatient(
 		@RequestParam(value = "firstName", defaultValue = "", required = false) String firstName,
 		@RequestParam(value = "secondName", defaultValue = "", required = false) String secondName,
-		@RequestParam(value = "birthDate", defaultValue = "", required = false) LocalDateTime birthDate,
-		@RequestParam(value = "address", defaultValue = "", required = false) String address
+		@RequestParam(value = "birthDate", required = false)
+		@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
+		@RequestParam(value = "address", defaultValue = "", required = false) String address,
+		@RequestParam(value = "city", defaultValue = "", required = false) String city,
+		@RequestParam(value = "age", defaultValue = "", required = false) String age,
+		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		@RequestParam(value = "size", required = false, defaultValue = DEFAULT_PAGE_SIZE) int size
 	) throws OHServiceException {
 		Map<String, Object> params = new HashMap<>();
 
@@ -207,16 +215,52 @@ public class PatientController {
 			params.put("address", address);
 		}
 
-		List<Patient> patientList = new ArrayList<>();
-		if (!params.entrySet().isEmpty()) {
-			patientList = patientManager.getPatients(params);
+		if (city != null && !city.isEmpty()) {
+			params.put("city", city);
 		}
 
-		return patientList.stream().map(patient -> {
-			Admission admission = admissionManager.getCurrentAdmission(patient);
-			Boolean status = admission != null;
-			return patientMapper.map2DTOWS(patient, status);
-		}).toList();
+		PagedResponse<Patient> patientList = new PagedResponse<>();
+		if (age != null && !age.isEmpty()) {
+			PagedResponse<Patient> ageFiltered = patientManager.AgeFromBirthDate(Integer.parseInt(age), page, size);
+
+			if (!params.isEmpty()) {
+				PagedResponse<Patient> paramFiltered = patientManager.getPatients(params, page, size);
+
+				List<Patient> combined = ageFiltered.getData().stream()
+					.filter(paramFiltered.getData()::contains)
+					.collect(Collectors.toList());
+
+				PageInfo pageInfo = new PageInfo();
+				pageInfo.setPage(page);
+				pageInfo.setSize(size);
+				pageInfo.setTotalNbOfElements(combined.size());
+				pageInfo.setTotalPages((int) Math.ceil((double) combined.size() / size));
+
+				patientList.setData(combined);
+				patientList.setPageInfo(pageInfo);
+
+			} else {
+				patientList = ageFiltered;
+			}
+		} else {
+				patientList = patientManager.getPatients(params, page, size);
+			}
+
+		Page<PatientDTO> patientPageableDTO = new Page<>();
+		List<PatientDTO> patientsDTO = new ArrayList<>();
+		if (patientList.getData() != null) {
+			patientsDTO = patientList.getData().stream().map(patient -> {
+				Admission admission = admissionManager.getCurrentAdmission(patient);
+				Boolean status = admission != null;
+				return patientMapper.map2DTOWS(patient, status);
+			}).toList();
+		}
+		patientPageableDTO.setData(patientsDTO);
+		if (patientList.getPageInfo() != null) {
+			patientPageableDTO.setPageInfo(patientMapper.setParameterPageInfo(patientList.getPageInfo()));
+		}
+
+		return patientPageableDTO;
 	}
 
 	@GetMapping(value = "/patients/all")

@@ -51,7 +51,7 @@ public class PatientDTO {
 
 	@NotNull
 	@Schema(description = "Age", example = "40")
-	private int age;
+	private Integer age;
 
 	@Schema(description = "Age type", example = "null")
 	private String agetype;
@@ -197,7 +197,7 @@ public class PatientDTO {
 		return this.birthDate;
 	}
 
-	public int getAge() {
+	public Integer getAge() {
 		return this.age;
 	}
 
@@ -269,7 +269,7 @@ public class PatientDTO {
 		this.birthDate = birthDate;
 	}
 
-	public void setAge(int age) {
+	public void setAge(Integer age) {
 		this.age = age;
 	}
 
