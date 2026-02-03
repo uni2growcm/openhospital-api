@@ -151,9 +151,9 @@ public class MedicalStockWardController {
 	 * for each ward, including ward and medical details.
 	 * @throws OHServiceException if an error occurs during quantity calculation.
 	 */
-	@GetMapping(value = "/medicalstockward/current-all-wards")
+	@GetMapping(value = "/medicalstockward/{medicalId}/ward-quantities")
 	public List<MedicalWardQuantityDTO> getCurrentQuantityInAllWards(
-		@RequestParam("med_id") int medicalId
+		@PathVariable("medicalId") int medicalId
 	) throws OHServiceException {
 
 		Medical medical = medicalManager.getMedical(medicalId);
