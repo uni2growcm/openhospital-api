@@ -23,13 +23,17 @@ package org.isf.medicalstockward.rest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
+import org.isf.medical.dto.MedicalDTO;
+import org.isf.medical.mapper.MedicalMapper;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
 import org.isf.medicalstockward.dto.MedicalWardDTO;
+import org.isf.medicalstockward.dto.MedicalWardQuantityDTO;
 import org.isf.medicalstockward.dto.MovementWardDTO;
 import org.isf.medicalstockward.manager.MovWardBrowserManager;
 import org.isf.medicalstockward.mapper.MedicalWardMapper;
@@ -40,7 +44,10 @@ import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.ward.manager.WardBrowserManager;
+import org.isf.ward.mapper.WardMapper;
 import org.isf.ward.model.Ward;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,6 +68,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class MedicalStockWardController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MedicalStockWardController.class);
+
 	private final MedicalWardMapper medicalWardMapper;
 
 	private final MovementWardMapper movementWardMapper;
@@ -71,18 +80,26 @@ public class MedicalStockWardController {
 
 	private final WardBrowserManager wardManager;
 
+	private final MedicalMapper medicalMapper;
+
+	private final WardMapper wardMapper;
+
 	public MedicalStockWardController(
 		MedicalWardMapper medicalWardMapper,
 		MovementWardMapper movementWardMapper,
 		MovWardBrowserManager movWardBrowserManager,
 		MedicalBrowsingManager medicalManager,
-		WardBrowserManager wardManager
+		WardBrowserManager wardManager,
+		MedicalMapper medicalMapper,
+		WardMapper wardMapper
 	) {
 		this.medicalWardMapper = medicalWardMapper;
 		this.movementWardMapper = movementWardMapper;
 		this.movWardBrowserManager = movWardBrowserManager;
 		this.medicalManager = medicalManager;
 		this.wardManager = wardManager;
+		this.medicalMapper = medicalMapper;
+		this.wardMapper = wardMapper;
 	}
 
 	/**
@@ -124,6 +141,58 @@ public class MedicalStockWardController {
 		}
 
 		return movWardBrowserManager.getCurrentQuantityInWard(wards.get(0), medical);
+	}
+
+	/**
+	 * Gets the current quantity for a specified {@link Medical} across wards that contain it.
+	 *
+	 * @param medicalId - the ID of the {@link Medical} to check.
+	 * @return a {@link List} of {@link MedicalWardQuantityDTO} containing the quantity
+	 * for each ward, including ward and medical details.
+	 * @throws OHServiceException if an error occurs during quantity calculation.
+	 */
+	@GetMapping(value = "/medicalstockward/{medicalId}/ward-quantities")
+	public List<MedicalWardQuantityDTO> getCurrentQuantityInAllWards(
+		@PathVariable("medicalId") int medicalId
+	) throws OHServiceException {
+
+		Medical medical = medicalManager.getMedical(medicalId);
+		if (medical == null) {
+			throw new OHAPIException(new OHExceptionMessage("Medical not found."), HttpStatus.NOT_FOUND);
+		}
+
+		MedicalDTO medicalDTO = medicalMapper.map2DTO(medical);
+
+		return Optional.ofNullable(wardManager.getWards()).orElse(Collections.emptyList()).stream()
+			.filter(Objects::nonNull)
+			.sorted(Comparator.comparing(Ward::getDescription, Comparator.nullsLast(Comparator.naturalOrder())))
+			.map(ward -> {
+				try {
+					List<MedicalWard> medWards = movWardBrowserManager.getMedicalsWard(ward.getCode(), medicalId, true);
+					if (medWards == null || medWards.isEmpty()) {
+						return null;
+					}
+
+					int qty = 0;
+					try {
+						qty = movWardBrowserManager.getCurrentQuantityInWard(ward, medical);
+					} catch (OHServiceException e) {
+						LOGGER.error("Error processing ward: {}" + ward.getCode(), e);
+					}
+
+					MedicalWardQuantityDTO dto = new MedicalWardQuantityDTO();
+					dto.setWard(wardMapper.map2DTO(ward));
+					dto.setMedical(medicalDTO);
+					dto.setQuantity(qty);
+					return dto;
+
+				} catch (OHServiceException e) {
+					LOGGER.error("Error processing ward: " + ward.getCode(), e);
+					return null;
+				}
+			})
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
 	}
 
 	/**
