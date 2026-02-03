@@ -23,9 +23,7 @@ package org.isf.medicalstockward.rest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
@@ -165,7 +163,8 @@ public class MedicalStockWardController {
 
 		MedicalDTO medicalDTO = medicalMapper.map2DTO(medical);
 
-		return wardManager.getWards().stream()
+		return Optional.ofNullable(wardManager.getWards()).orElse(Collections.emptyList()).stream()
+			.filter(Objects::nonNull)
 			.sorted(Comparator.comparing(Ward::getDescription, Comparator.nullsLast(Comparator.naturalOrder())))
 			.map(ward -> {
 				try {
@@ -178,7 +177,7 @@ public class MedicalStockWardController {
 					try {
 						qty = movWardBrowserManager.getCurrentQuantityInWard(ward, medical);
 					} catch (OHServiceException e) {
-						LOGGER.error("Could not retrieve quantity for ward: " + ward.getCode(), e);
+						LOGGER.error("Error processing ward: {}" + ward.getCode(), e);
 					}
 
 					MedicalWardQuantityDTO dto = new MedicalWardQuantityDTO();
