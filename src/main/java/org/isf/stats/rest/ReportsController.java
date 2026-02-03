@@ -183,15 +183,17 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/pharmaceuticalOrder")
-	public ResponseEntity<byte[]> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
+	public ResponseEntity<Resource> printPharmaceuticalOrderPdf(HttpServletRequest request) throws OHServiceException, JRException {
 		JasperReportResultDto result = reportsManager.getGenericReportPharmaceuticalOrder2Pdf("PharmaceuticalOrder", request.getLocale());
 
 		byte[] pdfBytes = JasperExportManager.exportReportToPdf(result.getJasperPrint());
 
+		ByteArrayResource resource = new ByteArrayResource(pdfBytes);
+
 		return ResponseEntity.ok()
 			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=PharmaceuticalOrder.pdf")
 			.contentType(MediaType.APPLICATION_PDF)
-			.body(pdfBytes);
+			.body(resource);
 	}
 
 	@GetMapping("/reports/pharmaceuticalExpiration")
