@@ -4015,7 +4015,7 @@ paths:
           format: int32
       - name: wardCode
         in: query
-        required: true
+        required: false
         schema:
           type: string
       responses:

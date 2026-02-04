@@ -90,6 +90,7 @@ public class ReportsController {
 	private final MovWardBrowserManager movWardBrowserManager;
 	private final MovBrowserManager movBrowserManager;
 
+	private static final String WARD_STOCK_CARD_REPORT = "ProductLedgerWard";
 	private static final String PHARMACEUTICAL_STOCK_CARD_REPORT = "ProductLedger";
 	private static final String PHARMACEUTICAL_AMC_REPORT = "PharmaceuticalAMC";
 	private static final String PHARMACEUTICAL_STOCK_WARD_REPORT = "PharmaceuticalStockWard";
@@ -128,7 +129,7 @@ public class ReportsController {
 		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime dateFrom,
 		@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX") LocalDateTime dateTo,
 		@RequestParam Integer medicalCode,
-		@RequestParam String wardCode,
+		@RequestParam(required = false) String wardCode,
 		HttpServletRequest request
 	) throws  OHServiceException, IOException {
 		Medical medical = medicalBrowsingManager.getMedical(medicalCode);
@@ -136,12 +137,16 @@ public class ReportsController {
 			throw new OHAPIException(new OHExceptionMessage("Medical not found."), HttpStatus.NOT_FOUND);
 		}
 
-		Ward ward = wardBrowserManager.findWard(wardCode);
-		if (ward == null) {
-			throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
+		String jasperReport = PHARMACEUTICAL_STOCK_CARD_REPORT;
+		Ward ward = null;
+		if (wardCode != null) {
+			jasperReport = WARD_STOCK_CARD_REPORT;
+			ward = wardBrowserManager.findWard(wardCode);
+			if (ward == null) {
+				throw new OHAPIException(new OHExceptionMessage("Ward not found."), HttpStatus.NOT_FOUND);
+			}
 		}
-
-		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(PHARMACEUTICAL_STOCK_CARD_REPORT, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
+		return getReport(reportsManager.getGenericReportPharmaceuticalStockCardPdf(jasperReport, exportFileName, dateFrom, dateTo, medical, ward, request.getLocale()), request);
 	}
 
 	@GetMapping(value = "/reports/pharmaceuticalStock", produces = MediaType.APPLICATION_PDF_VALUE)
