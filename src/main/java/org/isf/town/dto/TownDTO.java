@@ -28,7 +28,7 @@ import jakarta.validation.constraints.NotNull;
 public class TownDTO {
 
 	@Schema(description = "id of the town", example = "1")
-	private String id;
+	private Integer id;
 
 	@NotNull
 	@Schema(description = "name of the town", example = "Cotonou")
@@ -36,14 +36,14 @@ public class TownDTO {
 
 	@Override
 	public String toString() {
-		return "TownDTO{" + "id='" + id + '\'' + ", name='" + name + '}';
+		return "TownDTO{" + "id='" + id + '\'' + ", name='" + name + "'}";
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

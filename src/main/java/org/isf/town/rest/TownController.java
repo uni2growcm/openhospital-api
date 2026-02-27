@@ -28,7 +28,6 @@ import org.isf.town.dto.TownDTO;
 import org.isf.town.manager.TownManager;
 import org.isf.town.mapper.TownMapper;
 import org.isf.town.model.Town;
-import org.isf.utils.exception.OHDataIntegrityViolationException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.slf4j.Logger;
@@ -67,7 +66,7 @@ public class TownController {
     public List<TownDTO> getTowns() throws OHServiceException {
         LOGGER.info("Get towns");
 
-        return mapper.map2DTOList(townManager.getAllTowns());
+        return mapper.map2DTOList(townManager.getAll());
     }
 
     /**
@@ -81,13 +80,17 @@ public class TownController {
     public TownDTO getTownById(@PathVariable Integer id) throws OHServiceException {
         LOGGER.info("Get town by id: {}", id);
 
-        return mapper.map2DTO(townManager.getTown(id));
+		try {
+        	return mapper.map2DTO(townManager.getById(id));
+		} catch (OHServiceException serviceException) {
+			throw new OHAPIException(new OHExceptionMessage("Town not found."));
+		}
     }
 
     /**
      * Create a new town.
      *
-     * @param newTown town payload
+     * @param town town payload
      * @return an error message if there is a problem, ok otherwise.
      * @throws OHServiceException When failed to create the town
      */
@@ -98,7 +101,7 @@ public class TownController {
 		Town newTown = new Town();
 		newTown.setName(mapper.map2Model(town).getName());
         try {
-            return mapper.map2DTO(townManager.newTown(newTown));
+            return mapper.map2DTO(townManager.create(newTown));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Town not created."));
         }
@@ -107,18 +110,23 @@ public class TownController {
     /**
      * Update a town.
      *
-     * @param updateTown town payload
+     * @param updatedTown town payload
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to update town
      */
-    @PutMapping("/towns")
-    public TownDTO updateTown(@RequestBody TownDTO updateTown) throws OHServiceException {
-        LOGGER.info("Update town: {}", updateTown);
+    @PutMapping("/towns/{id}")
+    public TownDTO updateTown(@RequestParam Integer id, @RequestBody TownDTO updatedTown) throws OHServiceException {
+        LOGGER.info("Update town: {}", updatedTown);
 
-        Town town = mapper.map2Model(updateTown);
+        Town town = mapper.map2Model(updatedTown);
+		Town townFound = townManager.getById(id);
+
+		if (!Objects.equals(townFound.getId(), updatedTown.getId())) {
+			throw new OHAPIException(new OHExceptionMessage("Town not updated."));
+		}
 
         try {
-            return mapper.map2DTO(townManager.updateTown(town));
+            return mapper.map2DTO(townManager.update(id, town));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Town not updated."));
         }
@@ -134,17 +142,13 @@ public class TownController {
     @DeleteMapping("/towns/{id}")
     public boolean deleteTown(@PathVariable("id") Integer id) throws OHServiceException {
         LOGGER.info("Delete town code: {}", id);
-		Town townToDelete = townManager.getTown(id);
+		Town townToDelete = townManager.getById(id);
 
 		if (townToDelete == null) {
 			throw new OHAPIException(new OHExceptionMessage("Town not found."));
 		}
 
-        try {
-            townManager.deleteTown(townToDelete);
-            return true;
-        } catch (OHServiceException serviceException) {
-            throw new OHAPIException(new OHExceptionMessage("Town not deleted."));
-        }
+		townManager.delete(townToDelete.getId());
+		return true;
     }
 }

@@ -28,7 +28,7 @@ import jakarta.validation.constraints.NotNull;
 public class EthnicDTO {
 
 	@Schema(description = "id of the ethnic", example = "1")
-	private String id;
+	private Integer id;
 
 	@NotNull
 	@Schema(description = "name of the ethnic", example = "Adja")
@@ -36,14 +36,14 @@ public class EthnicDTO {
 
 	@Override
 	public String toString() {
-		return "EthnicDTO{" + "id='" + id + '\'' + ", name='" + name + '}';
+		return "EthnicDTO{" + "id='" + id + '\'' + ", name='" + name + "'}";
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

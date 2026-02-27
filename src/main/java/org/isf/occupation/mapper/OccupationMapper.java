@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2023 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -19,39 +19,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.commune.dto;
+package org.isf.occupation.mapper;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import org.isf.ethnic.model.Ethnic;
+import org.isf.occupation.dto.OccupationDTO;
+import org.isf.occupation.model.Occupation;
+import org.isf.shared.GenericMapper;
+import org.springframework.stereotype.Component;
 
-@Schema(description = "Class representing a commune")
-public class CommuneDTO {
-
-	@Schema(description = "id of the commune", example = "1")
-	private Integer id;
-
-	@NotNull
-	@Schema(description = "name of the commune", example = "Dassa")
-	private String name;
-
-	@Override
-	public String toString() {
-		return "CommuneDTO{" + "id='" + id + '\'' + ", name='" + name + "'}";
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+@Component
+public class OccupationMapper extends GenericMapper<Occupation, OccupationDTO> {
+	public OccupationMapper() {
+		super(Occupation.class, OccupationDTO.class);
 	}
 }

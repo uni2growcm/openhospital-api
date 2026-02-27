@@ -37,6 +37,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Tag(name = "Communes")
@@ -65,7 +66,7 @@ public class CommuneController {
     public List<CommuneDTO> getCommunes() throws OHServiceException {
         LOGGER.info("Get communes");
 
-        return mapper.map2DTOList(communeManager.getAllCommunes());
+        return mapper.map2DTOList(communeManager.getAll());
     }
 
     /**
@@ -79,7 +80,11 @@ public class CommuneController {
     public CommuneDTO getCommuneById(@PathVariable Integer id) throws OHServiceException {
         LOGGER.info("Get commune by id: {}", id);
 
-        return mapper.map2DTO(communeManager.getCommune(id));
+		try {
+        	return mapper.map2DTO(communeManager.getById(id));
+		} catch (OHServiceException serviceException) {
+			throw new OHAPIException(new OHExceptionMessage("Commune not found."));
+		}
     }
 
     /**
@@ -96,7 +101,7 @@ public class CommuneController {
 		Commune newCommune = new Commune();
 		newCommune.setName(mapper.map2Model(commune).getName());
         try {
-            return mapper.map2DTO(communeManager.newCommune(newCommune));
+            return mapper.map2DTO(communeManager.create(newCommune));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Commune not created."));
         }
@@ -105,18 +110,23 @@ public class CommuneController {
     /**
      * Update a commune.
      *
-     * @param updateCommune commune payload
+     * @param updatedCommune commune payload
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to update commune
      */
-    @PutMapping("/communes")
-    public CommuneDTO updateCommune(@RequestBody CommuneDTO updateCommune) throws OHServiceException {
-        LOGGER.info("Update commune: {}", updateCommune);
+    @PutMapping("/communes/{id}")
+    public CommuneDTO updateCommune(@RequestParam Integer id, @RequestBody CommuneDTO updatedCommune) throws OHServiceException {
+        LOGGER.info("Update commune: {}", updatedCommune);
 
-        Commune commune = mapper.map2Model(updateCommune);
+        Commune commune = mapper.map2Model(updatedCommune);
+		Commune communeFound = communeManager.getById(id);
+
+		if (!Objects.equals(communeFound.getId(), updatedCommune.getId())) {
+			throw new OHAPIException(new OHExceptionMessage("Commune not updated."));
+		}
 
         try {
-            return mapper.map2DTO(communeManager.updateCommune(commune));
+            return mapper.map2DTO(communeManager.update(id, commune));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Commune not updated."));
         }
@@ -132,17 +142,13 @@ public class CommuneController {
     @DeleteMapping("/communes/{id}")
     public boolean deleteCommune(@PathVariable("id") Integer id) throws OHServiceException {
         LOGGER.info("Delete commune code: {}", id);
-		Commune communeToDelete = communeManager.getCommune(id);
+		Commune communeToDelete = communeManager.getById(id);
 
 		if (communeToDelete == null) {
 			throw new OHAPIException(new OHExceptionMessage("Commune not found."));
 		}
 
-        try {
-            communeManager.deleteCommune(communeToDelete);
-            return true;
-        } catch (OHServiceException serviceException) {
-            throw new OHAPIException(new OHExceptionMessage("Commune not deleted."));
-        }
+		communeManager.delete(communeToDelete.getId());
+		return true;
     }
 }

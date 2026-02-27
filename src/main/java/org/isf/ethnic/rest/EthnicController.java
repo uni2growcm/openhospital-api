@@ -37,6 +37,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Tag(name = "Ethnics")
@@ -65,7 +66,7 @@ public class EthnicController {
     public List<EthnicDTO> getEthnics() throws OHServiceException {
         LOGGER.info("Get ethnics");
 
-        return mapper.map2DTOList(ethnicManager.getAllEthnics());
+        return mapper.map2DTOList(ethnicManager.getAll());
     }
 
     /**
@@ -79,7 +80,11 @@ public class EthnicController {
     public EthnicDTO getEthnicById(@PathVariable Integer id) throws OHServiceException {
         LOGGER.info("Get ethnic by id: {}", id);
 
-        return mapper.map2DTO(ethnicManager.getEthnic(id));
+		try {
+        	return mapper.map2DTO(ethnicManager.getById(id));
+		} catch (OHServiceException serviceException) {
+			throw new OHAPIException(new OHExceptionMessage("Ethnic not found."));
+		}
     }
 
     /**
@@ -96,7 +101,7 @@ public class EthnicController {
 		Ethnic newEthnic = new Ethnic();
 		newEthnic.setName(mapper.map2Model(ethnic).getName());
         try {
-            return mapper.map2DTO(ethnicManager.newEthnic(newEthnic));
+            return mapper.map2DTO(ethnicManager.create(newEthnic));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Ethnic not created."));
         }
@@ -105,18 +110,23 @@ public class EthnicController {
     /**
      * Update a ethnic.
      *
-     * @param updateEthnic ethnic payload
+     * @param updatedEthnic ethnic payload
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to update ethnic
      */
-    @PutMapping("/ethnics")
-    public EthnicDTO updateEthnic(@RequestBody EthnicDTO updateEthnic) throws OHServiceException {
-        LOGGER.info("Update ethnic: {}", updateEthnic);
+    @PutMapping("/ethnics/{id}")
+    public EthnicDTO updateEthnic(@RequestParam Integer id, @RequestBody EthnicDTO updatedEthnic) throws OHServiceException {
+        LOGGER.info("Update ethnic: {}", updatedEthnic);
 
-        Ethnic ethnic = mapper.map2Model(updateEthnic);
+        Ethnic ethnic = mapper.map2Model(updatedEthnic);
+		Ethnic ethnicFound = ethnicManager.getById(id);
+
+		if (!Objects.equals(ethnicFound.getId(), updatedEthnic.getId())) {
+			throw new OHAPIException(new OHExceptionMessage("Ethnic not updated."));
+		}
 
         try {
-            return mapper.map2DTO(ethnicManager.updateEthnic(ethnic));
+            return mapper.map2DTO(ethnicManager.update(id, ethnic));
         } catch (OHServiceException serviceException) {
             throw new OHAPIException(new OHExceptionMessage("Ethnic not updated."));
         }
@@ -132,17 +142,13 @@ public class EthnicController {
     @DeleteMapping("/ethnics/{id}")
     public boolean deleteEthnic(@PathVariable("id") Integer id) throws OHServiceException {
         LOGGER.info("Delete ethnic code: {}", id);
-		Ethnic ethnicToDelete = ethnicManager.getEthnic(id);
+		Ethnic ethnicToDelete = ethnicManager.getById(id);
 
 		if (ethnicToDelete == null) {
 			throw new OHAPIException(new OHExceptionMessage("Ethnic not found."));
 		}
 
-        try {
-            ethnicManager.deleteEthnic(ethnicToDelete);
-            return true;
-        } catch (OHServiceException serviceException) {
-            throw new OHAPIException(new OHExceptionMessage("Ethnic not deleted."));
-        }
+		ethnicManager.delete(ethnicToDelete.getId());
+		return true;
     }
 }
