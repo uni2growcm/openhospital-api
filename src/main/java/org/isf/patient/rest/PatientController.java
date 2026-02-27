@@ -21,12 +21,13 @@
  */
 package org.isf.patient.rest;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.model.Admission;
@@ -40,11 +41,14 @@ import org.isf.shared.exceptions.OHAPIException;
 import org.isf.shared.pagination.Page;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.isf.utils.pagination.PageInfo;
 import org.isf.utils.pagination.PagedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -140,15 +144,27 @@ public class PatientController {
 		return patientMapper.map2DTO(patient);
 	}
 
-	@PatchMapping(value = "/patients/{code}")
-	public PatientDTO updatePatientPatch(
+	@PatchMapping(
+		value = "/patients/{code}",
+		consumes = MediaType.APPLICATION_JSON_VALUE,
+		produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public ResponseEntity<PatientDTO> updatePatientPatch(
 		@PathVariable int code,
-		@RequestBody PatientDTO patchPatient
+		@RequestBody(required = false) PatientDTO patchPatient
 	) throws OHServiceException {
 
 		LOGGER.info("Patch patient code: '{}'.", code);
 
+		if (patchPatient == null) {
+			throw new OHAPIException(
+				new OHExceptionMessage("Patch body cannot be null."),
+				HttpStatus.BAD_REQUEST
+			);
+		}
+
 		Patient patientRead = patientManager.getPatientById(code);
+
 		if (patientRead == null) {
 			throw new OHAPIException(
 				new OHExceptionMessage("Patient not found."),
@@ -156,18 +172,26 @@ public class PatientController {
 			);
 		}
 
-		if (patchPatient.getBlobPhoto() != null && patchPatient.getBlobPhoto().length == 0) {
-			throw new OHAPIException(new OHExceptionMessage("Malformed picture."));
+		if (patchPatient.getBlobPhoto() != null &&
+			patchPatient.getBlobPhoto().length == 0) {
+			throw new OHAPIException(
+				new OHExceptionMessage("Malformed picture."),
+				HttpStatus.BAD_REQUEST
+			);
 		}
 
 		applyPatch(patientRead, patchPatient);
 
-		Patient patient = patientManager.savePatient(patientRead);
-		if (patient == null) {
-			throw new OHAPIException(new OHExceptionMessage("Patient not updated."));
+		Patient updated = patientManager.savePatient(patientRead);
+
+		if (updated == null) {
+			throw new OHAPIException(
+				new OHExceptionMessage("Patient not updated."),
+				HttpStatus.INTERNAL_SERVER_ERROR
+			);
 		}
 
-		return patientMapper.map2DTO(patient);
+		return ResponseEntity.ok(patientMapper.map2DTO(updated));
 	}
 
 	@GetMapping(value = "/patients")
@@ -204,11 +228,16 @@ public class PatientController {
 	}
 
 	@GetMapping(value = "/patients/search")
-	public List<PatientDTO> searchPatient(
+	public Page<PatientDTO> searchPatient(
 		@RequestParam(value = "firstName", defaultValue = "", required = false) String firstName,
 		@RequestParam(value = "secondName", defaultValue = "", required = false) String secondName,
-		@RequestParam(value = "birthDate", defaultValue = "", required = false) LocalDateTime birthDate,
-		@RequestParam(value = "address", defaultValue = "", required = false) String address
+		@RequestParam(value = "birthDate", required = false)
+		@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
+		@RequestParam(value = "address", defaultValue = "", required = false) String address,
+		@RequestParam(value = "city", defaultValue = "", required = false) String city,
+		@RequestParam(value = "age", defaultValue = "", required = false) String age,
+		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		@RequestParam(value = "size", required = false, defaultValue = DEFAULT_PAGE_SIZE) int size
 	) throws OHServiceException {
 		Map<String, Object> params = new HashMap<>();
 
@@ -228,16 +257,52 @@ public class PatientController {
 			params.put("address", address);
 		}
 
-		List<Patient> patientList = new ArrayList<>();
-		if (!params.entrySet().isEmpty()) {
-			patientList = patientManager.getPatients(params);
+		if (city != null && !city.isEmpty()) {
+			params.put("city", city);
 		}
 
-		return patientList.stream().map(patient -> {
-			Admission admission = admissionManager.getCurrentAdmission(patient);
-			Boolean status = admission != null;
-			return patientMapper.map2DTOWS(patient, status);
-		}).toList();
+		PagedResponse<Patient> patientList = new PagedResponse<>();
+		if (age != null && !age.isEmpty()) {
+			PagedResponse<Patient> ageFiltered = patientManager.AgeFromBirthDate(Integer.parseInt(age), page, size);
+
+			if (!params.isEmpty()) {
+				PagedResponse<Patient> paramFiltered = patientManager.getPatients(params, page, size);
+
+				List<Patient> combined = ageFiltered.getData().stream()
+					.filter(paramFiltered.getData()::contains)
+					.collect(Collectors.toList());
+
+				PageInfo pageInfo = new PageInfo();
+				pageInfo.setPage(page);
+				pageInfo.setSize(size);
+				pageInfo.setTotalNbOfElements(combined.size());
+				pageInfo.setTotalPages((int) Math.ceil((double) combined.size() / size));
+
+				patientList.setData(combined);
+				patientList.setPageInfo(pageInfo);
+
+			} else {
+				patientList = ageFiltered;
+			}
+		} else {
+				patientList = patientManager.getPatients(params, page, size);
+			}
+
+		Page<PatientDTO> patientPageableDTO = new Page<>();
+		List<PatientDTO> patientsDTO = new ArrayList<>();
+		if (patientList.getData() != null) {
+			patientsDTO = patientList.getData().stream().map(patient -> {
+				Admission admission = admissionManager.getCurrentAdmission(patient);
+				Boolean status = admission != null;
+				return patientMapper.map2DTOWS(patient, status);
+			}).toList();
+		}
+		patientPageableDTO.setData(patientsDTO);
+		if (patientList.getPageInfo() != null) {
+			patientPageableDTO.setPageInfo(patientMapper.setParameterPageInfo(patientList.getPageInfo()));
+		}
+
+		return patientPageableDTO;
 	}
 
 	@GetMapping(value = "/patients/all")
@@ -369,27 +434,27 @@ public class PatientController {
 			patient.setAnamnesis(patch.getAnamnesis());
 		}
 
-		if (patch.getAge() > 0) {
+		if (patch.getAge() != null) {   // IMPORTANT
 			patient.setAge(patch.getAge());
 		}
 
-		if (patch.getSex() != ' ') {
+		if (patch.getSex() != null) {
 			patient.setSex(patch.getSex());
 		}
 
-		if (patch.getMother() != ' ') {
+		if (patch.getMother() != null) {
 			patient.setMother(patch.getMother());
 		}
 
-		if (patch.getFather() != ' ') {
+		if (patch.getFather() != null) {
 			patient.setFather(patch.getFather());
 		}
 
-		if (patch.getHasInsurance() != ' ') {
+		if (patch.getHasInsurance() != null) {
 			patient.setHasInsurance(patch.getHasInsurance());
 		}
 
-		if (patch.getParentTogether() != ' ') {
+		if (patch.getParentTogether() != null) {
 			patient.setParentTogether(patch.getParentTogether());
 		}
 
@@ -403,6 +468,7 @@ public class PatientController {
 
 			if (!"OH".equals(patch.getUpdatedFrom())
 				&& !"SEITU".equals(patch.getUpdatedFrom())) {
+
 				throw new OHAPIException(
 					new OHExceptionMessage("Invalid updatedFrom value.")
 				);

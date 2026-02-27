@@ -51,14 +51,14 @@ public class PatientDTO {
 
 	@NotNull
 	@Schema(description = "Age", example = "40")
-	private int age;
+	private Integer age;
 
 	@Schema(description = "Age type", example = "null")
 	private String agetype;
 
 	@NotNull
 	@Schema(description = "Sex", allowableValues = { "M", "F" }, example = "M")
-	private char sex;
+	private Character sex;
 
 	@Schema(description = "Address", example = "Via Roma, 12", maxLength = 50)
 	private String address;
@@ -81,14 +81,14 @@ public class PatientDTO {
 	private String motherName;
 
 	@Schema(description = "Mother's status (D=dead, A=alive)", allowableValues = { "D", "A" }, example = "A")
-	private char mother;
+	private Character mother;
 
 	@NotNull
 	@Schema(description = "Father's name", example = "Giuseppe", maxLength = 50)
 	private String fatherName;
 
 	@Schema(description = "Father's status (D=dead, A=alive)", allowableValues = { "D", "A" }, example = "D")
-	private char father;
+	private Character father;
 
 	@NotNull
 	@Schema(description = "Blood type (0-/+, A-/+ , B-/+, AB-/+)", allowableValues = { "0-", "0+", "A-", "A+", "B-",
@@ -96,10 +96,10 @@ public class PatientDTO {
 	private String bloodType;
 
 	@Schema(description = "HasInsurance (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
-	private char hasInsurance;
+	private Character hasInsurance;
 
 	@Schema(description = "Parent together (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
-	private char parentTogether;
+	private Character parentTogether;
 
 	@Schema(description = "Tax code", example = "RSSMRA79E01L781N", maxLength = 30)
 	private String taxCode;
@@ -200,7 +200,7 @@ public class PatientDTO {
 		return this.birthDate;
 	}
 
-	public int getAge() {
+	public Integer getAge() {
 		return this.age;
 	}
 
@@ -208,7 +208,7 @@ public class PatientDTO {
 		return this.agetype;
 	}
 
-	public char getSex() {
+	public Character getSex() {
 		return this.sex;
 	}
 
@@ -228,11 +228,11 @@ public class PatientDTO {
 		return this.note;
 	}
 
-	public char getMother() {
+	public Character getMother() {
 		return this.mother;
 	}
 
-	public char getFather() {
+	public Character getFather() {
 		return this.father;
 	}
 
@@ -240,11 +240,11 @@ public class PatientDTO {
 		return this.bloodType;
 	}
 
-	public char getHasInsurance() {
+	public Character getHasInsurance() {
 		return this.hasInsurance;
 	}
 
-	public char getParentTogether() {
+	public Character getParentTogether() {
 		return this.parentTogether;
 	}
 
@@ -276,7 +276,7 @@ public class PatientDTO {
 		this.birthDate = birthDate;
 	}
 
-	public void setAge(int age) {
+	public void setAge(Integer age) {
 		this.age = age;
 	}
 
@@ -284,7 +284,7 @@ public class PatientDTO {
 		this.agetype = agetype;
 	}
 
-	public void setSex(char sex) {
+	public void setSex(Character sex) {
 		this.sex = sex;
 	}
 
@@ -308,11 +308,11 @@ public class PatientDTO {
 		this.note = note;
 	}
 
-	public void setMother(char mother) {
+	public void setMother(Character mother) {
 		this.mother = mother;
 	}
 
-	public void setFather(char father) {
+	public void setFather(Character father) {
 		this.father = father;
 	}
 
@@ -320,11 +320,11 @@ public class PatientDTO {
 		this.bloodType = bloodType;
 	}
 
-	public void setHasInsurance(char hasInsurance) {
+	public void setHasInsurance(Character hasInsurance) {
 		this.hasInsurance = hasInsurance;
 	}
 
-	public void setParentTogether(char parentTogether) {
+	public void setParentTogether(Character parentTogether) {
 		this.parentTogether = parentTogether;
 	}
 
