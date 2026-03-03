@@ -57,9 +57,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-public class VaccineControllerTest {
+public class CommuneControllerTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(VaccineControllerTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CommuneControllerTest.class);
 
 	@Mock
 	protected VaccineBrowserManager vaccineBrowserManagerMock;
