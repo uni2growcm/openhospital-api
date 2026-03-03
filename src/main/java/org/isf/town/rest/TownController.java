@@ -116,7 +116,7 @@ public class TownController {
      * @throws OHServiceException When failed to update town
      */
     @PutMapping("/towns/{id}")
-    public TownDTO updateTown(@RequestParam Integer id, @RequestBody TownDTO updatedTown) throws OHServiceException {
+    public TownDTO updateTown(@PathVariable Integer id, @RequestBody TownDTO updatedTown) throws OHServiceException {
         LOGGER.info("Update town: {}", updatedTown);
 
         Town town = mapper.map2Model(updatedTown);

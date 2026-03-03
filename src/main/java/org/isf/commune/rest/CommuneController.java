@@ -116,7 +116,7 @@ public class CommuneController {
      * @throws OHServiceException When failed to update commune
      */
     @PutMapping("/communes/{id}")
-    public CommuneDTO updateCommune(@RequestParam Integer id, @RequestBody CommuneDTO updatedCommune) throws OHServiceException {
+    public CommuneDTO updateCommune(@PathVariable Integer id, @RequestBody CommuneDTO updatedCommune) throws OHServiceException {
         LOGGER.info("Update commune: {}", updatedCommune);
 
         Commune commune = mapper.map2Model(updatedCommune);
