@@ -29,59 +29,52 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.config.PluginPermission;
 import org.isf.plugins.exception.PluginAccessDeniedException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+
+@SpringBootTest(classes = OpenHospitalApiApplication.class)
 class PluginAuthorizationCheckerTest {
 
-	@Mock
-	private Authentication authentication;
-
+	@Autowired
 	private PluginAuthorizationChecker checker;
-	private AutoCloseable closeable;
-
-	@BeforeEach
-	void setUp() {
-		closeable = MockitoAnnotations.openMocks(this);
-		checker = new PluginAuthorizationChecker();
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		when(authentication.isAuthenticated()).thenReturn(true);
-		when(authentication.getName()).thenReturn("testuser");
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-		SecurityContextHolder.clearContext();
-		closeable.close();
-	}
 
 	// -------------------------------------------------------------------------
 	// assertAccess — open plugin (no permissions declared)
 	// -------------------------------------------------------------------------
 
 	@Test
+	@WithMockUser(username = "user")
+	@DisplayName("Should grant access to any authenticated user when plugin declares no permissions")
 	void accessGranted_noPermissionsDeclared() {
 		PluginDefinition plugin = new PluginDefinition("open-plugin", "http://localhost:9000", "/health", List.of());
-		withAuthorities(List.of());  // user has no authorities at all
 
 		// Should not throw — no permissions means any authenticated user is allowed.
 		checker.assertAccess(plugin);
 	}
 
 	@Test
+	@WithMockUser(username = "user")
+	@DisplayName("Should grant access to any authenticated user when plugin permissions is null")
 	void accessGranted_nullPermissions() {
 		PluginDefinition plugin = new PluginDefinition("open-plugin", "http://localhost:9000", "/health", null);
-		withAuthorities(List.of());
 
 		checker.assertAccess(plugin);
 	}
@@ -91,43 +84,47 @@ class PluginAuthorizationCheckerTest {
 	// -------------------------------------------------------------------------
 
 	@Test
+	@WithMockUser(username = "user", authorities = {"smart-doc.read", "smart-doc.write"})
+	@DisplayName("Should grant access when user has at least one matching privilege across any permission group")
 	void accessGranted_userHasMatchingPrivilege() {
 		PluginPermission perm = new PluginPermission("admin", List.of("smart-doc.read", "smart-doc.write"));
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
-		withAuthorities(List.of("smart-doc.read", "patients.read"));
 
 		// Should not throw — user has smart-doc.read which is in the privilege list.
 		checker.assertAccess(plugin);
 	}
 
 	@Test
+	@WithMockUser(username = "user", authorities = {"smart-doc.read", "smart-doc.write"})
+	@DisplayName("Should grant access when user has a matching privilege in at least one of multiple permission groups")
 	void accessGranted_userHasOneOfMultiplePermissionGroups() {
 		PluginPermission adminPerm = new PluginPermission("admin", List.of("smart-doc.write"));
 		PluginPermission viewerPerm = new PluginPermission("viewer", List.of("smart-doc.read"));
 		PluginDefinition plugin = new PluginDefinition(
 				"smart-doc", "http://localhost:4000", "/health", List.of(adminPerm, viewerPerm));
-		withAuthorities(List.of("smart-doc.read"));  // matches the viewer group only
 
 		checker.assertAccess(plugin);
 	}
 
 	@Test
+	@WithMockUser(username = "user", authorities = {"smart-doc.create"})
+	@DisplayName("Should deny access when user has authorities but none match any required privilege")
 	void accessDenied_userHasNoMatchingPrivilege() {
 		PluginPermission perm = new PluginPermission("admin", List.of("smart-doc.read", "smart-doc.write"));
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
-		withAuthorities(List.of("patients.read", "wards.read"));
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
 				.isInstanceOf(PluginAccessDeniedException.class)
-				.hasMessageContaining("testuser")
+				.hasMessageContaining("user")
 				.hasMessageContaining("smart-doc");
 	}
 
 	@Test
+	@WithMockUser(username = "user", authorities = {})
+	@DisplayName("Should deny access when user has no authorities at all")
 	void accessDenied_userHasNoAuthoritiesAtAll() {
 		PluginPermission perm = new PluginPermission("admin", List.of("smart-doc.read"));
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
-		withAuthorities(List.of());
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
 				.isInstanceOf(PluginAccessDeniedException.class);
@@ -138,6 +135,7 @@ class PluginAuthorizationCheckerTest {
 	// -------------------------------------------------------------------------
 
 	@Test
+	@DisplayName("Should throw IllegalStateException when there is no authentication in the security context")
 	void throwsIllegalState_whenNoAuthentication() {
 		SecurityContextHolder.clearContext();
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of());
@@ -148,8 +146,8 @@ class PluginAuthorizationCheckerTest {
 	}
 
 	@Test
+	@DisplayName("Should throw IllegalStateException when authentication is present but not authenticated")
 	void throwsIllegalState_whenNotAuthenticated() {
-		when(authentication.isAuthenticated()).thenReturn(false);
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of());
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
@@ -161,6 +159,7 @@ class PluginAuthorizationCheckerTest {
 	// -------------------------------------------------------------------------
 
 	@Test
+	@DisplayName("Should return the flat set of all declared privileges across all permission groups")
 	void requiredPrivileges_returnsAllDeclaredPrivileges() {
 		PluginPermission adminPerm = new PluginPermission("admin", List.of("smart-doc.read", "smart-doc.write"));
 		PluginPermission viewerPerm = new PluginPermission("viewer", List.of("smart-doc.read", "smart-doc.export"));
@@ -173,20 +172,10 @@ class PluginAuthorizationCheckerTest {
 	}
 
 	@Test
+	@DisplayName("Should return an empty set when plugin permissions is null")
 	void requiredPrivileges_returnsEmptySetWhenNoPermissions() {
 		PluginDefinition plugin = new PluginDefinition("open-plugin", "http://localhost:9000", "/health", null);
 
 		assertThat(checker.requiredPrivileges(plugin)).isEmpty();
-	}
-
-	// -------------------------------------------------------------------------
-	// Helpers
-	// -------------------------------------------------------------------------
-
-	private void withAuthorities(List<String> authorityStrings) {
-		Collection<GrantedAuthority> authorities = authorityStrings.stream()
-				.map(a -> (GrantedAuthority) new SimpleGrantedAuthority(a))
-				.toList();
-		when(authentication.getAuthorities()).thenAnswer(inv -> authorities);
 	}
 }

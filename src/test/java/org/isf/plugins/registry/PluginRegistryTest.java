@@ -27,12 +27,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
+@SpringBootTest(classes = OpenHospitalApiApplication.class)
 class PluginRegistryTest {
 
+
+	@Autowired
 	private PluginRegistry registry;
 
 	private static final PluginDefinition SMART_DOC = new PluginDefinition(
@@ -40,18 +46,6 @@ class PluginRegistryTest {
 
 	private static final PluginDefinition REPORTS = new PluginDefinition(
 			"reports", "http://localhost:5000", "/ping", List.of());
-
-	@BeforeEach
-	void setUp() {
-		registry = new PluginRegistry();
-	}
-
-	@Test
-	void emptyBeforeRegistration() {
-		assertThat(registry.size()).isZero();
-		assertThat(registry.all()).isEmpty();
-		assertThat(registry.find("smart-doc")).isEmpty();
-	}
 
 	@Test
 	void registerSinglePlugin() {

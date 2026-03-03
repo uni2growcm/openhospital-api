@@ -94,7 +94,7 @@ public class PluginRequestForwarder {
 	 * @param queryString      the raw query string from the original request, may be {@code null}
 	 * @param method           the HTTP method of the original request
 	 * @param incomingHeaders  headers from the original request
-	 * @param body             the raw request body, may be {@code null} for bodyless methods
+	 * @param body             the raw request body, may be {@code null} for bodiless methods
 	 * @param username         the authenticated username (added as {@value #HEADER_X_USER})
 	 * @param authorities      the user's granted authorities (added as {@value #HEADER_X_PERMISSIONS})
 	 * @return the upstream response with its original status, headers, and body

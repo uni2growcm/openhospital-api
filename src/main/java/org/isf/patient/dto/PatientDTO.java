@@ -23,9 +23,8 @@ package org.isf.patient.dto;
 
 import java.time.LocalDate;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-
-import com.drew.lang.annotations.Nullable;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
