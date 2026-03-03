@@ -500,7 +500,7 @@ paths:
       operationId: updateTown
       parameters:
       - name: id
-        in: query
+        in: path
         required: true
         schema:
           type: integer
@@ -1177,7 +1177,7 @@ paths:
       operationId: updateOccupation
       parameters:
       - name: id
-        in: query
+        in: path
         required: true
         schema:
           type: integer
@@ -1812,7 +1812,7 @@ paths:
       operationId: updateEthnic
       parameters:
       - name: id
-        in: query
+        in: path
         required: true
         schema:
           type: integer
@@ -2161,7 +2161,7 @@ paths:
       operationId: updateCommune
       parameters:
       - name: id
-        in: query
+        in: path
         required: true
         schema:
           type: integer
@@ -7429,13 +7429,13 @@ components:
           format: int32
           description: lock
           example: 0
-        opd:
+        female:
           type: boolean
         male:
           type: boolean
-        female:
-          type: boolean
         pharmacy:
+          type: boolean
+        opd:
           type: boolean
       required:
       - beds
@@ -8369,11 +8369,11 @@ components:
           description: physical exam made by doctor
           example: "The patient appears alert, oriented to person, place, and time,\
             \ and in no acute distress. Well-nourished and well-hydrated."
+        fhu:
+          type: string
         yprog:
           type: integer
           format: int32
-        fhu:
-          type: string
       required:
       - admDate
       - admitted

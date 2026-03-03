@@ -116,7 +116,7 @@ public class EthnicController {
      * @throws OHServiceException When failed to update ethnic
      */
     @PutMapping("/ethnics/{id}")
-    public EthnicDTO updateEthnic(@RequestParam Integer id, @RequestBody EthnicDTO updatedEthnic) throws OHServiceException {
+    public EthnicDTO updateEthnic(@PathVariable Integer id, @RequestBody EthnicDTO updatedEthnic) throws OHServiceException {
         LOGGER.info("Update ethnic: {}", updatedEthnic);
 
         Ethnic ethnic = mapper.map2Model(updatedEthnic);

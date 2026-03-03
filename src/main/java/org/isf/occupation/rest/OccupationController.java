@@ -118,7 +118,7 @@ public class OccupationController {
      * @throws OHServiceException When failed to update occupation
      */
     @PutMapping("/occupations/{id}")
-    public OccupationDTO updateOccupation(@RequestParam Integer id, @RequestBody OccupationDTO updatedOccupation) throws OHServiceException {
+    public OccupationDTO updateOccupation(@PathVariable Integer id, @RequestBody OccupationDTO updatedOccupation) throws OHServiceException {
         LOGGER.info("Update occupation: {}", updatedOccupation);
 
         Occupation occupation = mapper.map2Model(updatedOccupation);
