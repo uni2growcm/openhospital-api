@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -72,7 +72,7 @@ public class TownController {
     /**
      * Get town related to a town id.
      *
-     * @param id of the town
+     * @param id the id of the town
      * @return The town related to the supplied town id
      * @throws OHServiceException When failed to get town
      */
@@ -110,6 +110,7 @@ public class TownController {
     /**
      * Update a town.
      *
+	 * @param id the id of the town
      * @param updatedTown town payload
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to update town
@@ -135,7 +136,7 @@ public class TownController {
     /**
      * Delete a town.
      *
-     * @param id of the town to delete
+     * @param id the id of the town to delete
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to delete town
      */

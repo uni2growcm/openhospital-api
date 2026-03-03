@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -74,7 +74,7 @@ public class OccupationController {
     /**
      * Get occupation related to a occupation id.
      *
-     * @param id of the occupation
+     * @param id the id of the occupation
      * @return The occupation related to the supplied occupation id
      * @throws OHServiceException When failed to get occupation
      */
@@ -112,6 +112,7 @@ public class OccupationController {
     /**
      * Update a occupation.
      *
+	 * @param id the id of the occupation
      * @param updatedOccupation occupation payload
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to update occupation
@@ -137,7 +138,7 @@ public class OccupationController {
     /**
      * Delete a occupation.
      *
-     * @param id of the occupation to delete
+     * @param id the id of the occupation to delete
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to delete occupation
      */

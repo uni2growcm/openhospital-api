@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -72,7 +72,7 @@ public class CommuneController {
     /**
      * Get commune related to a commune id.
      *
-     * @param id of the commune
+     * @param id the id of the commune
      * @return The commune related to the supplied commune id
      * @throws OHServiceException When failed to get commune
      */
@@ -110,6 +110,7 @@ public class CommuneController {
     /**
      * Update a commune.
      *
+	 * @param id the id of the commune
      * @param updatedCommune commune payload
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to update commune
@@ -135,7 +136,7 @@ public class CommuneController {
     /**
      * Delete a commune.
      *
-     * @param id of the commune to delete
+     * @param id the id of the commune to delete
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to delete commune
      */

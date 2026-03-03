@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2023 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -21,7 +21,6 @@
  */
 package org.isf.occupation.mapper;
 
-import org.isf.ethnic.model.Ethnic;
 import org.isf.occupation.dto.OccupationDTO;
 import org.isf.occupation.model.Occupation;
 import org.isf.shared.GenericMapper;

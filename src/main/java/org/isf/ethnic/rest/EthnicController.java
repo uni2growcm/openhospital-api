@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -72,7 +72,7 @@ public class EthnicController {
     /**
      * Get ethnic related to a ethnic id.
      *
-     * @param id of the ethnic
+     * @param id the id of the ethnic
      * @return The ethnic related to the supplied ethnic id
      * @throws OHServiceException When failed to get ethnic
      */
@@ -110,6 +110,7 @@ public class EthnicController {
     /**
      * Update a ethnic.
      *
+	 * @param id the id of the ethnic
      * @param updatedEthnic ethnic payload
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to update ethnic
@@ -135,7 +136,7 @@ public class EthnicController {
     /**
      * Delete a ethnic.
      *
-     * @param id of the ethnic to delete
+     * @param id the id of the ethnic to delete
      * @return an error message if there are some problems, ok otherwise.
      * @throws OHServiceException When failed to delete ethnic
      */
