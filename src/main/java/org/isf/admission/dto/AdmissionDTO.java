@@ -174,7 +174,10 @@ public class AdmissionDTO {
 	private String deleted;
 	
 	@Schema(description = "physical exam made by doctor", example = "The patient appears alert, oriented to person, place, and time, and in no acute distress. Well-nourished and well-hydrated.")
-	private String physicalExam;  
+	private String physicalExam;
+
+	@Schema(description = "course of action prescribed by the doctor", example = "Probabilistic antibiotic therapy with amoxicillin for 7 days.")
+	private String courseOfAction;
 
 	public int getId() {
 		return this.id;
@@ -505,6 +508,12 @@ public class AdmissionDTO {
 	public void setPhysicalExam(String physicalExam) {
 		this.physicalExam = physicalExam;
 	}
-	
-	
+
+	public String getCourseOfAction() {
+		return courseOfAction;
+	}
+
+	public void setCourseOfAction(String courseOfAction) {
+		this.courseOfAction = courseOfAction;
+	}
 }
