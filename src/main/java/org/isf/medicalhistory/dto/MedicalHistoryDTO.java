@@ -22,6 +22,8 @@
 package org.isf.medicalhistory.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 import org.isf.patient.dto.PatientDTO;
 import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -57,11 +59,19 @@ public class MedicalHistoryDTO {
 	@Schema(description = "Birth weight of the patient (kg)", example = "3.2")
 	private Double birthWeight;
 
-	@Schema(description = "Vaccination state for PEV vaccines", example = "Up to date")
-	private String vaccinationStatePev;
+	@Schema(
+		description = "Vaccination state for PEV vaccines. " +
+			"Stored as a list of descriptors (e.g., Polio 0,  BCG).",
+		example = "[\" Polio 0\", \" BCG\"]"
+	)
+	private List<String> vaccinationStatePev;
 
-	@Schema(description = "Vaccination state for non-PEV vaccines", example = "BCG pending")
-	private String vaccinationStateNoPev;
+	@Schema(
+		description = "Vaccination state for non-PEV vaccines. " +
+			"Stored as a list of descriptors (e.g., Polio 0,  BCG).",
+		example = "[\" Polio 0\", \" BCG\"]"
+	)
+	private List<String> vaccinationStateNoPev;
 
 	@Schema(description = "Use of Milda for anti-malarial prophylaxis", example = "YES")
 	private String antiMalarialProphylaxisMilda;
@@ -227,19 +237,19 @@ public class MedicalHistoryDTO {
 		this.birthWeight = birthWeight;
 	}
 
-	public String getVaccinationStatePev() {
+	public List<String> getVaccinationStatePev() {
 		return vaccinationStatePev;
 	}
 
-	public void setVaccinationStatePev(String vaccinationStatePev) {
+	public void setVaccinationStatePev(List<String> vaccinationStatePev) {
 		this.vaccinationStatePev = vaccinationStatePev;
 	}
 
-	public String getVaccinationStateNoPev() {
+	public List<String> getVaccinationStateNoPev() {
 		return vaccinationStateNoPev;
 	}
 
-	public void setVaccinationStateNoPev(String vaccinationStateNoPev) {
+	public void setVaccinationStateNoPev(List<String> vaccinationStateNoPev) {
 		this.vaccinationStateNoPev = vaccinationStateNoPev;
 	}
 
