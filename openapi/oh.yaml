@@ -9401,10 +9401,9 @@ components:
           description: Conditioning mce duration
           example: 4
         ventilation:
-          type: integer
-          format: int32
+          type: boolean
           description: Conditioning ventilation duration
-          example: 2
+          example: true
         oxygenDebit:
           type: number
           format: double
@@ -9426,9 +9425,13 @@ components:
           description: 'Bolus volume '
           example: 3
         sngNumber:
-          type: string
+          type: boolean
           description: Conditioning sng number
-          example: 3434634
+          example: true
+        reheating:
+          type: boolean
+          description: Conditioning reheating
+          example: true
         others:
           type: string
           description: Conditioning others

@@ -41,8 +41,8 @@ public class ConditioningDTO {
 	@Schema(description = "Conditioning mce duration", example = "4")
 	private Integer mce;
 
-	@Schema(description = "Conditioning ventilation duration", example = "2")
-	private Integer ventilation;
+	@Schema(description = "Conditioning ventilation duration", example = "true")
+	private Boolean ventilation;
 
 	@Schema(description = "Oxygen debit", example = "3")
 	private Double oxygenDebit;
@@ -56,8 +56,11 @@ public class ConditioningDTO {
 	@Schema(description = "Bolus volume ", example = "3")
 	private Double bolusSsVolume;
 
-	@Schema(description = "Conditioning sng number", example = "3434634")
-	private String sngNumber;
+	@Schema(description = "Conditioning sng number", example = "true")
+	private Boolean sngNumber;
+
+	@Schema(description = "Conditioning reheating", example = "true")
+	private Boolean reheating;
 
 	@Schema(description = "Conditioning others", example = "others")
 	private String others;
@@ -112,11 +115,11 @@ public class ConditioningDTO {
 		this.mce = mce;
 	}
 
-	public Integer getVentilation() {
+	public Boolean getVentilation() {
 		return ventilation;
 	}
 
-	public void setVentilation(Integer ventilation) {
+	public void setVentilation(Boolean ventilation) {
 		this.ventilation = ventilation;
 	}
 
@@ -152,12 +155,20 @@ public class ConditioningDTO {
 		this.bolusSsVolume = bolusSsVolume;
 	}
 
-	public String getSngNumber() {
+	public Boolean getSngNumber() {
 		return sngNumber;
 	}
 
-	public void setSngNumber(String sngNumber) {
+	public void setSngNumber(Boolean sngNumber) {
 		this.sngNumber = sngNumber;
+	}
+
+	public Boolean getReheating() {
+		return reheating;
+	}
+
+	public void setReheating(Boolean reheating) {
+		this.reheating = reheating;
 	}
 
 	public String getOthers() {
