@@ -21,73 +21,43 @@
  */
 package org.isf.plugins.registry;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import org.isf.plugins.config.PluginDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+
 /**
- * Runtime store of <em>healthy</em> plugin definitions.
- *
- * <p>The registry is populated once during application startup by
- * {@link org.isf.plugins.health.PluginHealthChecker}: only plugins whose health endpoint
- * responded successfully are registered here. Plugins that failed their health check are
- * silently excluded — their routes will return {@code 404 Not Found} at request time.</p>
- *
- * <p>After startup the registry is effectively immutable. It is thread-safe for concurrent
- * reads (backed by an unmodifiable view of a {@link LinkedHashMap}) and requires no
- * synchronization during normal request processing.</p>
+ * @author Steve Tsala
  */
 @Component
-public class PluginRegistry {
+public class PluginRegistry implements IPluginRegistry {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PluginRegistry.class);
 
-	/** Insertion-ordered map of pluginId → definition for all healthy plugins. */
+	/**
+	 * Insertion-ordered map of pluginId → definition for all healthy plugins.
+	 */
 	private Map<String, PluginDefinition> registry = Collections.emptyMap();
 
-	/**
-	 * Replaces the current registry contents.
-	 * Called exactly once by {@link org.isf.plugins.health.PluginHealthChecker} after
-	 * startup health checks complete. Subsequent calls (e.g. in tests) are safe.
-	 *
-	 * @param definitions map of pluginId → {@link PluginDefinition} for healthy plugins
-	 */
+	@Override
 	public void register(Map<String, PluginDefinition> definitions) {
 		this.registry = Collections.unmodifiableMap(new LinkedHashMap<>(definitions));
 		LOGGER.info("Plugin registry initialized with {} active plugin(s): {}", registry.size(), registry.keySet());
 	}
 
-	/**
-	 * Looks up a healthy plugin by its ID.
-	 *
-	 * @param pluginId the plugin identifier (e.g. {@code "smart-doc"})
-	 * @return an {@link Optional} containing the {@link PluginDefinition}, or empty if not found
-	 */
+	@Override
 	public Optional<PluginDefinition> find(String pluginId) {
 		return Optional.ofNullable(registry.get(pluginId));
 	}
 
-	/**
-	 * Returns an unmodifiable view of all registered (healthy) plugin definitions.
-	 *
-	 * @return all active plugin definitions; never {@code null}
-	 */
+	@Override
 	public Collection<PluginDefinition> all() {
 		return registry.values();
 	}
 
-	/**
-	 * Returns the number of currently registered (healthy) plugins.
-	 *
-	 * @return active plugin count
-	 */
+	@Override
 	public int size() {
 		return registry.size();
 	}

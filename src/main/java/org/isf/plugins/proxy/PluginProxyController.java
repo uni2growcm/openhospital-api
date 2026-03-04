@@ -21,27 +21,6 @@
  */
 package org.isf.plugins.proxy;
 
-import java.io.IOException;
-
-import org.isf.plugins.config.PluginDefinition;
-import org.isf.plugins.exception.PluginAccessDeniedException;
-import org.isf.plugins.exception.PluginNotFoundException;
-import org.isf.plugins.registry.PluginRegistry;
-import org.isf.plugins.security.PluginAuthorizationChecker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClientResponseException;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,6 +28,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import org.isf.plugins.config.PluginDefinition;
+import org.isf.plugins.exception.PluginAccessDeniedException;
+import org.isf.plugins.exception.PluginNotFoundException;
+import org.isf.plugins.registry.IPluginRegistry;
+import org.isf.plugins.security.IAuthenticationSupplier;
+import org.isf.plugins.security.IPluginAuthorizationChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientResponseException;
+
+import java.io.IOException;
 
 /**
  * Gateway controller that handles all {@code /plugins/{pluginId}/**} routes.
@@ -56,14 +52,14 @@ import jakarta.servlet.http.HttpServletRequest;
  * <h3>Request lifecycle</h3>
  * <ol>
  *   <li><strong>Resolve plugin</strong> — looks up {@code pluginId} in the
- *       {@link PluginRegistry}; returns {@code 404} if not found or unhealthy at startup.</li>
- *   <li><strong>Authorize</strong> — delegates to {@link PluginAuthorizationChecker} to verify
+ *       {@link IPluginRegistry}; returns {@code 404} if not found or unhealthy at startup.</li>
+ *   <li><strong>Authorize</strong> — delegates to {@link IPluginAuthorizationChecker} to verify
  *       the authenticated user holds at least one required privilege; returns {@code 403}
  *       on failure.</li>
  *   <li><strong>Extract sub-path</strong> — strips the {@code /plugins/{pluginId}} prefix from
  *       the request URI to obtain the upstream path segment.</li>
  *   <li><strong>Forward</strong> — proxies the full request (method, headers, body, query
- *       string) to the plugin via {@link PluginRequestForwarder}, adding {@code X-User} and
+ *       string) to the plugin via {@link IPluginRequestForwarder}, adding {@code X-User} and
  *       {@code X-Permissions} identity headers.</li>
  *   <li><strong>Return</strong> — the upstream response (status, headers, body) is returned
  *       to the client unmodified.</li>
@@ -82,7 +78,9 @@ import jakarta.servlet.http.HttpServletRequest;
  * All plugin routes fall under the existing {@code .anyRequest().authenticated()} rule in
  * {@link org.isf.config.SecurityConfig} — the {@code JWTFilter} validates the bearer token
  * before this controller is reached. Plugin-specific permission checks are performed inside
- * this controller via {@link PluginAuthorizationChecker}.
+ * this controller via {@link IPluginAuthorizationChecker}.
+ *
+ * @author Steve Tsala
  */
 @RestController
 @RequestMapping("/plugins")
@@ -92,20 +90,21 @@ public class PluginProxyController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PluginProxyController.class);
 
-	/** The URL prefix that will be stripped before forwarding to the upstream plugin. */
+	/**
+	 * The URL prefix that will be stripped before forwarding to the upstream plugin.
+	 */
 	private static final String PLUGINS_PREFIX = "/plugins/";
 
-	private final PluginRegistry pluginRegistry;
-	private final PluginAuthorizationChecker authorizationChecker;
-	private final PluginRequestForwarder requestForwarder;
+	private final IPluginRegistry pluginRegistry;
+	private final IPluginAuthorizationChecker authorizationChecker;
+	private final IPluginRequestForwarder requestForwarder;
+	private final IAuthenticationSupplier authenticationSupplier;
 
-	public PluginProxyController(
-			PluginRegistry pluginRegistry,
-			PluginAuthorizationChecker authorizationChecker,
-			PluginRequestForwarder requestForwarder) {
+	public PluginProxyController(IPluginRegistry pluginRegistry, IPluginAuthorizationChecker authorizationChecker, IPluginRequestForwarder requestForwarder, IAuthenticationSupplier authenticationSupplier) {
 		this.pluginRegistry = pluginRegistry;
 		this.authorizationChecker = authorizationChecker;
 		this.requestForwarder = requestForwarder;
+		this.authenticationSupplier = authenticationSupplier;
 	}
 
 	/**
@@ -115,49 +114,27 @@ public class PluginProxyController {
 	 * @return the upstream plugin's response, forwarded transparently
 	 * @throws IOException if reading the request body fails
 	 */
-	@RequestMapping(value = "/{id}/**")
-	@Operation(
-			summary = "Proxy a request to an external plugin",
-			description = "Resolves the plugin by ID, checks authorization, then forwards the request " +
-					"to the plugin's upstream URL. The sub-path after /plugins/{pluginId} is appended to the " +
-					"plugin base URL. All HTTP methods are supported.")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Upstream response forwarded successfully"),
-			@ApiResponse(responseCode = "403", description = "Authenticated user lacks required privileges for this plugin"),
-			@ApiResponse(responseCode = "404", description = "Plugin not found or unavailable"),
-			@ApiResponse(responseCode = "502", description = "Upstream plugin returned an unexpected error")
-	})
-	public ResponseEntity<byte[]> proxy(
-			@Parameter(hidden = true) HttpServletRequest request) throws IOException {
+	@RequestMapping(value = "/{id}/{*path}")
+	@Operation(summary = "Proxy a request to an external plugin", description = "Resolves the plugin by ID, checks authorization, then forwards the request " + "to the plugin's upstream URL. The sub-path after /plugins/{pluginId} is appended to the " + "plugin base URL. All HTTP methods are supported.")
+	@ApiResponses({@ApiResponse(responseCode = "200", description = "Upstream response forwarded successfully"), @ApiResponse(responseCode = "403", description = "Authenticated user lacks required privileges for this plugin"), @ApiResponse(responseCode = "404", description = "Plugin not found or unavailable"), @ApiResponse(responseCode = "502", description = "Upstream plugin returned an unexpected error")})
+	public ResponseEntity<byte[]> proxy(@Parameter(hidden = true) HttpServletRequest request, @PathVariable(required = false) String id, @PathVariable(required = false) String path) throws IOException {
 
-		String pluginId = extractPluginId(request.getRequestURI());
 
-		PluginDefinition plugin = pluginRegistry.find(pluginId)
-				.orElseThrow(() -> new PluginNotFoundException(pluginId));
+		PluginDefinition plugin = pluginRegistry.find(id).orElseThrow(() -> new PluginNotFoundException(id));
 
 		authorizationChecker.assertAccess(plugin);
 
-		// Extract sub-path (everything after /plugins/{pluginId})
-		String subPath = extractSubPath(request.getRequestURI(), pluginId);
+		// Extract sub-path (everything after /plugins/{id})
+		String subPath = String.format("/%s", path != null ? path : "");
 
 		// Read request body (may be empty for GET/DELETE/HEAD)
 		byte[] body = request.getInputStream().readAllBytes();
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Authentication authentication = authenticationSupplier.get();
 
-		LOGGER.debug("Routing [{}] /plugins/{}{} → {}{}",
-				request.getMethod(), pluginId, subPath, plugin.url(), subPath);
+		LOGGER.debug("Routing [{}] /plugins/{}{} → {}{}", request.getMethod(), id, subPath, plugin.url(), subPath);
 
-		// 7. Forward and return the upstream response
-		return requestForwarder.forward(
-				plugin,
-				subPath,
-				request.getQueryString(),
-				HttpMethod.valueOf(request.getMethod()),
-				buildRequestHeaders(request),
-				body,
-				authentication.getName(),
-				authentication.getAuthorities());
+		return requestForwarder.forward(plugin, subPath, request.getQueryString(), HttpMethod.valueOf(request.getMethod()), buildRequestHeaders(request), body, authentication.getName(), authentication.getAuthorities());
 	}
 
 	// -------------------------------------------------------------------------
@@ -167,61 +144,24 @@ public class PluginProxyController {
 	@ExceptionHandler(PluginNotFoundException.class)
 	public ResponseEntity<PluginErrorResponse> handlePluginNotFound(PluginNotFoundException ex) {
 		LOGGER.warn("Plugin not found: {}", ex.getMessage());
-		return ResponseEntity
-				.status(HttpStatus.NOT_FOUND)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(new PluginErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(new PluginErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
 	}
 
 	@ExceptionHandler(PluginAccessDeniedException.class)
 	public ResponseEntity<PluginErrorResponse> handleAccessDenied(PluginAccessDeniedException ex) {
 		LOGGER.warn("Plugin access denied: {}", ex.getMessage());
-		return ResponseEntity
-				.status(HttpStatus.FORBIDDEN)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(new PluginErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.APPLICATION_JSON).body(new PluginErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage()));
 	}
 
 	@ExceptionHandler(RestClientResponseException.class)
 	public ResponseEntity<byte[]> handleUpstreamError(RestClientResponseException ex) {
 		LOGGER.warn("Upstream plugin error: HTTP {} — {}", ex.getStatusCode(), ex.getMessage());
-		return ResponseEntity
-				.status(ex.getStatusCode())
-				.headers(ex.getResponseHeaders())
-				.body(ex.getResponseBodyAsByteArray());
+		return ResponseEntity.status(ex.getStatusCode()).headers(ex.getResponseHeaders()).body(ex.getResponseBodyAsByteArray());
 	}
 
 	// -------------------------------------------------------------------------
 	// Private helpers
 	// -------------------------------------------------------------------------
-
-	/**
-	 * Extracts the plugin ID from a URI of the form {@code /plugins/{pluginId}/...}.
-	 *
-	 * @param requestUri the full request URI (e.g. {@code /plugins/smart-doc/documents})
-	 * @return the plugin ID segment (e.g. {@code "smart-doc"})
-	 */
-	private String extractPluginId(String requestUri) {
-		// Strip context-path prefix if present, then take the segment after /plugins/
-		String afterPrefix = requestUri.substring(requestUri.indexOf(PLUGINS_PREFIX) + PLUGINS_PREFIX.length());
-		int slashIndex = afterPrefix.indexOf('/');
-		return slashIndex == -1 ? afterPrefix : afterPrefix.substring(0, slashIndex);
-	}
-
-	/**
-	 * Extracts the sub-path after {@code /plugins/{pluginId}}.
-	 * Returns {@code "/"} when there is no sub-path (request is to the plugin root).
-	 *
-	 * @param requestUri the full request URI
-	 * @param pluginId   the resolved plugin ID
-	 * @return the sub-path string, always starting with {@code /}
-	 */
-	private String extractSubPath(String requestUri, String pluginId) {
-		String prefix = PLUGINS_PREFIX + pluginId;
-		int prefixEnd = requestUri.indexOf(prefix) + prefix.length();
-		String subPath = prefixEnd < requestUri.length() ? requestUri.substring(prefixEnd) : "";
-		return subPath.isEmpty() ? "/" : subPath;
-	}
 
 	/**
 	 * Copies all headers from the {@link HttpServletRequest} into an {@link HttpHeaders} map.

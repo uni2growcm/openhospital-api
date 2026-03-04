@@ -21,16 +21,6 @@
  */
 package org.isf.plugins.proxy;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.net.URI;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 import org.isf.plugins.config.PluginDefinition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,25 +37,30 @@ import org.springframework.web.client.RestClient.RequestBodySpec;
 import org.springframework.web.client.RestClient.RequestBodyUriSpec;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
+import java.net.URI;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class PluginRequestForwarderTest {
 
+	private static final PluginDefinition PLUGIN = new PluginDefinition(
+		"smart-doc", "http://localhost:4000/api", "/health", List.of());
 	@Mock
 	private RestClient mockRestClient;
-
 	@Mock
 	private RequestBodyUriSpec uriSpec;
-
 	@Mock
 	private RequestBodySpec requestBodySpec;
-
 	@Mock
 	private ResponseSpec responseSpec;
-
 	private PluginRequestForwarder forwarder;
-
-	private static final PluginDefinition PLUGIN = new PluginDefinition(
-			"smart-doc", "http://localhost:4000/api", "/health", List.of());
 
 	@BeforeEach
 	void setUp() {
@@ -85,14 +80,14 @@ class PluginRequestForwarderTest {
 		when(responseSpec.toEntity(eq(byte[].class))).thenReturn(upstreamResponse);
 
 		ResponseEntity<byte[]> result = forwarder.forward(
-				PLUGIN,
-				"/documents/1",
-				null,
-				HttpMethod.GET,
-				new HttpHeaders(),
-				null,
-				"alice",
-				List.of(new SimpleGrantedAuthority("smart-doc.read")));
+			PLUGIN,
+			"/documents/1",
+			null,
+			HttpMethod.GET,
+			new HttpHeaders(),
+			null,
+			"alice",
+			List.of(new SimpleGrantedAuthority("smart-doc.read")));
 
 		assertThat(result.getStatusCode().value()).isEqualTo(200);
 		assertThat(result.getBody()).isEqualTo("hello".getBytes());
@@ -107,14 +102,14 @@ class PluginRequestForwarderTest {
 
 		byte[] requestBody = "{\"name\":\"doc\"}".getBytes();
 		ResponseEntity<byte[]> result = forwarder.forward(
-				PLUGIN,
-				"/documents",
-				null,
-				HttpMethod.POST,
-				new HttpHeaders(),
-				requestBody,
-				"alice",
-				List.of());
+			PLUGIN,
+			"/documents",
+			null,
+			HttpMethod.POST,
+			new HttpHeaders(),
+			requestBody,
+			"alice",
+			List.of());
 
 		assertThat(result.getStatusCode().value()).isEqualTo(201);
 	}
@@ -136,8 +131,8 @@ class PluginRequestForwarderTest {
 		when(responseSpec.toEntity(eq(byte[].class))).thenReturn(upstreamResponse);
 
 		forwarder.forward(PLUGIN, "/path", null, HttpMethod.GET,
-				new HttpHeaders(), null, "bob",
-				List.of(new SimpleGrantedAuthority("smart-doc.read")));
+			new HttpHeaders(), null, "bob",
+			List.of(new SimpleGrantedAuthority("smart-doc.read")));
 
 		assertThat(capturedHeaders[0]).isNotNull();
 		assertThat(capturedHeaders[0].getFirst(PluginRequestForwarder.HEADER_X_USER)).isEqualTo("bob");
@@ -159,10 +154,10 @@ class PluginRequestForwarderTest {
 		when(responseSpec.toEntity(eq(byte[].class))).thenReturn(upstreamResponse);
 
 		forwarder.forward(PLUGIN, "/path", null, HttpMethod.GET,
-				new HttpHeaders(), null, "alice",
-				List.of(
-						new SimpleGrantedAuthority("smart-doc.read"),
-						new SimpleGrantedAuthority("smart-doc.write")));
+			new HttpHeaders(), null, "alice",
+			List.of(
+				new SimpleGrantedAuthority("smart-doc.read"),
+				new SimpleGrantedAuthority("smart-doc.write")));
 
 		String permHeader = capturedHeaders[0].getFirst(PluginRequestForwarder.HEADER_X_PERMISSIONS);
 		assertThat(permHeader).contains("smart-doc.read", "smart-doc.write");
@@ -188,7 +183,7 @@ class PluginRequestForwarderTest {
 		incoming.add("X-Custom", "value");
 
 		forwarder.forward(PLUGIN, "/path", null, HttpMethod.GET,
-				incoming, null, "alice", List.of());
+			incoming, null, "alice", List.of());
 
 		assertThat(capturedHeaders[0].containsKey(HttpHeaders.HOST)).isFalse();
 		assertThat(capturedHeaders[0].getFirst("X-Custom")).isEqualTo("value");

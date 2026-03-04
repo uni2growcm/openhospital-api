@@ -19,18 +19,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.plugins.config;
+package org.isf.plugins.security;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Loads {@code rsc/plugins.yaml} into the Spring {@link org.springframework.core.env.Environment}
- * and activates type-safe binding via {@link PluginProperties}.
+ * Registers security-related beans used by the plugin subsystem.
  *
  * @author Steve Tsala
  */
 @Configuration
-@EnableConfigurationProperties(PluginProperties.class)
-public class PluginsYamlConfig {
+public class PluginSecurityConfig {
+
+	/**
+	 * Provides the {@link IAuthenticationSupplier} bean that resolves the current
+	 * {@link org.springframework.security.core.Authentication} from
+	 * {@link SecurityContextHolder}.
+	 *
+	 * @return a lambda delegating to {@code SecurityContextHolder.getContext().getAuthentication()}
+	 */
+	@Bean
+	public IAuthenticationSupplier authenticationSupplier() {
+		return () -> SecurityContextHolder.getContext().getAuthentication();
+	}
 }

@@ -21,40 +21,29 @@
  */
 package org.isf.plugins.security;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.config.PluginPermission;
 import org.isf.plugins.exception.PluginAccessDeniedException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @SpringBootTest(classes = OpenHospitalApiApplication.class)
 class PluginAuthorizationCheckerTest {
 
 	@Autowired
-	private PluginAuthorizationChecker checker;
+	private IPluginAuthorizationChecker checker;
 
 	// -------------------------------------------------------------------------
 	// assertAccess — open plugin (no permissions declared)
@@ -101,7 +90,7 @@ class PluginAuthorizationCheckerTest {
 		PluginPermission adminPerm = new PluginPermission("admin", List.of("smart-doc.write"));
 		PluginPermission viewerPerm = new PluginPermission("viewer", List.of("smart-doc.read"));
 		PluginDefinition plugin = new PluginDefinition(
-				"smart-doc", "http://localhost:4000", "/health", List.of(adminPerm, viewerPerm));
+			"smart-doc", "http://localhost:4000", "/health", List.of(adminPerm, viewerPerm));
 
 		checker.assertAccess(plugin);
 	}
@@ -114,9 +103,9 @@ class PluginAuthorizationCheckerTest {
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
-				.isInstanceOf(PluginAccessDeniedException.class)
-				.hasMessageContaining("user")
-				.hasMessageContaining("smart-doc");
+			.isInstanceOf(PluginAccessDeniedException.class)
+			.hasMessageContaining("user")
+			.hasMessageContaining("smart-doc");
 	}
 
 	@Test
@@ -127,7 +116,7 @@ class PluginAuthorizationCheckerTest {
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
-				.isInstanceOf(PluginAccessDeniedException.class);
+			.isInstanceOf(PluginAccessDeniedException.class);
 	}
 
 	// -------------------------------------------------------------------------
@@ -141,8 +130,8 @@ class PluginAuthorizationCheckerTest {
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of());
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("No authenticated principal");
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("No authenticated principal");
 	}
 
 	@Test
@@ -151,7 +140,7 @@ class PluginAuthorizationCheckerTest {
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of());
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
-				.isInstanceOf(IllegalStateException.class);
+			.isInstanceOf(IllegalStateException.class);
 	}
 
 	// -------------------------------------------------------------------------
@@ -164,7 +153,7 @@ class PluginAuthorizationCheckerTest {
 		PluginPermission adminPerm = new PluginPermission("admin", List.of("smart-doc.read", "smart-doc.write"));
 		PluginPermission viewerPerm = new PluginPermission("viewer", List.of("smart-doc.read", "smart-doc.export"));
 		PluginDefinition plugin = new PluginDefinition(
-				"smart-doc", "http://localhost:4000", "/health", List.of(adminPerm, viewerPerm));
+			"smart-doc", "http://localhost:4000", "/health", List.of(adminPerm, viewerPerm));
 
 		Set<String> required = checker.requiredPrivileges(plugin);
 

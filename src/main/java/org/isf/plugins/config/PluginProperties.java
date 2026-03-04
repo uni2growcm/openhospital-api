@@ -21,10 +21,10 @@
  */
 package org.isf.plugins.config;
 
-import java.util.List;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
+
+import java.util.List;
 
 /**
  * Type-safe binding of the {@code plugins} namespace from {@code plugins.yaml}.
@@ -47,8 +47,9 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  *
  * @param definitions the list of plugin definitions loaded from {@code plugins.yaml};
  *                    defaults to an empty list when the file is absent or the key is omitted
+ * @author Steve Tsala
  */
 @ConfigurationProperties(prefix = "plugins")
 public record PluginProperties(
-		@DefaultValue List<PluginDefinition> definitions) {
+	@DefaultValue List<PluginDefinition> definitions) {
 }

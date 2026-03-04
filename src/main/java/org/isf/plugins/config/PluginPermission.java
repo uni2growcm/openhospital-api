@@ -21,9 +21,9 @@
  */
 package org.isf.plugins.config;
 
-import java.util.List;
-
 import org.springframework.boot.context.properties.bind.DefaultValue;
+
+import java.util.List;
 
 /**
  * Represents the access-control entry for a single role within a plugin definition.
@@ -46,8 +46,9 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @param role       a human-readable role label (e.g. {@code "admin"}, {@code "user"});
  *                   not used for programmatic access control — see {@link #privileges()}
  * @param privileges fine-grained authority strings; defaults to an empty list if omitted in YAML
+ * @author Steve Tsala
  */
 public record PluginPermission(
-		String role,
-		@DefaultValue List<String> privileges) {
+	String role,
+	@DefaultValue List<String> privileges) {
 }

@@ -27,6 +27,8 @@ package org.isf.plugins.exception;
  *
  * <p>Mapped to HTTP {@code 403 Forbidden} by
  * {@link org.isf.plugins.proxy.PluginProxyController}.</p>
+ *
+ * @author Steve Tsala
  */
 public class PluginAccessDeniedException extends RuntimeException {
 

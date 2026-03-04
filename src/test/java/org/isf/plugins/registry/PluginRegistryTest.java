@@ -21,32 +21,29 @@
  */
 package org.isf.plugins.registry;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest(classes = OpenHospitalApiApplication.class)
 class PluginRegistryTest {
 
 
-	@Autowired
-	private PluginRegistry registry;
-
 	private static final PluginDefinition SMART_DOC = new PluginDefinition(
-			"smart-doc", "http://localhost:4000/api", "/health", List.of());
-
+		"smart-doc", "http://localhost:4000/api", "/health", List.of());
 	private static final PluginDefinition REPORTS = new PluginDefinition(
-			"reports", "http://localhost:5000", "/ping", List.of());
+		"reports", "http://localhost:5000", "/ping", List.of());
+	@Autowired
+	private IPluginRegistry registry;
 
 	@Test
 	@DisplayName("Should register a single plugin and find it by ID")
@@ -84,8 +81,8 @@ class PluginRegistryTest {
 		registry.register(Map.of("smart-doc", SMART_DOC, "reports", REPORTS));
 
 		assertThat(registry.all())
-				.hasSize(2)
-				.containsExactlyInAnyOrder(SMART_DOC, REPORTS);
+			.hasSize(2)
+			.containsExactlyInAnyOrder(SMART_DOC, REPORTS);
 	}
 
 	@Test

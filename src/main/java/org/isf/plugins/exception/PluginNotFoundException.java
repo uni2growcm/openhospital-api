@@ -28,6 +28,8 @@ package org.isf.plugins.exception;
  *
  * <p>Mapped to HTTP {@code 404 Not Found} by
  * {@link org.isf.plugins.proxy.PluginProxyController}.</p>
+ *
+ * @author Steve Tsala
  */
 public class PluginNotFoundException extends RuntimeException {
 

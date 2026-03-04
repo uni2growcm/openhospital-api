@@ -21,9 +21,9 @@
  */
 package org.isf.plugins.config;
 
-import java.util.List;
-
 import org.springframework.boot.context.properties.bind.DefaultValue;
+
+import java.util.List;
 
 /**
  * Immutable description of a single external plugin registered with the gateway.
@@ -53,10 +53,11 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @param health      health check path relative to {@link #url()} (e.g. {@code "/health"});
  *                    probed at startup — a non-2xx or connection failure excludes the plugin
  * @param permissions access-control rules grouped by role; defaults to an empty list (any authenticated user may access the plugin)
+ * @author Steve Tsala
  */
 public record PluginDefinition(
-		String id,
-		String url,
-		String health,
-		@DefaultValue List<PluginPermission> permissions) {
+	String id,
+	String url,
+	String health,
+	@DefaultValue List<PluginPermission> permissions) {
 }
