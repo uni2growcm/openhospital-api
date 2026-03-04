@@ -30,6 +30,7 @@ import java.util.Optional;
 import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +49,7 @@ class PluginRegistryTest {
 			"reports", "http://localhost:5000", "/ping", List.of());
 
 	@Test
+	@DisplayName("Should register a single plugin and find it by ID")
 	void registerSinglePlugin() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 
@@ -59,6 +61,7 @@ class PluginRegistryTest {
 	}
 
 	@Test
+	@DisplayName("Should register multiple plugins and find them by ID")
 	void registerMultiplePlugins() {
 		registry.register(Map.of("smart-doc", SMART_DOC, "reports", REPORTS));
 
@@ -68,6 +71,7 @@ class PluginRegistryTest {
 	}
 
 	@Test
+	@DisplayName("Finding an unknown plugin ID should return empty")
 	void findUnknownPluginReturnsEmpty() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 
@@ -75,6 +79,7 @@ class PluginRegistryTest {
 	}
 
 	@Test
+	@DisplayName("Should return all registered plugin definitions")
 	void allReturnsRegisteredDefinitions() {
 		registry.register(Map.of("smart-doc", SMART_DOC, "reports", REPORTS));
 
@@ -84,6 +89,7 @@ class PluginRegistryTest {
 	}
 
 	@Test
+	@DisplayName("Should register a new set of plugins and replace the old contents")
 	void secondRegisterCallReplacesContents() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 		assertThat(registry.size()).isEqualTo(1);
@@ -95,6 +101,7 @@ class PluginRegistryTest {
 	}
 
 	@Test
+	@DisplayName("Should register an empty map and clear the registry")
 	void registerWithEmptyMapClearsRegistry() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 		registry.register(Map.of());

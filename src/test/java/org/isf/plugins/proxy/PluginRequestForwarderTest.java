@@ -32,12 +32,17 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -48,11 +53,8 @@ import org.springframework.web.client.RestClient.RequestBodySpec;
 import org.springframework.web.client.RestClient.RequestBodyUriSpec;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
+@ExtendWith(MockitoExtension.class)
 class PluginRequestForwarderTest {
-
-	// We need to inject a mock RestClient into PluginRequestForwarder.
-	// Since the forwarder creates its RestClient internally, we test via a subclass
-	// that accepts an injected RestClient for test isolation.
 
 	@Mock
 	private RestClient mockRestClient;
@@ -67,17 +69,14 @@ class PluginRequestForwarderTest {
 	private ResponseSpec responseSpec;
 
 	private PluginRequestForwarderTestable forwarder;
-	private AutoCloseable closeable;
 
 	private static final PluginDefinition PLUGIN = new PluginDefinition(
 			"smart-doc", "http://localhost:4000/api", "/health", List.of());
 
 	@BeforeEach
 	void setUp() {
-		closeable = MockitoAnnotations.openMocks(this);
 		forwarder = new PluginRequestForwarderTestable(mockRestClient);
 
-		// Wire mock RestClient chain: method → uri → headers → retrieve → onStatus → toEntity
 		when(mockRestClient.method(any(HttpMethod.class))).thenReturn(uriSpec);
 		when(uriSpec.uri(any(URI.class))).thenReturn(requestBodySpec);
 		when(requestBodySpec.headers(any())).thenReturn(requestBodySpec);
@@ -85,14 +84,9 @@ class PluginRequestForwarderTest {
 		when(responseSpec.onStatus(any(Predicate.class), any())).thenReturn(responseSpec);
 	}
 
-	@AfterEach
-	void tearDown() throws Exception {
-		closeable.close();
-	}
-
 	@Test
-	@SuppressWarnings("unchecked")
-	void forwardGet_returnsUpstreamResponse() {
+	@DisplayName("Should forward GET request and return upstream response")
+	void forwardGetReturnsUpstreamResponse() {
 		ResponseEntity<byte[]> upstreamResponse = ResponseEntity.ok("hello".getBytes());
 		when(responseSpec.toEntity(eq(byte[].class))).thenReturn(upstreamResponse);
 
@@ -111,8 +105,8 @@ class PluginRequestForwarderTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	void forwardPost_withBody_setsBody() {
+	@DisplayName("Should forward POST request with body and return upstream response")
+	void forwardPostWithBodySetsBody() {
 		ResponseEntity<byte[]> upstreamResponse = ResponseEntity.status(201).body(new byte[0]);
 		when(requestBodySpec.body(any(byte[].class))).thenReturn(requestBodySpec);
 		when(responseSpec.toEntity(eq(byte[].class))).thenReturn(upstreamResponse);
@@ -132,6 +126,7 @@ class PluginRequestForwarderTest {
 	}
 
 	@Test
+	@DisplayName("Should add X-User header with authenticated username")
 	void xUserHeaderIsSet() {
 		// Capture the headers consumer argument to verify identity headers are added
 		HttpHeaders[] capturedHeaders = new HttpHeaders[1];

@@ -63,7 +63,7 @@ class PluginAuthorizationCheckerTest {
 	@Test
 	@WithMockUser(username = "user")
 	@DisplayName("Should grant access to any authenticated user when plugin declares no permissions")
-	void accessGranted_noPermissionsDeclared() {
+	void accessGrantedNoPermissionsDeclared() {
 		PluginDefinition plugin = new PluginDefinition("open-plugin", "http://localhost:9000", "/health", List.of());
 
 		// Should not throw — no permissions means any authenticated user is allowed.
@@ -73,7 +73,7 @@ class PluginAuthorizationCheckerTest {
 	@Test
 	@WithMockUser(username = "user")
 	@DisplayName("Should grant access to any authenticated user when plugin permissions is null")
-	void accessGranted_nullPermissions() {
+	void accessGrantedNullPermissions() {
 		PluginDefinition plugin = new PluginDefinition("open-plugin", "http://localhost:9000", "/health", null);
 
 		checker.assertAccess(plugin);
@@ -86,7 +86,7 @@ class PluginAuthorizationCheckerTest {
 	@Test
 	@WithMockUser(username = "user", authorities = {"smart-doc.read", "smart-doc.write"})
 	@DisplayName("Should grant access when user has at least one matching privilege across any permission group")
-	void accessGranted_userHasMatchingPrivilege() {
+	void accessGrantedUserHasMatchingPrivilege() {
 		PluginPermission perm = new PluginPermission("admin", List.of("smart-doc.read", "smart-doc.write"));
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
 
@@ -97,7 +97,7 @@ class PluginAuthorizationCheckerTest {
 	@Test
 	@WithMockUser(username = "user", authorities = {"smart-doc.read", "smart-doc.write"})
 	@DisplayName("Should grant access when user has a matching privilege in at least one of multiple permission groups")
-	void accessGranted_userHasOneOfMultiplePermissionGroups() {
+	void accessGrantedUserHasOneOfMultiplePermissionGroups() {
 		PluginPermission adminPerm = new PluginPermission("admin", List.of("smart-doc.write"));
 		PluginPermission viewerPerm = new PluginPermission("viewer", List.of("smart-doc.read"));
 		PluginDefinition plugin = new PluginDefinition(
@@ -109,7 +109,7 @@ class PluginAuthorizationCheckerTest {
 	@Test
 	@WithMockUser(username = "user", authorities = {"smart-doc.create"})
 	@DisplayName("Should deny access when user has authorities but none match any required privilege")
-	void accessDenied_userHasNoMatchingPrivilege() {
+	void accessDeniedUserHasNoMatchingPrivilege() {
 		PluginPermission perm = new PluginPermission("admin", List.of("smart-doc.read", "smart-doc.write"));
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
 
@@ -122,7 +122,7 @@ class PluginAuthorizationCheckerTest {
 	@Test
 	@WithMockUser(username = "user", authorities = {})
 	@DisplayName("Should deny access when user has no authorities at all")
-	void accessDenied_userHasNoAuthoritiesAtAll() {
+	void accessDeniedUserHasNoAuthoritiesAtAll() {
 		PluginPermission perm = new PluginPermission("admin", List.of("smart-doc.read"));
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of(perm));
 
@@ -136,7 +136,7 @@ class PluginAuthorizationCheckerTest {
 
 	@Test
 	@DisplayName("Should throw IllegalStateException when there is no authentication in the security context")
-	void throwsIllegalState_whenNoAuthentication() {
+	void throwsIllegalStateWhenNoAuthentication() {
 		SecurityContextHolder.clearContext();
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of());
 
@@ -147,7 +147,7 @@ class PluginAuthorizationCheckerTest {
 
 	@Test
 	@DisplayName("Should throw IllegalStateException when authentication is present but not authenticated")
-	void throwsIllegalState_whenNotAuthenticated() {
+	void throwsIllegalStateWhenNotAuthenticated() {
 		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", List.of());
 
 		assertThatThrownBy(() -> checker.assertAccess(plugin))
@@ -160,7 +160,7 @@ class PluginAuthorizationCheckerTest {
 
 	@Test
 	@DisplayName("Should return the flat set of all declared privileges across all permission groups")
-	void requiredPrivileges_returnsAllDeclaredPrivileges() {
+	void requiredPrivilegesReturnsAllDeclaredPrivileges() {
 		PluginPermission adminPerm = new PluginPermission("admin", List.of("smart-doc.read", "smart-doc.write"));
 		PluginPermission viewerPerm = new PluginPermission("viewer", List.of("smart-doc.read", "smart-doc.export"));
 		PluginDefinition plugin = new PluginDefinition(
@@ -173,7 +173,7 @@ class PluginAuthorizationCheckerTest {
 
 	@Test
 	@DisplayName("Should return an empty set when plugin permissions is null")
-	void requiredPrivileges_returnsEmptySetWhenNoPermissions() {
+	void requiredPrivilegesReturnsEmptySetWhenNoPermissions() {
 		PluginDefinition plugin = new PluginDefinition("open-plugin", "http://localhost:9000", "/health", null);
 
 		assertThat(checker.requiredPrivileges(plugin)).isEmpty();
