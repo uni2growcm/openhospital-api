@@ -50,7 +50,7 @@ class PluginRegistryTest {
 
 	@Test
 	@DisplayName("Should register a single plugin and find it by ID")
-	void registerSinglePlugin() {
+	void shouldFindPluginAfterRegisteringIt() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 
 		assertThat(registry.size()).isEqualTo(1);
@@ -62,7 +62,7 @@ class PluginRegistryTest {
 
 	@Test
 	@DisplayName("Should register multiple plugins and find them by ID")
-	void registerMultiplePlugins() {
+	void shouldFindAllPluginsAfterRegisteringMultiple() {
 		registry.register(Map.of("smart-doc", SMART_DOC, "reports", REPORTS));
 
 		assertThat(registry.size()).isEqualTo(2);
@@ -72,7 +72,7 @@ class PluginRegistryTest {
 
 	@Test
 	@DisplayName("Finding an unknown plugin ID should return empty")
-	void findUnknownPluginReturnsEmpty() {
+	void shouldReturnEmptyWhenPluginNotFound() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 
 		assertThat(registry.find("no-such-plugin")).isEmpty();
@@ -80,7 +80,7 @@ class PluginRegistryTest {
 
 	@Test
 	@DisplayName("Should return all registered plugin definitions")
-	void allReturnsRegisteredDefinitions() {
+	void shouldReturnAllRegisteredDefinitions() {
 		registry.register(Map.of("smart-doc", SMART_DOC, "reports", REPORTS));
 
 		assertThat(registry.all())
@@ -90,7 +90,7 @@ class PluginRegistryTest {
 
 	@Test
 	@DisplayName("Should register a new set of plugins and replace the old contents")
-	void secondRegisterCallReplacesContents() {
+	void shouldReplaceContentsOnSecondRegisterCall() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 		assertThat(registry.size()).isEqualTo(1);
 
@@ -102,7 +102,7 @@ class PluginRegistryTest {
 
 	@Test
 	@DisplayName("Should register an empty map and clear the registry")
-	void registerWithEmptyMapClearsRegistry() {
+	void shouldClearRegistryWhenRegisteredWithEmptyMap() {
 		registry.register(Map.of("smart-doc", SMART_DOC));
 		registry.register(Map.of());
 

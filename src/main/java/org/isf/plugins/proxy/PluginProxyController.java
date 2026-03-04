@@ -130,23 +130,19 @@ public class PluginProxyController {
 	public ResponseEntity<byte[]> proxy(
 			@Parameter(hidden = true) HttpServletRequest request) throws IOException {
 
-		// 1. Extract plugin ID from the URI
 		String pluginId = extractPluginId(request.getRequestURI());
 
-		// 2. Resolve the plugin from the registry
 		PluginDefinition plugin = pluginRegistry.find(pluginId)
 				.orElseThrow(() -> new PluginNotFoundException(pluginId));
 
-		// 3. Authorization check
 		authorizationChecker.assertAccess(plugin);
 
-		// 4. Extract sub-path (everything after /plugins/{pluginId})
+		// Extract sub-path (everything after /plugins/{pluginId})
 		String subPath = extractSubPath(request.getRequestURI(), pluginId);
 
-		// 5. Read request body (may be empty for GET/DELETE/HEAD)
+		// Read request body (may be empty for GET/DELETE/HEAD)
 		byte[] body = request.getInputStream().readAllBytes();
 
-		// 6. Collect authentication for identity headers
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		LOGGER.debug("Routing [{}] /plugins/{}{} → {}{}",

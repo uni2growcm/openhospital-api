@@ -24,7 +24,6 @@ package org.isf.plugins.proxy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -32,20 +31,15 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.client.RestClient;
@@ -68,14 +62,14 @@ class PluginRequestForwarderTest {
 	@Mock
 	private ResponseSpec responseSpec;
 
-	private PluginRequestForwarderTestable forwarder;
+	private PluginRequestForwarder forwarder;
 
 	private static final PluginDefinition PLUGIN = new PluginDefinition(
 			"smart-doc", "http://localhost:4000/api", "/health", List.of());
 
 	@BeforeEach
 	void setUp() {
-		forwarder = new PluginRequestForwarderTestable(mockRestClient);
+		forwarder = new PluginRequestForwarder(mockRestClient);
 
 		when(mockRestClient.method(any(HttpMethod.class))).thenReturn(uriSpec);
 		when(uriSpec.uri(any(URI.class))).thenReturn(requestBodySpec);
@@ -85,8 +79,8 @@ class PluginRequestForwarderTest {
 	}
 
 	@Test
-	@DisplayName("Should forward GET request and return upstream response")
-	void forwardGetReturnsUpstreamResponse() {
+	@DisplayName("Should return upstream response for a GET request")
+	void shouldReturnUpstreamResponseForGetRequest() {
 		ResponseEntity<byte[]> upstreamResponse = ResponseEntity.ok("hello".getBytes());
 		when(responseSpec.toEntity(eq(byte[].class))).thenReturn(upstreamResponse);
 
@@ -105,8 +99,8 @@ class PluginRequestForwarderTest {
 	}
 
 	@Test
-	@DisplayName("Should forward POST request with body and return upstream response")
-	void forwardPostWithBodySetsBody() {
+	@DisplayName("Should return upstream response for a POST request with body")
+	void shouldReturnUpstreamResponseForPostRequestWithBody() {
 		ResponseEntity<byte[]> upstreamResponse = ResponseEntity.status(201).body(new byte[0]);
 		when(requestBodySpec.body(any(byte[].class))).thenReturn(requestBodySpec);
 		when(responseSpec.toEntity(eq(byte[].class))).thenReturn(upstreamResponse);
@@ -127,7 +121,7 @@ class PluginRequestForwarderTest {
 
 	@Test
 	@DisplayName("Should add X-User header with authenticated username")
-	void xUserHeaderIsSet() {
+	void shouldSetXUserHeaderWithAuthenticatedUsername() {
 		// Capture the headers consumer argument to verify identity headers are added
 		HttpHeaders[] capturedHeaders = new HttpHeaders[1];
 		when(requestBodySpec.headers(any())).thenAnswer(inv -> {
@@ -150,7 +144,8 @@ class PluginRequestForwarderTest {
 	}
 
 	@Test
-	void xPermissionsHeaderIsCommaSeparated() {
+	@DisplayName("Should set X-Permissions header as comma-separated list of authorities")
+	void shouldSetXPermissionsHeaderAsCommaSeparatedList() {
 		HttpHeaders[] capturedHeaders = new HttpHeaders[1];
 		when(requestBodySpec.headers(any())).thenAnswer(inv -> {
 			Consumer<HttpHeaders> consumer = inv.getArgument(0);
@@ -174,7 +169,8 @@ class PluginRequestForwarderTest {
 	}
 
 	@Test
-	void hostHeaderIsStripped() {
+	@DisplayName("Should strip Host header from forwarded request")
+	void shouldStripHostHeaderFromForwardedRequest() {
 		HttpHeaders[] capturedHeaders = new HttpHeaders[1];
 		when(requestBodySpec.headers(any())).thenAnswer(inv -> {
 			Consumer<HttpHeaders> consumer = inv.getArgument(0);
@@ -196,74 +192,5 @@ class PluginRequestForwarderTest {
 
 		assertThat(capturedHeaders[0].containsKey(HttpHeaders.HOST)).isFalse();
 		assertThat(capturedHeaders[0].getFirst("X-Custom")).isEqualTo("value");
-	}
-
-	// -------------------------------------------------------------------------
-	// Testable subclass — allows injecting a mock RestClient
-	// -------------------------------------------------------------------------
-
-	static class PluginRequestForwarderTestable extends PluginRequestForwarder {
-
-		private final RestClient injectedClient;
-
-		PluginRequestForwarderTestable(RestClient client) {
-			super();
-			this.injectedClient = client;
-		}
-
-		@Override
-		public ResponseEntity<byte[]> forward(
-				PluginDefinition plugin,
-				String subPath,
-				String queryString,
-				HttpMethod method,
-				HttpHeaders incomingHeaders,
-				byte[] body,
-				String username,
-				java.util.Collection<? extends org.springframework.security.core.GrantedAuthority> authorities) {
-
-			// Delegate to a minimal inline forwarding that uses the injected mock client
-			URI targetUri = buildTargetUriForTest(plugin, subPath, queryString);
-
-			HttpHeaders forwardHeaders = new HttpHeaders();
-			incomingHeaders.forEach((name, values) -> {
-				if (!name.equalsIgnoreCase(HttpHeaders.HOST)) {
-					forwardHeaders.addAll(name, values);
-				}
-			});
-			forwardHeaders.set(PluginRequestForwarder.HEADER_X_USER, username);
-			forwardHeaders.set(PluginRequestForwarder.HEADER_X_PERMISSIONS,
-					authorities.stream()
-							.map(org.springframework.security.core.GrantedAuthority::getAuthority)
-							.reduce((a, b) -> a + "," + b)
-							.orElse(""));
-
-			RestClient.RequestBodySpec spec = injectedClient.method(method)
-					.uri(targetUri)
-					.headers(h -> h.addAll(forwardHeaders));
-
-			if (body != null && body.length > 0) {
-				spec.body(body);
-			}
-
-			return spec.retrieve()
-					.onStatus(s -> true, (req, res) -> { })
-					.toEntity(byte[].class);
-		}
-
-		private URI buildTargetUriForTest(PluginDefinition plugin, String subPath, String queryString) {
-			String base = plugin.url().endsWith("/")
-					? plugin.url().substring(0, plugin.url().length() - 1)
-					: plugin.url();
-			String path = (subPath != null && !subPath.isBlank())
-					? (subPath.startsWith("/") ? subPath : "/" + subPath)
-					: "";
-			org.springframework.web.util.UriComponentsBuilder builder =
-					org.springframework.web.util.UriComponentsBuilder.fromUriString(base + path);
-			if (queryString != null && !queryString.isBlank()) {
-				builder.query(queryString);
-			}
-			return builder.build(true).toUri();
-		}
 	}
 }

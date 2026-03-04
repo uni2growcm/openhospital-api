@@ -25,7 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,42 +37,47 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Optional;
 
+import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.config.PluginPermission;
 import org.isf.plugins.exception.PluginAccessDeniedException;
-import org.isf.plugins.exception.PluginNotFoundException;
 import org.isf.plugins.registry.PluginRegistry;
 import org.isf.plugins.security.PluginAuthorizationChecker;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpMethod;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockMakers;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestClientResponseException;
 
+@AutoConfigureMockMvc
+@SpringBootTest(classes = OpenHospitalApiApplication.class)
 class PluginProxyControllerTest {
 
-	@Mock
+	@MockitoBean
 	private PluginRegistry pluginRegistry;
-
-	@Mock
+	@MockitoBean
 	private PluginAuthorizationChecker authorizationChecker;
-
-	@Mock
+	@MockitoBean
 	private PluginRequestForwarder requestForwarder;
 
+	@Autowired
 	private MockMvc mockMvc;
-	private AutoCloseable closeable;
 
 	private static final PluginDefinition SMART_DOC = new PluginDefinition(
 			"smart-doc",
@@ -77,32 +85,10 @@ class PluginProxyControllerTest {
 			"/health",
 			List.of(new PluginPermission("admin", List.of("smart-doc.read"))));
 
-	@BeforeEach
-	void setUp() {
-		closeable = MockitoAnnotations.openMocks(this);
-		mockMvc = MockMvcBuilders
-				.standaloneSetup(new PluginProxyController(pluginRegistry, authorizationChecker, requestForwarder))
-				.build();
-
-		// Populate a minimal authenticated principal so the controller can call
-		// authentication.getName() and authentication.getAuthorities().
-		UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-				"alice", null, List.of(new SimpleGrantedAuthority("smart-doc.read")));
-		SecurityContextHolder.getContext().setAuthentication(auth);
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-		SecurityContextHolder.clearContext();
-		closeable.close();
-	}
-
-	// -------------------------------------------------------------------------
-	// Happy path
-	// -------------------------------------------------------------------------
-
 	@Test
-	void proxyGet_returnsUpstreamResponse() throws Exception {
+	@WithMockUser(username = "alice", authorities = "smart-doc.read")
+	@DisplayName("Should return upstream response for a proxied GET request")
+	void shouldReturnUpstreamResponseForProxiedGetRequest() throws Exception {
 		when(pluginRegistry.find("smart-doc")).thenReturn(Optional.of(SMART_DOC));
 		doNothing().when(authorizationChecker).assertAccess(SMART_DOC);
 		when(requestForwarder.forward(any(), any(), any(), any(), any(), any(), any(), any()))
@@ -116,7 +102,9 @@ class PluginProxyControllerTest {
 	}
 
 	@Test
-	void proxyPost_forwardsBodyAndReturns201() throws Exception {
+	@WithMockUser(username = "alice", authorities = "smart-doc.read")
+	@DisplayName("Should forward body and return 201 for a proxied POST request")
+	void shouldForwardBodyAndReturn201ForProxiedPostRequest() throws Exception {
 		when(pluginRegistry.find("smart-doc")).thenReturn(Optional.of(SMART_DOC));
 		doNothing().when(authorizationChecker).assertAccess(SMART_DOC);
 		when(requestForwarder.forward(any(), any(), any(), any(), any(), any(), any(), any()))
@@ -133,7 +121,9 @@ class PluginProxyControllerTest {
 	// -------------------------------------------------------------------------
 
 	@Test
-	void returns404_whenPluginNotFound() throws Exception {
+	@WithMockUser(username = "alice", authorities = "smart-doc.read")
+	@DisplayName("Should return 404 when the plugin is not found")
+	void shouldReturn404WhenPluginNotFound() throws Exception {
 		when(pluginRegistry.find("unknown")).thenReturn(Optional.empty());
 
 		mockMvc.perform(get("/plugins/unknown/path"))
@@ -147,7 +137,9 @@ class PluginProxyControllerTest {
 	// -------------------------------------------------------------------------
 
 	@Test
-	void returns403_whenAccessDenied() throws Exception {
+	@WithMockUser(username = "alice", authorities = "smart-doc.read")
+	@DisplayName("Should return 403 when access is denied")
+	void shouldReturn403WhenAccessIsDenied() throws Exception {
 		when(pluginRegistry.find("smart-doc")).thenReturn(Optional.of(SMART_DOC));
 		doThrow(new PluginAccessDeniedException("smart-doc", "alice"))
 				.when(authorizationChecker).assertAccess(SMART_DOC);
@@ -163,7 +155,9 @@ class PluginProxyControllerTest {
 	// -------------------------------------------------------------------------
 
 	@Test
-	void passesThrough502_fromUpstream() throws Exception {
+	@WithMockUser(username = "alice", authorities = "smart-doc.read")
+	@DisplayName("Should pass through 502 from upstream service")
+	void shouldPassThrough502FromUpstream() throws Exception {
 		when(pluginRegistry.find("smart-doc")).thenReturn(Optional.of(SMART_DOC));
 		doNothing().when(authorizationChecker).assertAccess(SMART_DOC);
 
@@ -183,7 +177,8 @@ class PluginProxyControllerTest {
 	// -------------------------------------------------------------------------
 
 	@Test
-	void pluginErrorResponse_recordAccessors() {
+	@DisplayName("Should expose status and message via record accessors")
+	void shouldExposeStatusAndMessageViaRecordAccessors() {
 		PluginProxyController.PluginErrorResponse response =
 				new PluginProxyController.PluginErrorResponse(404, "not found");
 

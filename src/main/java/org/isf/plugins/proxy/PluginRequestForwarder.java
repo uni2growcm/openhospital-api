@@ -86,6 +86,11 @@ public class PluginRequestForwarder {
 		this.restClient = RestClient.builder().build();
 	}
 
+	/** Package-private constructor for testing — allows injecting a mock {@link RestClient}. */
+	PluginRequestForwarder(RestClient restClient) {
+		this.restClient = restClient;
+	}
+
 	/**
 	 * Forwards an incoming request to the appropriate upstream plugin endpoint.
 	 *
