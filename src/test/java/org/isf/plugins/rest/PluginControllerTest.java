@@ -19,12 +19,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.plugins.proxy;
+package org.isf.plugins.rest;
 
 import org.isf.OpenHospitalApiApplication;
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.config.PluginPermission;
 import org.isf.plugins.exception.PluginAccessDeniedException;
+import org.isf.plugins.proxy.IPluginRequestForwarder;
 import org.isf.plugins.registry.IPluginRegistry;
 import org.isf.plugins.security.IAuthenticationSupplier;
 import org.isf.plugins.security.IPluginAuthorizationChecker;
@@ -57,13 +58,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = OpenHospitalApiApplication.class)
-class PluginProxyControllerTest {
+class PluginControllerTest {
 
 	private static final PluginDefinition SMART_DOC = new PluginDefinition(
 		"smart-doc",
 		"http://localhost:4000/api",
 		"/health",
 		List.of(new PluginPermission("admin", List.of("smart-doc.read"))));
+
 	@MockitoBean
 	private IPluginRegistry pluginRegistry;
 	@MockitoBean
@@ -72,6 +74,7 @@ class PluginProxyControllerTest {
 	private IPluginRequestForwarder requestForwarder;
 	@MockitoBean
 	private IAuthenticationSupplier authenticationSupplier;
+
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -82,6 +85,39 @@ class PluginProxyControllerTest {
 		lenient().when(authenticationSupplier.get())
 			.thenAnswer(inv -> SecurityContextHolder.getContext().getAuthentication());
 	}
+
+	// -------------------------------------------------------------------------
+	// GET /plugins — list registered plugins
+	// -------------------------------------------------------------------------
+
+	@Test
+	@WithMockUser
+	@DisplayName("GET /plugins returns the list of registered plugins")
+	void shouldReturnListOfRegisteredPlugins() throws Exception {
+		PluginDefinition billing = new PluginDefinition("billing", "http://localhost:5000/api", "/health", List.of());
+		when(pluginRegistry.all()).thenReturn(List.of(SMART_DOC, billing));
+
+		mockMvc.perform(get("/plugins"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(2))
+			.andExpect(jsonPath("$[0].id").value("smart-doc"))
+			.andExpect(jsonPath("$[1].id").value("billing"));
+	}
+
+	@Test
+	@WithMockUser
+	@DisplayName("GET /plugins returns empty array when no plugins are registered")
+	void shouldReturnEmptyArrayWhenNoPluginsRegistered() throws Exception {
+		when(pluginRegistry.all()).thenReturn(List.of());
+
+		mockMvc.perform(get("/plugins"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(0));
+	}
+
+	// -------------------------------------------------------------------------
+	// ANY /plugins/{id}/** — proxy handler
+	// -------------------------------------------------------------------------
 
 	@Test
 	@WithMockUser(username = "alice", authorities = "smart-doc.read")
@@ -177,8 +213,8 @@ class PluginProxyControllerTest {
 	@Test
 	@DisplayName("Should expose status and message via record accessors")
 	void shouldExposeStatusAndMessageViaRecordAccessors() {
-		PluginProxyController.PluginErrorResponse response =
-			new PluginProxyController.PluginErrorResponse(404, "not found");
+		PluginController.PluginErrorResponse response =
+			new PluginController.PluginErrorResponse(404, "not found");
 
 		assertThat(response.status()).isEqualTo(404);
 		assertThat(response.message()).isEqualTo("not found");

@@ -34,9 +34,6 @@ plugins:
       permissions:
         - role: admin
           privileges:
-            - smart-doc.read
-            - smart-doc.write
-            - smart-doc.delete
-        - role: user
-          privileges:
-            - smart-doc.read
+            - patients.read
+            - patients.create
+            - patients.update

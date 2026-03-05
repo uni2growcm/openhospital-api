@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.plugins.proxy;
+package org.isf.plugins.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +31,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.exception.PluginAccessDeniedException;
 import org.isf.plugins.exception.PluginNotFoundException;
+import org.isf.plugins.proxy.IPluginRequestForwarder;
 import org.isf.plugins.registry.IPluginRegistry;
 import org.isf.plugins.security.IAuthenticationSupplier;
 import org.isf.plugins.security.IPluginAuthorizationChecker;
@@ -38,25 +39,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
- * Gateway controller that handles all {@code /plugins/{pluginId}/**} routes.
+ * Controller for all {@code /plugins} routes.
  *
- * <h3>Request lifecycle</h3>
+ * <h3>Endpoints</h3>
+ * <ul>
+ *   <li>{@code GET /plugins} — lists every plugin registered and healthy at startup.</li>
+ *   <li>{@code ANY /plugins/{id}/**} — gateway that proxies a request to the upstream
+ *       plugin identified by {@code id}.</li>
+ * </ul>
+ *
+ * <h3>Proxy request lifecycle</h3>
  * <ol>
  *   <li><strong>Resolve plugin</strong> — looks up {@code pluginId} in the
  *       {@link IPluginRegistry}; returns {@code 404} if not found or unhealthy at startup.</li>
  *   <li><strong>Authorize</strong> — delegates to {@link IPluginAuthorizationChecker} to verify
  *       the authenticated user holds at least one required privilege; returns {@code 403}
  *       on failure.</li>
- *   <li><strong>Extract sub-path</strong> — strips the {@code /plugins/{pluginId}} prefix from
+ *   <li><strong>Extract sub-path</strong> — strips the {@code /plugins/{id}} prefix from
  *       the request URI to obtain the upstream path segment.</li>
  *   <li><strong>Forward</strong> — proxies the full request (method, headers, body, query
  *       string) to the plugin via {@link IPluginRequestForwarder}, adding {@code X-User} and
@@ -65,8 +71,11 @@ import java.io.IOException;
  *       to the client unmodified.</li>
  * </ol>
  *
- * <h3>Route example</h3>
+ * <h3>Route examples</h3>
  * <pre>
+ *   GET /plugins
+ *       → [ { "id": "smart-doc", "url": "...", ... }, ... ]
+ *
  *   GET /plugins/smart-doc/document-types
  *       → GET http://localhost:8042/api/document-types
  *
@@ -86,39 +95,66 @@ import java.io.IOException;
 @RequestMapping("/plugins")
 @Tag(name = "Plugins", description = "Dynamic gateway to registered external plugin services")
 @SecurityRequirement(name = "bearerAuth")
-public class PluginProxyController {
+public class PluginController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PluginProxyController.class);
-
-	/**
-	 * The URL prefix that will be stripped before forwarding to the upstream plugin.
-	 */
-	private static final String PLUGINS_PREFIX = "/plugins/";
+	private static final Logger LOGGER = LoggerFactory.getLogger(PluginController.class);
 
 	private final IPluginRegistry pluginRegistry;
 	private final IPluginAuthorizationChecker authorizationChecker;
 	private final IPluginRequestForwarder requestForwarder;
 	private final IAuthenticationSupplier authenticationSupplier;
 
-	public PluginProxyController(IPluginRegistry pluginRegistry, IPluginAuthorizationChecker authorizationChecker, IPluginRequestForwarder requestForwarder, IAuthenticationSupplier authenticationSupplier) {
+	public PluginController(IPluginRegistry pluginRegistry, IPluginAuthorizationChecker authorizationChecker, IPluginRequestForwarder requestForwarder, IAuthenticationSupplier authenticationSupplier) {
 		this.pluginRegistry = pluginRegistry;
 		this.authorizationChecker = authorizationChecker;
 		this.requestForwarder = requestForwarder;
 		this.authenticationSupplier = authenticationSupplier;
 	}
 
+	// -------------------------------------------------------------------------
+	// GET /plugins — list all registered plugins
+	// -------------------------------------------------------------------------
+
 	/**
-	 * Catch-all handler for every HTTP method under {@code /plugins/{pluginId}/**}.
+	 * Returns the full list of plugins that are registered and healthy.
+	 * Any authenticated user may call this endpoint.
+	 *
+	 * @return {@code 200 OK} with a JSON array of {@link PluginDefinition}
+	 */
+	@GetMapping
+	@Operation(summary = "List all registered plugins",
+		description = "Returns all plugins that passed the startup health check and are currently available through the gateway.")
+	@ApiResponse(responseCode = "200", description = "Plugin list returned successfully")
+	public Collection<PluginDefinition> listPlugins() {
+		return pluginRegistry.all();
+	}
+
+	// -------------------------------------------------------------------------
+	// ANY /plugins/{id}/** — proxy handler
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Catch-all handler for every HTTP method under {@code /plugins/{id}/**}.
 	 *
 	 * @param request the original {@link HttpServletRequest}
 	 * @return the upstream plugin's response, forwarded transparently
 	 * @throws IOException if reading the request body fails
 	 */
 	@RequestMapping(value = "/{id}/{*path}")
-	@Operation(summary = "Proxy a request to an external plugin", description = "Resolves the plugin by ID, checks authorization, then forwards the request " + "to the plugin's upstream URL. The sub-path after /plugins/{pluginId} is appended to the " + "plugin base URL. All HTTP methods are supported.")
-	@ApiResponses({@ApiResponse(responseCode = "200", description = "Upstream response forwarded successfully"), @ApiResponse(responseCode = "403", description = "Authenticated user lacks required privileges for this plugin"), @ApiResponse(responseCode = "404", description = "Plugin not found or unavailable"), @ApiResponse(responseCode = "502", description = "Upstream plugin returned an unexpected error")})
-	public ResponseEntity<byte[]> proxy(@Parameter(hidden = true) HttpServletRequest request, @PathVariable(required = false) String id, @PathVariable(required = false) String path) throws IOException {
-
+	@Operation(summary = "Proxy a request to an external plugin",
+		description = "Resolves the plugin by ID, checks authorization, then forwards the request " +
+			"to the plugin's upstream URL. The sub-path after /plugins/{pluginId} is appended to the " +
+			"plugin base URL. All HTTP methods are supported.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Upstream response forwarded successfully"),
+		@ApiResponse(responseCode = "403", description = "Authenticated user lacks required privileges for this plugin"),
+		@ApiResponse(responseCode = "404", description = "Plugin not found or unavailable"),
+		@ApiResponse(responseCode = "502", description = "Upstream plugin returned an unexpected error")
+	})
+	public ResponseEntity<byte[]> proxy(
+		@Parameter(hidden = true) HttpServletRequest request,
+		@PathVariable(required = false) String id,
+		@PathVariable(required = false) String path) throws IOException {
 
 		PluginDefinition plugin = pluginRegistry.find(id).orElseThrow(() -> new PluginNotFoundException(id));
 
