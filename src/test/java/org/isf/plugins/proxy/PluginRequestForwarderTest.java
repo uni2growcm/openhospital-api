@@ -33,6 +33,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestBodySpec;
@@ -41,12 +42,14 @@ import org.springframework.web.client.RestClient.ResponseSpec;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,11 +70,11 @@ class PluginRequestForwarderTest {
 	void setUp() {
 		forwarder = new PluginRequestForwarder(mockRestClient);
 
-		when(mockRestClient.method(any(HttpMethod.class))).thenReturn(uriSpec);
-		when(uriSpec.uri(any(URI.class))).thenReturn(requestBodySpec);
-		when(requestBodySpec.headers(any())).thenReturn(requestBodySpec);
-		when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-		when(responseSpec.onStatus(any(Predicate.class), any())).thenReturn(responseSpec);
+		lenient().when(mockRestClient.method(any(HttpMethod.class))).thenReturn(uriSpec);
+		lenient().when(uriSpec.uri(any(URI.class))).thenReturn(requestBodySpec);
+		lenient().when(requestBodySpec.headers(any())).thenReturn(requestBodySpec);
+		lenient().when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+		lenient().when(responseSpec.onStatus(any(Predicate.class), any())).thenReturn(responseSpec);
 	}
 
 	private HttpServletRequest mockRequest(HttpMethod method, HttpHeaders headers, byte[] body) {
@@ -176,5 +179,135 @@ class PluginRequestForwarderTest {
 
 		assertThat(capturedHeaders[0].containsKey(HttpHeaders.HOST)).isFalse();
 		assertThat(capturedHeaders[0].getFirst("X-Custom")).isEqualTo("value");
+	}
+
+	// -------------------------------------------------------------------------
+	// buildRequestHeaders
+	// -------------------------------------------------------------------------
+
+	@Test
+	@DisplayName("buildRequestHeaders copies all request headers into HttpHeaders")
+	void buildRequestHeadersCopiesAllHeaders() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.addHeader("X-Custom", "value");
+		request.addHeader("Accept", "application/json");
+
+		HttpHeaders result = forwarder.buildRequestHeaders(request);
+
+		assertThat(result.getFirst("X-Custom")).isEqualTo("value");
+		assertThat(result.getFirst("Accept")).isEqualTo("application/json");
+	}
+
+	@Test
+	@DisplayName("buildRequestHeaders copies multiple values for the same header name")
+	void buildRequestHeadersCopiesMultiValueHeader() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.addHeader("Accept", "application/json");
+		request.addHeader("Accept", "text/plain");
+
+		HttpHeaders result = forwarder.buildRequestHeaders(request);
+
+		assertThat(result.get("Accept")).containsExactlyInAnyOrder("application/json", "text/plain");
+	}
+
+	@Test
+	@DisplayName("buildRequestHeaders returns headers without Content-Length")
+	void buildRequestHeadersStripsContentLength() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.addHeader(HttpHeaders.CONTENT_LENGTH, "42");
+		request.addHeader("X-Custom", "keep-me");
+
+		HttpHeaders result = forwarder.buildRequestHeaders(request);
+
+		// Content-Length is set to null (removed) so the upstream can determine its own length
+		assertThat(result.getContentLength()).isEqualTo(-1);
+		assertThat(result.getFirst("X-Custom")).isEqualTo("keep-me");
+	}
+
+	@Test
+	@DisplayName("buildRequestHeaders returns empty HttpHeaders when request has no headers")
+	void buildRequestHeadersReturnsEmptyWhenNoHeaders() {
+		// MockHttpServletRequest with no headers added still injects some defaults;
+		// the important assertion is that buildRequestHeaders never throws and always
+		// returns a non-null object.
+		MockHttpServletRequest request = new MockHttpServletRequest();
+
+		HttpHeaders result = forwarder.buildRequestHeaders(request);
+
+		assertThat(result).isNotNull();
+	}
+
+	// -------------------------------------------------------------------------
+	// getFormParametersOnly
+	// -------------------------------------------------------------------------
+
+	@Test
+	@DisplayName("getFormParametersOnly returns all params when there is no query string")
+	void getFormParametersOnlyReturnsAllParamsWithNoQueryString() {
+		MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
+		request.addParameter("title", "hello");
+		request.addParameter("type", "RX");
+		// no query string → all parameters are form parameters
+
+		Map<String, String[]> result = forwarder.getFormParametersOnly(request);
+
+		assertThat(result).containsKey("title");
+		assertThat(result).containsKey("type");
+		assertThat(result.get("title")).containsExactly("hello");
+		assertThat(result.get("type")).containsExactly("RX");
+	}
+
+	@Test
+	@DisplayName("getFormParametersOnly excludes params that appear in the query string")
+	void getFormParametersOnlyExcludesQueryParams() {
+		MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
+		request.setQueryString("type=RX");
+		request.addParameter("type", "RX");   // duplicated from query string — must be excluded
+		request.addParameter("title", "hello"); // form-only — must be kept
+
+		Map<String, String[]> result = forwarder.getFormParametersOnly(request);
+
+		assertThat(result).containsKey("title");
+		assertThat(result).doesNotContainKey("type");
+	}
+
+	@Test
+	@DisplayName("getFormParametersOnly returns empty map when parameter map is empty")
+	void getFormParametersOnlyReturnsEmptyMapWhenNoParams() {
+		MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
+
+		Map<String, String[]> result = forwarder.getFormParametersOnly(request);
+
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	@DisplayName("getFormParametersOnly handles URL-encoded keys in query string")
+	void getFormParametersOnlyHandlesUrlEncodedQueryKeys() {
+		MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
+		// "my param" URL-encoded as "my+param" or "my%20param" — the key must be decoded
+		request.setQueryString("my%20param=value");
+		request.addParameter("my param", "value"); // decoded key in parameterMap
+		request.addParameter("other", "keep");
+
+		Map<String, String[]> result = forwarder.getFormParametersOnly(request);
+
+		assertThat(result).doesNotContainKey("my param");
+		assertThat(result).containsKey("other");
+	}
+
+	@Test
+	@DisplayName("getFormParametersOnly keeps form params whose key differs from every query key")
+	void getFormParametersOnlyKeepsUnrelatedFormParams() {
+		MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
+		request.setQueryString("page=1&size=10");
+		request.addParameter("page", "1");    // query param — excluded
+		request.addParameter("size", "10");   // query param — excluded
+		request.addParameter("notes", "abc"); // form-only — kept
+		request.addParameter("tag", "x");     // form-only — kept
+
+		Map<String, String[]> result = forwarder.getFormParametersOnly(request);
+
+		assertThat(result).containsOnlyKeys("notes", "tag");
 	}
 }
