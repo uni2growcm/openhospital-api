@@ -27,8 +27,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Constructs and dispatches HTTP requests to upstream plugin services, then returns
@@ -76,6 +78,14 @@ public interface IPluginRequestForwarder {
 		HttpServletRequest request,
 		String username,
 		Collection<? extends GrantedAuthority> authorities);
+
+	/**
+	 * Extracts only the form parameters from a multipart request, excluding any query parameters.
+	 *
+	 * @param multipartRequest the incoming multipart HTTP request
+	 * @return a map of form parameter names to their values, excluding query parameters
+	 */
+	Map<String, String[]> getFormParametersOnly(MultipartHttpServletRequest multipartRequest);
 
 	/**
 	 * Copies all headers from the {@link HttpServletRequest} into an {@link HttpHeaders} map.
