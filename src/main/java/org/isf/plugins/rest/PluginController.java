@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.exception.PluginAccessDeniedException;
 import org.isf.plugins.exception.PluginNotFoundException;
@@ -37,7 +38,9 @@ import org.isf.plugins.security.IAuthenticationSupplier;
 import org.isf.plugins.security.IPluginAuthorizationChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
@@ -116,6 +119,33 @@ public class PluginController {
 	// -------------------------------------------------------------------------
 
 	/**
+	 * Reads the raw request body, bypassing any servlet wrapper layers.
+	 *
+	 * <p>Spring's multipart support wraps the original request in a
+	 * {@link jakarta.servlet.http.HttpServletRequestWrapper} (specifically
+	 * {@code StandardMultipartHttpServletRequest}) that may replace the
+	 * {@code InputStream} with a parsed view of the parts. Unwrapping to the
+	 * underlying container request guarantees that the raw bytes — including the
+	 * multipart boundary — are read unmodified, so they can be forwarded verbatim
+	 * to the upstream plugin together with the original {@code Content-Type} header.
+	 *
+	 * @param request the incoming servlet request (possibly wrapped)
+	 * @return the raw request body bytes; empty array if the body is absent
+	 * @throws IOException if reading the stream fails
+	 */
+	private static byte[] readRawBody(HttpServletRequest request) throws IOException {
+		HttpServletRequest target = request;
+		while (target instanceof HttpServletRequestWrapper wrapper) {
+			target = (HttpServletRequest) wrapper.getRequest();
+		}
+		return target.getInputStream().readAllBytes();
+	}
+
+	// -------------------------------------------------------------------------
+	// ANY /plugins/{id}/** — proxy handler
+	// -------------------------------------------------------------------------
+
+	/**
 	 * Returns the full list of plugins that are registered and healthy.
 	 * Any authenticated user may call this endpoint.
 	 *
@@ -130,7 +160,7 @@ public class PluginController {
 	}
 
 	// -------------------------------------------------------------------------
-	// ANY /plugins/{id}/** — proxy handler
+	// Exception handlers (controller-scoped, highest precedence for plugin errors)
 	// -------------------------------------------------------------------------
 
 	/**
@@ -162,20 +192,10 @@ public class PluginController {
 
 		// Extract sub-path (everything after /plugins/{id})
 		String subPath = String.format("/%s", path != null ? path : "");
-
-		// Read request body (may be empty for GET/DELETE/HEAD)
-		byte[] body = request.getInputStream().readAllBytes();
-
 		Authentication authentication = authenticationSupplier.get();
 
-		LOGGER.debug("Routing [{}] /plugins/{}{} → {}{}", request.getMethod(), id, subPath, plugin.url(), subPath);
-
-		return requestForwarder.forward(plugin, subPath, request.getQueryString(), HttpMethod.valueOf(request.getMethod()), buildRequestHeaders(request), body, authentication.getName(), authentication.getAuthorities());
+		return requestForwarder.forward(plugin, subPath, request, authentication.getName(), authentication.getAuthorities());
 	}
-
-	// -------------------------------------------------------------------------
-	// Exception handlers (controller-scoped, highest precedence for plugin errors)
-	// -------------------------------------------------------------------------
 
 	@ExceptionHandler(PluginNotFoundException.class)
 	public ResponseEntity<PluginErrorResponse> handlePluginNotFound(PluginNotFoundException ex) {
@@ -189,35 +209,14 @@ public class PluginController {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.APPLICATION_JSON).body(new PluginErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage()));
 	}
 
-	@ExceptionHandler(RestClientResponseException.class)
-	public ResponseEntity<byte[]> handleUpstreamError(RestClientResponseException ex) {
-		LOGGER.warn("Upstream plugin error: HTTP {} — {}", ex.getStatusCode(), ex.getMessage());
-		return ResponseEntity.status(ex.getStatusCode()).headers(ex.getResponseHeaders()).body(ex.getResponseBodyAsByteArray());
-	}
-
 	// -------------------------------------------------------------------------
 	// Private helpers
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Copies all headers from the {@link HttpServletRequest} into an {@link HttpHeaders} map.
-	 *
-	 * @param request the incoming servlet request
-	 * @return assembled {@link HttpHeaders}
-	 */
-	private HttpHeaders buildRequestHeaders(HttpServletRequest request) {
-		HttpHeaders headers = new HttpHeaders();
-		java.util.Enumeration<String> headerNames = request.getHeaderNames();
-		if (headerNames != null) {
-			while (headerNames.hasMoreElements()) {
-				String name = headerNames.nextElement();
-				java.util.Enumeration<String> values = request.getHeaders(name);
-				while (values.hasMoreElements()) {
-					headers.add(name, values.nextElement());
-				}
-			}
-		}
-		return headers;
+	@ExceptionHandler(RestClientResponseException.class)
+	public ResponseEntity<byte[]> handleUpstreamError(RestClientResponseException ex) {
+		LOGGER.warn("Upstream plugin error: HTTP {} — {}", ex.getStatusCode(), ex.getMessage());
+		return ResponseEntity.status(ex.getStatusCode()).headers(ex.getResponseHeaders()).body(ex.getResponseBodyAsByteArray());
 	}
 
 	// -------------------------------------------------------------------------

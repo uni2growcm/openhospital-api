@@ -21,6 +21,7 @@
  */
 package org.isf.plugins.proxy;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.isf.plugins.config.PluginDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,15 +65,16 @@ public class PluginRequestForwarder implements IPluginRequestForwarder {
 	public ResponseEntity<byte[]> forward(
 		PluginDefinition plugin,
 		String subPath,
-		String queryString,
-		HttpMethod method,
-		HttpHeaders incomingHeaders,
-		byte[] body,
+		HttpServletRequest request,
 		String username,
 		Collection<? extends GrantedAuthority> authorities) {
 
-		URI targetUri = PluginUriBuilder.build(plugin, subPath, queryString);
-		HttpHeaders forwardHeaders = PluginHeadersBuilder.build(incomingHeaders, username, authorities);
+		LOGGER.debug("Routing [{}] /plugins/{}{} → {}{}", request.getMethod(), plugin.id(), subPath, plugin.url(), subPath);
+
+		URI targetUri = PluginUriBuilder.build(plugin, subPath, request.getQueryString());
+		HttpHeaders forwardHeaders = PluginHeadersBuilder.build(buildRequestHeaders(request), username, authorities);
+
+		HttpMethod method = HttpMethod.valueOf(request.getMethod());
 
 		LOGGER.debug("Proxying {} {} → {}", method, subPath, targetUri);
 
@@ -81,9 +83,7 @@ public class PluginRequestForwarder implements IPluginRequestForwarder {
 				.uri(targetUri)
 				.headers(h -> h.addAll(forwardHeaders));
 
-			if (body != null && body.length > 0) {
-				requestSpec.body(body);
-			}
+			requestSpec.body(output -> request.getInputStream().transferTo(output));
 
 			return requestSpec
 				.retrieve()
@@ -96,5 +96,27 @@ public class PluginRequestForwarder implements IPluginRequestForwarder {
 			LOGGER.warn("Upstream plugin '{}' returned error {}: {}", plugin.id(), ex.getStatusCode(), ex.getMessage());
 			throw ex;
 		}
+	}
+
+	/**
+	 * Copies all headers from the {@link HttpServletRequest} into an {@link HttpHeaders} map.
+	 *
+	 * @param request the incoming servlet request
+	 * @return assembled {@link HttpHeaders}
+	 */
+	@Override
+	public HttpHeaders buildRequestHeaders(HttpServletRequest request) {
+		HttpHeaders headers = new HttpHeaders();
+		java.util.Enumeration<String> headerNames = request.getHeaderNames();
+		if (headerNames != null) {
+			while (headerNames.hasMoreElements()) {
+				String name = headerNames.nextElement();
+				java.util.Enumeration<String> values = request.getHeaders(name);
+				while (values.hasMoreElements()) {
+					headers.add(name, values.nextElement());
+				}
+			}
+		}
+		return headers;
 	}
 }

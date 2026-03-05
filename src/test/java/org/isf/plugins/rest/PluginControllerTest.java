@@ -38,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -51,8 +52,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -125,7 +125,7 @@ class PluginControllerTest {
 	void shouldReturnUpstreamResponseForProxiedGetRequest() throws Exception {
 		when(pluginRegistry.find("smart-doc")).thenReturn(Optional.of(SMART_DOC));
 		doNothing().when(authorizationChecker).assertAccess(SMART_DOC);
-		when(requestForwarder.forward(any(), any(), any(), any(), any(), any(), any(), any()))
+		when(requestForwarder.forward(any(), any(), any(), any(), any()))
 			.thenReturn(ResponseEntity.ok("upstream-body".getBytes()));
 
 		MvcResult result = mockMvc.perform(get("/plugins/smart-doc/documents/42"))
@@ -141,7 +141,7 @@ class PluginControllerTest {
 	void shouldForwardBodyAndReturn201ForProxiedPostRequest() throws Exception {
 		when(pluginRegistry.find("smart-doc")).thenReturn(Optional.of(SMART_DOC));
 		doNothing().when(authorizationChecker).assertAccess(SMART_DOC);
-		when(requestForwarder.forward(any(), any(), any(), any(), any(), any(), any(), any()))
+		when(requestForwarder.forward(any(), any(), any(), any(), any()))
 			.thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(new byte[0]));
 
 		mockMvc.perform(post("/plugins/smart-doc/documents")
@@ -199,11 +199,37 @@ class PluginControllerTest {
 			"Bad Gateway", 502, "Bad Gateway",
 			new org.springframework.http.HttpHeaders(),
 			"upstream error".getBytes(), null);
-		when(requestForwarder.forward(any(), any(), any(), any(), any(), any(), any(), any()))
+		when(requestForwarder.forward(any(), any(), any(), any(), any()))
 			.thenThrow(upstream);
 
 		mockMvc.perform(get("/plugins/smart-doc/documents"))
 			.andExpect(status().isBadGateway());
+	}
+
+	// -------------------------------------------------------------------------
+	// Multipart forwarding
+	// -------------------------------------------------------------------------
+
+	@Test
+	@WithMockUser(username = "alice", authorities = "smart-doc.read")
+	@DisplayName("Should forward multipart body raw and return 201")
+	void shouldForwardMultipartBodyAndReturn201() throws Exception {
+		when(pluginRegistry.find("smart-doc")).thenReturn(Optional.of(SMART_DOC));
+		doNothing().when(authorizationChecker).assertAccess(SMART_DOC);
+		when(requestForwarder.forward(any(), any(), any(), any(), any()))
+			.thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(new byte[0]));
+
+		MockMultipartFile file = new MockMultipartFile(
+			"document", "id-card.png", MediaType.IMAGE_PNG_VALUE, "image-content".getBytes());
+
+		// The request reaches the forwarder without throwing and the upstream 201 is returned.
+		// Raw-byte fidelity (boundary preservation) is covered at the unit level in
+		// PluginRequestForwarderTest; the controller's responsibility is to not corrupt
+		// the stream before handing it off.
+		mockMvc.perform(multipart("/plugins/smart-doc/documents").file(file))
+			.andExpect(status().isCreated());
+
+		verify(requestForwarder).forward(any(), any(), any(), any(), any());
 	}
 
 	// -------------------------------------------------------------------------

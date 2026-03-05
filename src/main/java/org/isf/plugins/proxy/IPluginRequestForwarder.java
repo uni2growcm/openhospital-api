@@ -21,9 +21,9 @@
  */
 package org.isf.plugins.proxy;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.isf.plugins.config.PluginDefinition;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.client.RestClientResponseException;
@@ -63,23 +63,25 @@ public interface IPluginRequestForwarder {
 	/**
 	 * Forwards an incoming request to the appropriate upstream plugin endpoint.
 	 *
-	 * @param plugin          the target plugin definition
-	 * @param subPath         the path segment after {@code /plugins/{id}} (e.g. {@code "/documents/123"})
-	 * @param queryString     the raw query string from the original request, may be {@code null}
-	 * @param method          the HTTP method of the original request
-	 * @param incomingHeaders headers from the original request
-	 * @param body            the raw request body, may be {@code null} for bodiless methods
-	 * @param username        the authenticated username (added as {@code X-User})
-	 * @param authorities     the user's granted authorities (added as {@code X-Permissions})
+	 * @param plugin      the target plugin definition
+	 * @param subPath     the path segment after {@code /plugins/{id}} (e.g. {@code "/documents/123"})
+	 * @param request     the original HTTP servlet request (provides method, headers, body)
+	 * @param username    the authenticated username (added as {@code X-User})
+	 * @param authorities the user's granted authorities (added as {@code X-Permissions})
 	 * @return the upstream response with its original status, headers, and body
 	 */
 	ResponseEntity<byte[]> forward(
 		PluginDefinition plugin,
 		String subPath,
-		String queryString,
-		HttpMethod method,
-		HttpHeaders incomingHeaders,
-		byte[] body,
+		HttpServletRequest request,
 		String username,
 		Collection<? extends GrantedAuthority> authorities);
+
+	/**
+	 * Copies all headers from the {@link HttpServletRequest} into an {@link HttpHeaders} map.
+	 *
+	 * @param request the incoming servlet request
+	 * @return assembled {@link HttpHeaders}
+	 */
+	HttpHeaders buildRequestHeaders(HttpServletRequest request);
 }
