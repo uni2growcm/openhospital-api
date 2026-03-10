@@ -3773,7 +3773,7 @@ paths:
     post:
       tags:
       - Cares
-      operationId: newConditioning_1
+      operationId: newCare
       requestBody:
         content:
           application/json:
@@ -6528,6 +6528,28 @@ paths:
                   $ref: "#/components/schemas/ConditioningDTO"
       security:
       - bearerAuth: []
+  /encounters/{code}/cares:
+    get:
+      tags:
+      - Encounter
+      operationId: getCareByPatientEncounter
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CareDTO"
+      security:
+      - bearerAuth: []
   /encounters/{code}/admissions:
     get:
       tags:
@@ -7499,13 +7521,13 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
+        opd:
           type: boolean
         female:
           type: boolean
         male:
           type: boolean
-        opd:
+        pharmacy:
           type: boolean
       required:
       - beds

@@ -71,7 +71,7 @@ public class CareController {
 	 * @throws OHServiceException
 	 */
 	@PostMapping("/cares")
-	public ResponseEntity<CareDTO> newConditioning(@RequestBody CareDTO careDTO) throws OHServiceException {
+	public ResponseEntity<CareDTO> newCare(@RequestBody CareDTO careDTO) throws OHServiceException {
 		LOGGER.info("Create care");
 		if (careDTO.getPatient() != null) {
 			Patient patient = patientBrowserManager.getPatientById(careDTO.getPatient().getCode());
