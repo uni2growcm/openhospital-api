@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 /**
  * Token service implementation with caching and automatic refresh.
  * Manages OAuth tokens for LabBook API authentication.
+ *
+ * @author Steve Tsala
  */
 @Service(LabBookBeanNames.TOKEN_SERVICE)
 @ConditionalOnProperty(name = "labbook.enabled", havingValue = "true")

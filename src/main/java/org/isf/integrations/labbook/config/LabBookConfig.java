@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -25,6 +25,7 @@ import org.isf.integrations.labbook.ports.IOauthTokenService;
 import org.isf.integrations.labbook.services.ITokenService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -34,10 +35,14 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 /**
  * Configuration for LabBook REST clients.
  * Creates RestClient beans for OAuth token requests and API calls.
+ *
+ * @author Steve Tsala
  */
+
 @Configuration
+@ConfigurationPropertiesScan("org.isf.integrations.labbook")
 @ConditionalOnProperty(name = "labbook.enabled", havingValue = "true")
-public class LabBookRestClientConfig {
+public class LabBookConfig {
 
     /**
      * RestClient for OAuth token requests (no authentication needed).

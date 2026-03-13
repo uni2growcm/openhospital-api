@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -26,6 +26,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Response model for OAuth token endpoint.
  * Maps the JSON response from /services/oauth/token.
+ *
+ * @author Steve Tsala
  */
 public record OauthTokenResponse(
     @JsonProperty("access_token") String accessToken,
