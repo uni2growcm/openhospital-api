@@ -22,9 +22,9 @@
 
 package org.isf.opd.dto;
 
-import java.util.List;
-
 import org.isf.operation.dto.OperationRowDTO;
+
+import java.util.List;
 
 public class OpdWithOperationRowDTO {
 

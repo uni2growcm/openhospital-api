@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,11 +36,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = OpenHospitalApiApplication.class)
 class PluginRegistryTest {
 
-
 	private static final PluginDefinition SMART_DOC = new PluginDefinition(
-		"smart-doc", "http://localhost:4000/api", "/health", List.of());
+		"smart-doc", "http://localhost:4000/api", "/health", null);
 	private static final PluginDefinition REPORTS = new PluginDefinition(
-		"reports", "http://localhost:5000", "/ping", List.of());
+		"reports", "http://localhost:5000", "/ping", null);
+
 	@Autowired
 	private IPluginRegistry registry;
 

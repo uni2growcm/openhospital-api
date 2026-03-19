@@ -42,6 +42,7 @@ import java.util.List;
 
 /**
  * Setting DTO
+ *
  * @author Hema
  */
 @RestController
@@ -62,6 +63,7 @@ public class SettingController {
 
 	/**
 	 * Get a setting by its ID
+	 *
 	 * @param id Setting ID
 	 * @return {@link SettingDTO}
 	 * @throws OHServiceException When failed to get the setting
@@ -82,6 +84,7 @@ public class SettingController {
 
 	/**
 	 * Get a setting by its code
+	 *
 	 * @param code Setting code
 	 * @return {@link SettingDTO}
 	 * @throws OHServiceException When failed to get the setting
@@ -102,6 +105,7 @@ public class SettingController {
 
 	/**
 	 * Get all settings
+	 *
 	 * @return {@link List} of {@link SettingDTO}
 	 * @throws OHServiceException When failed to get settings
 	 */
@@ -116,7 +120,7 @@ public class SettingController {
 	 * Update setting
 	 *
 	 * @param code Setting code
-	 * @param dto Setting Update payload
+	 * @param dto  Setting Update payload
 	 * @return {@link SettingDTO} the updated setting
 	 * @throws OHServiceException When failed to update setting
 	 */
@@ -138,6 +142,7 @@ public class SettingController {
 
 	/**
 	 * Reset all settings to default
+	 *
 	 * @return <code>true</code> when settings have been reset, <code>false</code> otherwise
 	 * @throws OHServiceException When failed to reset settings
 	 */

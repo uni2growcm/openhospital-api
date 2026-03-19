@@ -21,10 +21,9 @@
  */
 package org.isf.priceslist.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Class representing a prices")
 public class PriceDTO {
@@ -63,6 +62,10 @@ public class PriceDTO {
 		return editable;
 	}
 
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
+
 	@Override
 	public String toString() {
 		return description;
@@ -73,60 +76,56 @@ public class PriceDTO {
 		return hashCode;
 	}
 
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
+	}
+
 	public int getId() {
 		return this.id;
-	}
-
-	public PriceListDTO getList() {
-		return this.list;
-	}
-
-	public String getGroup() {
-		return this.group;
-	}
-
-	public String getItem() {
-		return this.item;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public Double getPrice() {
-		return this.price;
 	}
 
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	public PriceListDTO getList() {
+		return this.list;
+	}
+
 	public void setList(PriceListDTO list) {
 		this.list = list;
+	}
+
+	public String getGroup() {
+		return this.group;
 	}
 
 	public void setGroup(String group) {
 		this.group = group;
 	}
 
+	public String getItem() {
+		return this.item;
+	}
+
 	public void setItem(String item) {
 		this.item = item;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	public Double getPrice() {
+		return this.price;
+	}
+
 	public void setPrice(Double price) {
 		this.price = price;
-	}
-
-	public void setEditable(boolean editable) {
-		this.editable = editable;
-	}
-
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
 	}
 
 	public int getLock() {

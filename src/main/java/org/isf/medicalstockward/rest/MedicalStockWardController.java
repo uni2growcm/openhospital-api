@@ -21,12 +21,9 @@
  */
 package org.isf.medicalstockward.rest;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
 import org.isf.medicalstockward.dto.MedicalWardDTO;
@@ -43,17 +40,11 @@ import org.isf.ward.manager.WardBrowserManager;
 import org.isf.ward.model.Ward;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @Tag(name = "Medical Stock Ward")
@@ -103,7 +94,7 @@ public class MedicalStockWardController {
 	/**
 	 * Gets the current quantity for the specified {@link Medical} and specified {@link Ward}.
 	 *
-	 * @param wardId - if {@code null} the quantity is counted for the whole hospital
+	 * @param wardId    - if {@code null} the quantity is counted for the whole hospital
 	 * @param medicalId - the {@link Medical} to check.
 	 * @return the total quantity.
 	 * @throws OHServiceException if an error occurs retrieving the quantity.
@@ -129,9 +120,9 @@ public class MedicalStockWardController {
 	/**
 	 * Gets all the movement ward with the specified criteria.
 	 *
-	 * @param wardId the ward id.
+	 * @param wardId   the ward id.
 	 * @param dateFrom the lower bound for the movement date range.
-	 * @param dateTo the upper bound for the movement date range.
+	 * @param dateTo   the upper bound for the movement date range.
 	 * @return all the retrieved movements.
 	 * @throws OHServiceException When failed to get ward movements
 	 */
@@ -159,7 +150,7 @@ public class MedicalStockWardController {
 	 *
 	 * @param idWardTo the target ward id.
 	 * @param dateFrom the lower bound for the movement date range.
-	 * @param dateTo the upper bound for the movement date range.
+	 * @param dateTo   the upper bound for the movement date range.
 	 * @return all the retrieved movements.
 	 * @throws OHServiceException When failed to get ward movements
 	 */

@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HospitalMapper extends GenericMapper<Hospital, HospitalDTO> {
 
-    public HospitalMapper() {
-        super(Hospital.class, HospitalDTO.class);
-    }
+	public HospitalMapper() {
+		super(Hospital.class, HospitalDTO.class);
+	}
 }

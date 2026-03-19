@@ -26,33 +26,28 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 import java.util.List;
 
 /**
- * Represents the access-control entry for a single user-group role within a plugin definition.
+ * Declares a single upstream path and the HTTP methods that are permitted on it.
  *
- * <p>Each {@code PluginPermission} binds a user-group role (matched against
- * {@code UserGroup.code}, e.g. {@code "admin"}) to the set of upstream routes
- * ({@link PluginRoute}) that members of that group may access. Authorization is enforced
- * by comparing the authenticated user's group code against {@link #role()} and then
- * verifying that the request path and HTTP method match at least one declared
- * {@link PluginRoute}.</p>
+ * <p>Path matching uses a <em>prefix</em> strategy: a configured {@code path} of
+ * {@code /documents} will match any incoming sub-path such as
+ * {@code /documents/123} or {@code /documents/123/attachments}.</p>
  *
  * <p>Example YAML fragment:</p>
  * <pre>{@code
- * permissions:
- *   - role: admin
- *     routes:
- *       - path: /documents
- *         methods:
- *           - GET
- *           - POST
+ * routes:
+ *   - path: /documents
+ *     methods:
+ *       - GET
+ *       - POST
  * }</pre>
  *
- * @param role   user-group code (e.g. {@code "admin"}, {@code "doctor"}) matched against
- *               {@code UserGroup.getCode()} for the authenticated user
- * @param routes upstream path + method combinations accessible to this role;
- *               defaults to an empty list if omitted in YAML
+ * @param path    path prefix on the upstream service (e.g. {@code "/documents"});
+ *                matched as a prefix against the incoming sub-path
+ * @param methods HTTP methods permitted on this path (e.g. {@code "GET"}, {@code "POST"});
+ *                defaults to an empty list if omitted in YAML
  * @author Steve Tsala
  */
-public record PluginPermission(
-	String role,
-	@DefaultValue List<PluginRoute> routes) {
+public record PluginRoute(
+	String path,
+	@DefaultValue List<String> methods) {
 }

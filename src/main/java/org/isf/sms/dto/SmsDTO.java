@@ -21,11 +21,10 @@
  */
 package org.isf.sms.dto;
 
-import java.time.LocalDateTime;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 
 public class SmsDTO {
 
@@ -66,7 +65,7 @@ public class SmsDTO {
 	}
 
 	public SmsDTO(Integer smsId, LocalDateTime smsDate, LocalDateTime smsDateSched, String smsNumber, String smsText,
-			LocalDateTime smsDateSent, String smsUser, String module, String moduleID) {
+				  LocalDateTime smsDateSent, String smsUser, String module, String moduleID) {
 		this.smsId = smsId;
 		this.smsDate = smsDate;
 		this.smsDateSched = smsDateSched;
@@ -82,68 +81,68 @@ public class SmsDTO {
 		return this.smsId;
 	}
 
-	public LocalDateTime getSmsDate() {
-		return this.smsDate;
-	}
-
-	public LocalDateTime getSmsDateSched() {
-		return this.smsDateSched;
-	}
-
-	public String getSmsNumber() {
-		return this.smsNumber;
-	}
-
-	public String getSmsText() {
-		return this.smsText;
-	}
-
-	public LocalDateTime getSmsDateSent() {
-		return this.smsDateSent;
-	}
-
-	public String getSmsUser() {
-		return this.smsUser;
-	}
-
-	public String getModule() {
-		return this.module;
-	}
-
-	public String getModuleID() {
-		return this.moduleID;
-	}
-
 	public void setSmsId(Integer smsId) {
 		this.smsId = smsId;
+	}
+
+	public LocalDateTime getSmsDate() {
+		return this.smsDate;
 	}
 
 	public void setSmsDate(LocalDateTime smsDate) {
 		this.smsDate = smsDate;
 	}
 
+	public LocalDateTime getSmsDateSched() {
+		return this.smsDateSched;
+	}
+
 	public void setSmsDateSched(LocalDateTime smsDateSched) {
 		this.smsDateSched = smsDateSched;
+	}
+
+	public String getSmsNumber() {
+		return this.smsNumber;
 	}
 
 	public void setSmsNumber(String smsNumber) {
 		this.smsNumber = smsNumber;
 	}
 
+	public String getSmsText() {
+		return this.smsText;
+	}
+
 	public void setSmsText(String smsText) {
 		this.smsText = smsText;
+	}
+
+	public LocalDateTime getSmsDateSent() {
+		return this.smsDateSent;
 	}
 
 	public void setSmsDateSent(LocalDateTime smsDateSent) {
 		this.smsDateSent = smsDateSent;
 	}
 
+	public String getSmsUser() {
+		return this.smsUser;
+	}
+
 	public void setSmsUser(String smsUser) {
 		this.smsUser = smsUser;
 	}
 
+	public String getModule() {
+		return this.module;
+	}
+
 	public void setModule(String module) {
 		this.module = module;
+	}
+
+	public String getModuleID() {
+		return this.moduleID;
 	}
 
 	public void setModuleID(String moduleID) {

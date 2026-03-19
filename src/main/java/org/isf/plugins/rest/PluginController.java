@@ -34,6 +34,7 @@ import org.isf.plugins.exception.PluginAccessDeniedException;
 import org.isf.plugins.exception.PluginNotFoundException;
 import org.isf.plugins.proxy.IPluginRequestForwarder;
 import org.isf.plugins.registry.IPluginRegistry;
+import org.isf.plugins.security.AuthenticationContext;
 import org.isf.plugins.security.IAuthenticationSupplier;
 import org.isf.plugins.security.IPluginAuthorizationChecker;
 import org.slf4j.Logger;
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -188,13 +188,17 @@ public class PluginController {
 
 		PluginDefinition plugin = pluginRegistry.find(id).orElseThrow(() -> new PluginNotFoundException(id));
 
-		authorizationChecker.assertAccess(plugin);
+		// Extract sub-path (everything after /plugins/{id}).
+		// Spring's {*path} catch-all may or may not include a leading slash depending on
+		// the container version, so normalise defensively.
+		String rawPath = path != null ? path : "";
+		String subPath = rawPath.startsWith("/") ? rawPath : "/" + rawPath;
 
-		// Extract sub-path (everything after /plugins/{id})
-		String subPath = String.format("/%s", path != null ? path : "");
-		Authentication authentication = authenticationSupplier.get();
+		authorizationChecker.assertAccess(plugin, subPath, request.getMethod());
 
-		return requestForwarder.forward(plugin, subPath, request, authentication.getName(), authentication.getAuthorities());
+		AuthenticationContext authContext = authenticationSupplier.get();
+
+		return requestForwarder.forward(plugin, subPath, request, authContext.authentication().getName(), authContext.authentication().getAuthorities());
 	}
 
 	@ExceptionHandler(PluginNotFoundException.class)

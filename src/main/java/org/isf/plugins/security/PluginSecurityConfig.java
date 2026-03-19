@@ -21,8 +21,14 @@
  */
 package org.isf.plugins.security;
 
+import org.isf.menu.manager.UserBrowsingManager;
+import org.isf.menu.model.User;
+import org.isf.utils.exception.OHServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -33,15 +39,45 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Configuration
 public class PluginSecurityConfig {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(PluginSecurityConfig.class);
+
 	/**
 	 * Provides the {@link IAuthenticationSupplier} bean that resolves the current
-	 * {@link org.springframework.security.core.Authentication} from
-	 * {@link SecurityContextHolder}.
+	 * {@link AuthenticationContext} for each incoming request.
 	 *
-	 * @return a lambda delegating to {@code SecurityContextHolder.getContext().getAuthentication()}
+	 * <p>The role is resolved by calling
+	 * {@link UserBrowsingManager#getUserByName(String)} with the authenticated
+	 * username and reading {@code user.getUserGroupName().getCode()}. If resolution
+	 * fails (e.g. database error or unknown user) a warning is logged and
+	 * {@code role} is set to {@code null}, which will cause the authorization
+	 * checker to deny access.</p>
+	 *
+	 * @param userBrowsingManager the manager used to look up the full {@link User} entity
+	 * @return the {@link IAuthenticationSupplier} bean
 	 */
 	@Bean
-	public IAuthenticationSupplier authenticationSupplier() {
-		return () -> SecurityContextHolder.getContext().getAuthentication();
+	public IAuthenticationSupplier authenticationSupplier(UserBrowsingManager userBrowsingManager) {
+		return () -> {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (authentication == null || !authentication.isAuthenticated()) {
+				return new AuthenticationContext(authentication, null);
+			}
+			String role = resolveRole(authentication.getName(), userBrowsingManager);
+			return new AuthenticationContext(authentication, role);
+		};
+	}
+
+	private static String resolveRole(String username, UserBrowsingManager userBrowsingManager) {
+		try {
+			User user = userBrowsingManager.getUserByName(username);
+			if (user == null || user.getUserGroupName() == null) {
+				LOGGER.warn("Plugin auth: no user or group found for username '{}'", username);
+				return null;
+			}
+			return user.getUserGroupName().getCode();
+		} catch (OHServiceException e) {
+			LOGGER.warn("Plugin auth: failed to resolve role for username '{}': {}", username, e.getMessage());
+			return null;
+		}
 	}
 }

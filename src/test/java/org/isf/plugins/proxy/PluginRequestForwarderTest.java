@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PluginRequestForwarderTest {
 
-	private static final PluginDefinition PLUGIN = new PluginDefinition("smart-doc", "http://localhost:4000/api", "/health", List.of());
+	private static final PluginDefinition PLUGIN = new PluginDefinition("smart-doc", "http://localhost:4000/api", "/health", null);
 	@Mock
 	private RestClient mockRestClient;
 	@Mock

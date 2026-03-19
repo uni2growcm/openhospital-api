@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExamRowMapper extends GenericMapper<ExamRow, ExamRowDTO> {
 
-    public ExamRowMapper() {
-        super(ExamRow.class, ExamRowDTO.class);
-    }
+	public ExamRowMapper() {
+		super(ExamRow.class, ExamRowDTO.class);
+	}
 }

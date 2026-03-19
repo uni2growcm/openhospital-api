@@ -23,26 +23,33 @@ package org.isf.plugins.security;
 
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.config.PluginPermission;
-import org.isf.plugins.exception.PluginAccessDeniedException;
-import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Set;
+import org.isf.plugins.config.PluginRoute;
 
 /**
- * Enforces plugin-level access control by comparing the authenticated user's
- * {@link GrantedAuthority} list against the privilege declarations in a
- * {@link PluginDefinition}.
+ * Enforces plugin-level access control using a <em>restrictive</em> policy:
+ * any route not explicitly declared in the plugin's configuration is blocked.
  *
  * <h3>Authorization model</h3>
- * A plugin declares one or more {@link PluginPermission} entries, each associating a
- * descriptive role label with a list of fine-grained privilege strings
- * (e.g. {@code "smart-doc.read"}). These privilege strings mirror the authority naming
- * convention used throughout the rest of the application (e.g. {@code "patients.read"}).
+ * Each plugin declares a {@code configuration.permissions} list. Every entry binds
+ * a user-group role (matched against {@code UserGroup.getCode()}) to a set of
+ * {@link org.isf.plugins.config.PluginRoute} objects, each specifying a path prefix
+ * and a list of allowed HTTP methods.
  *
- * <p>A user is <em>granted access</em> if their JWT carries <strong>at least one</strong>
- * authority that appears in <em>any</em> of the plugin's {@link PluginPermission#privileges()}
- * lists. This is an OR-across-permissions, OR-within-privileges model — consistent with
- * how {@code hasAnyAuthority()} is used in {@link org.isf.config.SecurityConfig}.</p>
+ * <p>Access is granted when <strong>all</strong> of the following hold:</p>
+ * <ol>
+ *   <li>The authenticated user's group code equals {@code permission.role()} for at
+ *       least one entry in the permissions list.</li>
+ *   <li>Within that matching entry, at least one route whose {@code path} is a
+ *       <em>prefix</em> of the incoming sub-path also includes the request's HTTP
+ *       method in its {@code methods} list.</li>
+ * </ol>
+ *
+ * <p>If the plugin has no {@code configuration} or an empty {@code permissions}
+ * list, access is denied for <em>all</em> users.</p>
+ *
+ * <h3>Path matching</h3>
+ * Matching is a simple prefix check: a configured path of {@code /documents} matches
+ * {@code /documents}, {@code /documents/123}, {@code /documents/123/attachments}, etc.
  *
  * <h3>Integration</h3>
  * The check runs entirely within the controller layer, after the {@code JWTFilter} has
@@ -54,21 +61,26 @@ import java.util.Set;
 public interface IPluginAuthorizationChecker {
 
 	/**
-	 * Asserts that the currently authenticated user has at least one privilege required
-	 * by the given plugin.
+	 * {@inheritDoc}
 	 *
-	 * @param plugin the target plugin whose permission rules are evaluated
-	 * @throws PluginAccessDeniedException if the user holds none of the required privileges
-	 * @throws IllegalStateException       if there is no authenticated principal in the security context
-	 */
-	void assertAccess(PluginDefinition plugin);
-
-	/**
-	 * Returns the set of all required privileges across all permission entries of a plugin.
-	 * Useful for diagnostic / documentation purposes.
+	 * <p>Enforcement algorithm (restrictive — deny by default):</p>
+	 * <ol>
+	 *   <li>Verify a valid, authenticated principal exists.</li>
+	 *   <li>If the plugin has no {@code configuration} or empty {@code permissions}
+	 *       → deny.</li>
+	 *   <li>Find all {@link PluginPermission} entries whose {@code role} matches the
+	 *       user's group code (case-sensitive).</li>
+	 *   <li>Within those entries, look for any {@link PluginRoute} where:
+	 *       <ul>
+	 *         <li>{@code requestPath} starts with {@code route.path()} (prefix match), and</li>
+	 *         <li>{@code httpMethod} is contained in {@code route.methods()}
+	 *             (case-insensitive).</li>
+	 *       </ul></li>
+	 *   <li>If no matching route is found → deny.</li>
+	 * </ol>
 	 *
-	 * @param plugin the plugin definition
-	 * @return flat set of all declared privilege strings
+	 * @throws IllegalStateException if there is no authenticated principal in the
+	 *                               security context
 	 */
-	Set<String> requiredPrivileges(PluginDefinition plugin);
+	void assertAccess(PluginDefinition plugin, String requestPath, String httpMethod);
 }

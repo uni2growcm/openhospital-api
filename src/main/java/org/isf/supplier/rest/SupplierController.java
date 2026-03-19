@@ -21,10 +21,9 @@
  */
 package org.isf.supplier.rest;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.supplier.dto.SupplierDTO;
 import org.isf.supplier.manager.SupplierBrowserManager;
@@ -36,19 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 
 @RestController
 @Tag(name = "Suppliers")
@@ -69,6 +58,7 @@ public class SupplierController {
 
 	/**
 	 * Saves the specified {@link SupplierDTO}.
+	 *
 	 * @param supplierDTO The payload
 	 * @return {@code true} if the supplier was saved
 	 * @throws OHServiceException When failed to save the supplier
@@ -89,6 +79,7 @@ public class SupplierController {
 
 	/**
 	 * Updates the specified {@link SupplierDTO}.
+	 *
 	 * @param supplierDTO The payload
 	 * @return {@code true} if the supplier was updated
 	 * @throws OHServiceException When failed to update the supplier
@@ -111,16 +102,17 @@ public class SupplierController {
 
 	/**
 	 * Get the suppliers.
+	 *
 	 * @param excludeDeleted Whether to exclude deleted suppliers or not
 	 * @return the list of suppliers found
 	 * @throws OHServiceException When failed to retrieve suppliers
 	 */
 	@GetMapping("/suppliers")
 	public List<SupplierDTO> getSuppliers(
-		@RequestParam(name="exclude_deleted", defaultValue="true") boolean excludeDeleted
+		@RequestParam(name = "exclude_deleted", defaultValue = "true") boolean excludeDeleted
 	) throws OHServiceException {
 		LOGGER.info("Loading suppliers...");
-		List<Supplier> suppliers = excludeDeleted? manager.getList() : manager.getAll();
+		List<Supplier> suppliers = excludeDeleted ? manager.getList() : manager.getAll();
 		LOGGER.info("Found {} suppliers.", suppliers.size());
 
 		return mapper.map2DTOList(suppliers);
@@ -128,6 +120,7 @@ public class SupplierController {
 
 	/**
 	 * Get a supplier by its ID.
+	 *
 	 * @param id The ID of the supplier to retrieve
 	 * @return the found supplier
 	 * @throws OHServiceException When failed to retrieve the supplier
@@ -148,6 +141,7 @@ public class SupplierController {
 	/**
 	 * Delete a supplier.
 	 * <p>This is a soft deletion.</p>
+	 *
 	 * @param id Supplier ID
 	 * @throws OHServiceException When failed to delete the supplier
 	 */

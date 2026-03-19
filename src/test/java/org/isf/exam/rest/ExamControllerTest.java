@@ -21,16 +21,7 @@
  */
 package org.isf.exam.rest;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.isf.OpenHospitalApiApplication;
 import org.isf.exa.manager.ExamBrowsingManager;
 import org.isf.exa.model.Exam;
@@ -54,7 +45,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = OpenHospitalApiApplication.class)
 @AutoConfigureMockMvc
@@ -90,7 +89,7 @@ class ExamControllerTest {
 
 		@Test
 		@DisplayName("Should create a new exam with associated examrows")
-		@WithMockUser(username = "admin", authorities = { "exams.create", "examrows.create" })
+		@WithMockUser(username = "admin", authorities = {"exams.create", "examrows.create"})
 		void shouldCreateExamWithRows() throws Exception {
 			ExamWithRowsDTO payload = ExamHelper.generateExamWithRowsDTO();
 
@@ -109,7 +108,7 @@ class ExamControllerTest {
 
 		@Test
 		@DisplayName("Should fail to create exam procedure 1 with rows when default result doesn't match")
-		@WithMockUser(username = "admin", authorities = { "exams.create", "examrows.create" })
+		@WithMockUser(username = "admin", authorities = {"exams.create", "examrows.create"})
 		void shouldFailToCreateExamWithInvalidDefaultResult() throws Exception {
 			ExamDTO examDTO = ExamHelper.generateExam();
 			examDTO.setDefaultResult("IRES");
@@ -127,7 +126,7 @@ class ExamControllerTest {
 
 		@Test
 		@DisplayName("Should fail to create exam when user doesn't have required permissions")
-		@WithMockUser(username = "admin", authorities = { "examrows.create" })
+		@WithMockUser(username = "admin", authorities = {"examrows.create"})
 		void shouldFailToCreateExamWhenInsufficientPermissions() throws Exception {
 			var result = mvc.perform(
 					post("/exams").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(ExamHelper.generateExamWithRowsDTO())))
@@ -145,7 +144,7 @@ class ExamControllerTest {
 
 		@Test
 		@DisplayName("Should update an exam with associated examrows")
-		@WithMockUser(username = "admin", authorities = { "exams.create", "exams.update", "examrows.create", "examrows.delete" })
+		@WithMockUser(username = "admin", authorities = {"exams.create", "exams.update", "examrows.create", "examrows.delete"})
 		void shouldUpdateExamWithRows() throws Exception {
 			ExamWithRowsDTO payload = ExamHelper.generateExamWithRowsDTO();
 			Exam exam = examMapper.map2Model(payload.exam());
@@ -167,7 +166,7 @@ class ExamControllerTest {
 
 		@Test
 		@DisplayName("Should fail to update exam procedure 1 with rows when default result doesn't match")
-		@WithMockUser(username = "admin", authorities = { "exams.create", "exams.update", "examrows.create", "examrows.delete" })
+		@WithMockUser(username = "admin", authorities = {"exams.create", "exams.update", "examrows.create", "examrows.delete"})
 		void shouldFailToUpdateExamWithInvalidDefaultResult() throws Exception {
 			ExamDTO examDTO = ExamHelper.generateExam();
 			examDTO.setDefaultResult("IRES");
@@ -190,7 +189,7 @@ class ExamControllerTest {
 
 		@Test
 		@DisplayName("Should fail to update exam code in body doesn't match")
-		@WithMockUser(username = "admin", authorities = { "exams.create", "exams.update", "examrows.create", "examrows.delete" })
+		@WithMockUser(username = "admin", authorities = {"exams.create", "exams.update", "examrows.create", "examrows.delete"})
 		void shouldFailToUpdateExamWhenCodeInBodyDoesntMatch() throws Exception {
 			var result = mvc.perform(
 					put("/exams/{code}", "DD").contentType(MediaType.APPLICATION_JSON)
@@ -204,7 +203,7 @@ class ExamControllerTest {
 
 		@Test
 		@DisplayName("Should fail to update exam when user doesn't have required permissions")
-		@WithMockUser(username = "admin", authorities = { "exams.create", "examrows.create", "examrows.delete" })
+		@WithMockUser(username = "admin", authorities = {"exams.create", "examrows.create", "examrows.delete"})
 		void shouldFailToUpdateExamWhenInsufficientPermissions() throws Exception {
 			var result = mvc.perform(
 					put("/exams/hd").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(ExamHelper.generateExamWithRowsDTO())))

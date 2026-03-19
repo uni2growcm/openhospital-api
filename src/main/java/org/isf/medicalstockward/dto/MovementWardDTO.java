@@ -21,15 +21,13 @@
  */
 package org.isf.medicalstockward.dto;
 
-import java.time.LocalDate;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-
 import org.isf.medical.dto.MedicalDTO;
 import org.isf.patient.dto.PatientDTO;
 import org.isf.ward.dto.WardDTO;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
 
 public class MovementWardDTO {
 
@@ -82,8 +80,8 @@ public class MovementWardDTO {
 	}
 
 	public MovementWardDTO(int code, WardDTO ward, LocalDate date, boolean isPatient, PatientDTO patient, int age,
-			float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
-			WardDTO wardFrom) {
+						   float weight, String description, MedicalDTO medical, Double quantity, String units, WardDTO wardTo,
+						   WardDTO wardFrom) {
 		this.code = code;
 		this.ward = ward;
 		this.date = date;
@@ -103,12 +101,24 @@ public class MovementWardDTO {
 		return this.code;
 	}
 
+	public void setCode(int code) {
+		this.code = code;
+	}
+
 	public WardDTO getWard() {
 		return this.ward;
 	}
 
+	public void setWard(WardDTO ward) {
+		this.ward = ward;
+	}
+
 	public LocalDate getDate() {
 		return this.date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
 	public boolean isPatient() {
@@ -119,50 +129,6 @@ public class MovementWardDTO {
 		return this.patient;
 	}
 
-	public int getAge() {
-		return this.age;
-	}
-
-	public float getWeight() {
-		return this.weight;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public MedicalDTO getMedical() {
-		return this.medical;
-	}
-
-	public Double getQuantity() {
-		return this.quantity;
-	}
-
-	public String getUnits() {
-		return this.units;
-	}
-
-	public WardDTO getWardTo() {
-		return this.wardTo;
-	}
-
-	public WardDTO getWardFrom() {
-		return this.wardFrom;
-	}
-
-	public void setCode(int code) {
-		this.code = code;
-	}
-
-	public void setWard(WardDTO ward) {
-		this.ward = ward;
-	}
-
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-
 	public void setPatient(boolean isPatient) {
 		this.isPatient = isPatient;
 	}
@@ -171,32 +137,64 @@ public class MovementWardDTO {
 		this.patient = patient;
 	}
 
+	public int getAge() {
+		return this.age;
+	}
+
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public float getWeight() {
+		return this.weight;
 	}
 
 	public void setWeight(float weight) {
 		this.weight = weight;
 	}
 
+	public String getDescription() {
+		return this.description;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public MedicalDTO getMedical() {
+		return this.medical;
 	}
 
 	public void setMedical(MedicalDTO medical) {
 		this.medical = medical;
 	}
 
+	public Double getQuantity() {
+		return this.quantity;
+	}
+
 	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
+	}
+
+	public String getUnits() {
+		return this.units;
 	}
 
 	public void setUnits(String units) {
 		this.units = units;
 	}
 
+	public WardDTO getWardTo() {
+		return this.wardTo;
+	}
+
 	public void setWardTo(WardDTO wardTo) {
 		this.wardTo = wardTo;
+	}
+
+	public WardDTO getWardFrom() {
+		return this.wardFrom;
 	}
 
 	public void setWardFrom(WardDTO wardFrom) {

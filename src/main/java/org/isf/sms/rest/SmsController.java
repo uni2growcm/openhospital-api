@@ -21,11 +21,9 @@
  */
 package org.isf.sms.rest;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.sms.dto.SmsDTO;
 import org.isf.sms.manager.SmsManager;
@@ -37,15 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @Tag(name = "SMS")
@@ -66,8 +59,9 @@ public class SmsController {
 
 	/**
 	 * Fetch the list of {@link Sms}s.
+	 *
 	 * @param dateFrom Start date
-	 * @param dateTo End date
+	 * @param dateTo   End date
 	 * @return the found list
 	 * @throws OHServiceException When failed to get sms
 	 */
@@ -86,6 +80,7 @@ public class SmsController {
 
 	/**
 	 * Save the specified {@link Sms}.
+	 *
 	 * @param smsDTO SMS payload
 	 * @return {@code true} if the sms is saved
 	 * @throws OHServiceException When failed to save the SMS
@@ -93,7 +88,7 @@ public class SmsController {
 	@PostMapping(value = "/sms")
 	public boolean saveSms(
 		@RequestBody @Valid SmsDTO smsDTO,
-		@RequestParam(defaultValue="false") boolean split
+		@RequestParam(defaultValue = "false") boolean split
 	) throws OHServiceException {
 		smsManager.saveOrUpdate(smsMapper.map2Model(smsDTO), split);
 		return true;
@@ -101,6 +96,7 @@ public class SmsController {
 
 	/**
 	 * Deletes the specified {@link Sms}.
+	 *
 	 * @param smsDTOList SMS
 	 * @return {@code true} if the sms is deleted
 	 * @throws OHServiceException When failed to delete SMS

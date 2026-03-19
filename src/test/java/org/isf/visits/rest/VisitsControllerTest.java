@@ -21,18 +21,6 @@
  */
 package org.isf.visits.rest;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-import java.util.Objects;
-
 import org.isf.shared.exceptions.OHResponseEntityExceptionHandler;
 import org.isf.shared.mapper.converter.BlobToByteArrayConverter;
 import org.isf.shared.mapper.converter.ByteArrayToBlobConverter;
@@ -56,6 +44,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
+import java.util.Objects;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 class VisitsControllerTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VisitsControllerTest.class);
@@ -73,9 +71,9 @@ class VisitsControllerTest {
 	void setup() {
 		closeable = MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders
-				.standaloneSetup(new VisitsController(visitManagerMock, visitMapper))
-				.setControllerAdvice(new OHResponseEntityExceptionHandler())
-				.build();
+			.standaloneSetup(new VisitsController(visitManagerMock, visitMapper))
+			.setControllerAdvice(new OHResponseEntityExceptionHandler())
+			.build();
 		ModelMapper modelMapper = new ModelMapper();
 		PatientMapping.addMapping(modelMapper);
 		modelMapper.addConverter(new BlobToByteArrayConverter());
@@ -96,17 +94,17 @@ class VisitsControllerTest {
 		List<Visit> visitsList = VisitHelper.setupVisitList(4);
 
 		when(visitManagerMock.getVisits(patID))
-				.thenReturn(visitsList);
+			.thenReturn(visitsList);
 
 		List<VisitDTO> expectedVisitsDTOs = visitMapper.map2DTOList(visitsList);
 
 		MvcResult result = this.mockMvc
-				.perform(get(request, patID))
-				.andDo(log())
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(status().isOk())
-				.andExpect(content().string(containsString(VisitHelper.getObjectMapper().writeValueAsString(expectedVisitsDTOs))))
-				.andReturn();
+			.perform(get(request, patID))
+			.andDo(log())
+			.andExpect(status().is2xxSuccessful())
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString(VisitHelper.getObjectMapper().writeValueAsString(expectedVisitsDTOs))))
+			.andReturn();
 
 		LOGGER.debug("result: {}", result);
 	}
@@ -118,17 +116,17 @@ class VisitsControllerTest {
 		VisitDTO body = visitMapper.map2DTO(VisitHelper.setup(id));
 
 		when(visitManagerMock.newVisit(visitMapper.map2Model(body)))
-				.thenReturn(visitMapper.map2Model(body));
+			.thenReturn(visitMapper.map2Model(body));
 
 		MvcResult result = this.mockMvc
-				.perform(post(request)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(Objects.requireNonNull(VisitHelper.asJsonString(body)))
-				)
-				.andDo(log())
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(status().isCreated())
-				.andReturn();
+			.perform(post(request)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(Objects.requireNonNull(VisitHelper.asJsonString(body)))
+			)
+			.andDo(log())
+			.andExpect(status().is2xxSuccessful())
+			.andExpect(status().isCreated())
+			.andReturn();
 
 		LOGGER.debug("result: {}", result);
 	}
@@ -143,18 +141,18 @@ class VisitsControllerTest {
 
 		Boolean isCreated = true;
 		when(visitManagerMock.newVisits(visitsList))
-				.thenReturn(isCreated);
+			.thenReturn(isCreated);
 
 		MvcResult result = this.mockMvc
-				.perform(post(request)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(Objects.requireNonNull(VisitHelper.asJsonString(body)))
-				)
-				.andDo(log())
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(status().isCreated())
-				.andExpect(content().string(containsString(isCreated.toString())))
-				.andReturn();
+			.perform(post(request)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(Objects.requireNonNull(VisitHelper.asJsonString(body)))
+			)
+			.andDo(log())
+			.andExpect(status().is2xxSuccessful())
+			.andExpect(status().isCreated())
+			.andExpect(content().string(containsString(isCreated.toString())))
+			.andReturn();
 		LOGGER.debug("result: {}", result);
 	}
 
@@ -166,15 +164,15 @@ class VisitsControllerTest {
 
 		Boolean isDeleted = true;
 		when(visitManagerMock.deleteAllVisits(id))
-				.thenReturn(isDeleted);
+			.thenReturn(isDeleted);
 
 		MvcResult result = this.mockMvc
-				.perform(delete(request, id))
-				.andDo(log())
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(status().isOk())
-				.andExpect(content().string(containsString(isDeleted.toString())))
-				.andReturn();
+			.perform(delete(request, id))
+			.andDo(log())
+			.andExpect(status().is2xxSuccessful())
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString(isDeleted.toString())))
+			.andReturn();
 
 		LOGGER.debug("result: {}", result);
 	}

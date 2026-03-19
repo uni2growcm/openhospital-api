@@ -50,20 +50,20 @@ public class MedicalWardDTO {
 		return this.id;
 	}
 
-	public float getIn_quantity() {
-		return this.in_quantity;
-	}
-
-	public float getOut_quantity() {
-		return this.out_quantity;
-	}
-
 	public void setId(MedicalWardIdDTO id) {
 		this.id = id;
 	}
 
+	public float getIn_quantity() {
+		return this.in_quantity;
+	}
+
 	public void setIn_quantity(float in_quantity) {
 		this.in_quantity = in_quantity;
+	}
+
+	public float getOut_quantity() {
+		return this.out_quantity;
 	}
 
 	public void setOut_quantity(float out_quantity) {
@@ -73,6 +73,7 @@ public class MedicalWardDTO {
 	public int getLock() {
 		return lock;
 	}
+
 	public void setLock(int lock) {
 		this.lock = lock;
 	}

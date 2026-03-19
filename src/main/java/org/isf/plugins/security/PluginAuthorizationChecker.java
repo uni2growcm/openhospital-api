@@ -21,17 +21,16 @@
  */
 package org.isf.plugins.security;
 
+import org.isf.plugins.config.PluginConfiguration;
 import org.isf.plugins.config.PluginDefinition;
 import org.isf.plugins.config.PluginPermission;
+import org.isf.plugins.config.PluginRoute;
 import org.isf.plugins.exception.PluginAccessDeniedException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Steve Tsala
@@ -46,46 +45,69 @@ public class PluginAuthorizationChecker implements IPluginAuthorizationChecker {
 	}
 
 	@Override
-	public void assertAccess(PluginDefinition plugin) {
-		Authentication authentication = authenticationSupplier.get();
+	public void assertAccess(PluginDefinition plugin, String requestPath, String httpMethod) {
+		AuthenticationContext ctx = authenticationSupplier.get();
+		Authentication authentication = ctx.authentication();
 
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new IllegalStateException("No authenticated principal found in SecurityContext");
-		}
+		List<PluginPermission> permissions = getPluginPermissions(plugin, authentication);
 
-		List<PluginPermission> permissions = plugin.permissions();
-
-		// A plugin with no permissions declared is accessible to any authenticated user.
-		if (permissions == null || permissions.isEmpty()) {
-			return;
-		}
-
-		Set<String> userAuthorities = extractAuthorities(authentication.getAuthorities());
+		String userRole = ctx.role();
 
 		boolean hasAccess = permissions.stream()
-			.map(PluginPermission::privileges)
-			.flatMap(Collection::stream)
-			.anyMatch(userAuthorities::contains);
+			.filter(p -> p.role() != null && p.role().equals(userRole))
+			.flatMap(p -> p.routes() == null ? java.util.stream.Stream.empty() : p.routes().stream())
+			.anyMatch(route -> pathMatches(route, requestPath) && methodMatches(route, httpMethod));
 
 		if (!hasAccess) {
 			throw new PluginAccessDeniedException(plugin.id(), authentication.getName());
 		}
 	}
 
-	@Override
-	public Set<String> requiredPrivileges(PluginDefinition plugin) {
-		if (plugin.permissions() == null) {
-			return Set.of();
+	private static @NonNull List<PluginPermission> getPluginPermissions(PluginDefinition plugin, Authentication authentication) {
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new IllegalStateException("No authenticated principal found in SecurityContext");
 		}
-		return plugin.permissions().stream()
-			.map(PluginPermission::privileges)
-			.flatMap(Collection::stream)
-			.collect(Collectors.toSet());
+
+		PluginConfiguration configuration = plugin.configuration();
+
+		// Restrictive default: no configuration or empty permissions → deny everyone.
+		if (configuration == null) {
+			throw new PluginAccessDeniedException(plugin.id(), authentication.getName());
+		}
+
+		List<PluginPermission> permissions = configuration.permissions();
+		if (permissions == null || permissions.isEmpty()) {
+			throw new PluginAccessDeniedException(plugin.id(), authentication.getName());
+		}
+		return permissions;
 	}
 
-	private Set<String> extractAuthorities(Collection<? extends GrantedAuthority> grantedAuthorities) {
-		return grantedAuthorities.stream()
-			.map(GrantedAuthority::getAuthority)
-			.collect(Collectors.toSet());
+	/**
+	 * Returns {@code true} if {@code requestPath} starts with {@code route.path()},
+	 * implementing prefix-based path matching.
+	 *
+	 * <p>Examples:</p>
+	 * <ul>
+	 *   <li>{@code route.path() = "/documents"}, {@code requestPath = "/documents"} → {@code true}</li>
+	 *   <li>{@code route.path() = "/documents"}, {@code requestPath = "/documents/123"} → {@code true}</li>
+	 *   <li>{@code route.path() = "/documents"}, {@code requestPath = "/other"} → {@code false}</li>
+	 * </ul>
+	 */
+	private static boolean pathMatches(PluginRoute route, String requestPath) {
+		if (route.path() == null || requestPath == null) {
+			return false;
+		}
+		return requestPath.equals(route.path()) || requestPath.startsWith(route.path() + "/");
+	}
+
+	/**
+	 * Returns {@code true} if the route's {@code methods} list contains
+	 * {@code httpMethod} (case-insensitive).
+	 */
+	private static boolean methodMatches(PluginRoute route, String httpMethod) {
+		if (route.methods() == null || httpMethod == null) {
+			return false;
+		}
+		return route.methods().stream().anyMatch(m -> m.equalsIgnoreCase(httpMethod));
 	}
 }

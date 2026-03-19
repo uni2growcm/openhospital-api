@@ -26,33 +26,25 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 import java.util.List;
 
 /**
- * Represents the access-control entry for a single user-group role within a plugin definition.
+ * Groups the access-control configuration for a single plugin.
  *
- * <p>Each {@code PluginPermission} binds a user-group role (matched against
- * {@code UserGroup.code}, e.g. {@code "admin"}) to the set of upstream routes
- * ({@link PluginRoute}) that members of that group may access. Authorization is enforced
- * by comparing the authenticated user's group code against {@link #role()} and then
- * verifying that the request path and HTTP method match at least one declared
- * {@link PluginRoute}.</p>
+ * <p>Bound from the {@code configuration} key under a plugin definition in
+ * {@code plugins.yaml}. A {@code null} or empty {@code permissions} list means that
+ * <strong>no role has access</strong> — the gateway enforces a restrictive default.</p>
  *
  * <p>Example YAML fragment:</p>
  * <pre>{@code
- * permissions:
- *   - role: admin
- *     routes:
- *       - path: /documents
- *         methods:
- *           - GET
- *           - POST
+ * configuration:
+ *   permissions:
+ *     - role: admin
+ *       routes:
+ *         - path: /documents
+ *           methods: [GET, POST, DELETE]
  * }</pre>
  *
- * @param role   user-group code (e.g. {@code "admin"}, {@code "doctor"}) matched against
- *               {@code UserGroup.getCode()} for the authenticated user
- * @param routes upstream path + method combinations accessible to this role;
- *               defaults to an empty list if omitted in YAML
+ * @param permissions list of role-to-routes mappings; defaults to an empty list if omitted
  * @author Steve Tsala
  */
-public record PluginPermission(
-	String role,
-	@DefaultValue List<PluginRoute> routes) {
+public record PluginConfiguration(
+	@DefaultValue List<PluginPermission> permissions) {
 }

@@ -21,24 +21,10 @@
  */
 package org.isf.security;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-
-import java.lang.reflect.Field;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.assertj.core.data.Offset;
 import org.isf.OpenHospitalApiApplication;
 import org.isf.menu.manager.UserBrowsingManager;
@@ -59,22 +45,30 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.lang.reflect.Field;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = OpenHospitalApiApplication.class)
 class TokenProviderTest {
 
-	@Autowired
-	private TokenProvider tokenProvider;
-
-	@MockitoBean
-	private UserBrowsingManager userManager;
-
 	@MockitoBean
 	protected PermissionManager permissionManager;
+	@Autowired
+	private TokenProvider tokenProvider;
+	@MockitoBean
+	private UserBrowsingManager userManager;
 
 	@BeforeEach
 	void setUp() {
@@ -135,11 +129,11 @@ class TokenProviderTest {
 
 		// Create an expired token by setting the expiration date in the past
 		String expiredToken = Jwts.builder()
-						.setSubject("testuser")
-						.claim("auth", "ROLE_USER")
-						.signWith(key, SignatureAlgorithm.HS512)
-						.setExpiration(new Date(System.currentTimeMillis() - 1000))
-						.compact();
+			.setSubject("testuser")
+			.claim("auth", "ROLE_USER")
+			.signWith(key, SignatureAlgorithm.HS512)
+			.setExpiration(new Date(System.currentTimeMillis() - 1000))
+			.compact();
 
 		// Validate the expired token
 		TokenValidationResult result = tokenProvider.validateToken(expiredToken);
@@ -174,9 +168,9 @@ class TokenProviderTest {
 
 		// Create a JWT token signed with RS256 (RSA algorithm) instead of HS512
 		String unsupportedToken = Jwts.builder()
-						.setSubject("testuser")
-						.signWith(keyPair.getPrivate(), SignatureAlgorithm.RS256)
-						.compact();
+			.setSubject("testuser")
+			.signWith(keyPair.getPrivate(), SignatureAlgorithm.RS256)
+			.compact();
 
 		// Validate the token using tokenProvider
 		TokenValidationResult result = tokenProvider.validateToken(unsupportedToken);
@@ -190,10 +184,10 @@ class TokenProviderTest {
 
 		// Create a token with empty claims
 		String emptyClaimsToken = Jwts.builder()
-						.setSubject("") // Set empty subject (claims are present but empty)
-						.claim("auth", "") // Set empty authority claims
-						.signWith(key, SignatureAlgorithm.HS512)
-						.compact();
+			.setSubject("") // Set empty subject (claims are present but empty)
+			.claim("auth", "") // Set empty authority claims
+			.signWith(key, SignatureAlgorithm.HS512)
+			.compact();
 
 		// Validate the token using tokenProvider
 		TokenValidationResult result = tokenProvider.validateToken(emptyClaimsToken);
@@ -220,7 +214,7 @@ class TokenProviderTest {
 		assertThat(((User) authToken.getPrincipal()).getUsername()).isEqualTo("testuser");
 
 		// Check authorities
-		Collection< ? extends GrantedAuthority> resultAuthorities = authToken.getAuthorities();
+		Collection<? extends GrantedAuthority> resultAuthorities = authToken.getAuthorities();
 		assertThat(resultAuthorities).extracting(GrantedAuthority::getAuthority).contains("ROLE_USER");
 
 		// Check credentials
@@ -309,14 +303,14 @@ class TokenProviderTest {
 		Date now = new Date();
 		Date expiredDate = new Date(now.getTime() - 1000); // 1 second in the past
 		String expiredToken = Jwts.builder()
-						.setClaims(Jwts.parserBuilder()
-										.setSigningKey(key)
-										.build()
-										.parseClaimsJws(token)
-										.getBody())
-						.setExpiration(expiredDate)
-						.signWith(key, SignatureAlgorithm.HS512)
-						.compact();
+			.setClaims(Jwts.parserBuilder()
+				.setSigningKey(key)
+				.build()
+				.parseClaimsJws(token)
+				.getBody())
+			.setExpiration(expiredDate)
+			.signWith(key, SignatureAlgorithm.HS512)
+			.compact();
 
 		// Test if the token is expired
 		Boolean isExpired = tokenProvider.isTokenExpired(expiredToken);
@@ -345,7 +339,7 @@ class TokenProviderTest {
 	void testGetAuthenticationByUsername() throws OHServiceException, OHException {
 		Authentication authentication = createAuthentication();
 		String username = authentication.getName();
-		Collection< ? extends GrantedAuthority> authorities = authentication.getAuthorities();
+		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
 		// Mock the user with same values used in the helper
 		org.isf.menu.model.User user = new org.isf.menu.model.User();

@@ -21,10 +21,6 @@
  */
 package org.isf.plugins.config;
 
-import org.springframework.boot.context.properties.bind.DefaultValue;
-
-import java.util.List;
-
 /**
  * Immutable description of a single external plugin registered with the gateway.
  *
@@ -39,25 +35,27 @@ import java.util.List;
  *     - id: smart-doc
  *       url: http://localhost:4000/api
  *       health: /health
- *       permissions:
- *         - role: admin
- *           privileges:
- *             - smart-doc.read
- *             - smart-doc.write
+ *       configuration:
+ *         permissions:
+ *           - role: admin
+ *             routes:
+ *               - path: /documents
+ *                 methods: [GET, POST, DELETE]
  * }</pre>
  *
- * @param id          unique identifier used as the URL path segment in
- *                    {@code /plugins/{id}/**}; must be URL-safe (lowercase, hyphens allowed)
- * @param url         base URL of the upstream plugin service (no trailing slash);
- *                    all proxied requests are forwarded to {@code url + subPath}
- * @param health      health check path relative to {@link #url()} (e.g. {@code "/health"});
- *                    probed at startup — a non-2xx or connection failure excludes the plugin
- * @param permissions access-control rules grouped by role; defaults to an empty list (any authenticated user may access the plugin)
+ * @param id            unique identifier used as the URL path segment in
+ *                      {@code /plugins/{id}/**}; must be URL-safe (lowercase, hyphens allowed)
+ * @param url           base URL of the upstream plugin service (no trailing slash);
+ *                      all proxied requests are forwarded to {@code url + subPath}
+ * @param health        health check path relative to {@link #url()} (e.g. {@code "/health"});
+ *                      probed at startup — a non-2xx or connection failure excludes the plugin
+ * @param configuration access-control configuration for this plugin; a {@code null} or
+ *                      empty configuration means no role has access (restrictive default)
  * @author Steve Tsala
  */
 public record PluginDefinition(
 	String id,
 	String url,
 	String health,
-	@DefaultValue List<PluginPermission> permissions) {
+	PluginConfiguration configuration) {
 }

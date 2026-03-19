@@ -21,20 +21,29 @@
  */
 package org.isf.plugins.security;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 /**
- * Functional interface that resolves the current {@link Authentication} from the
- * security context.
+ * Functional interface that resolves the current authentication context — both the
+ * raw {@link org.springframework.security.core.Authentication} and the user's resolved
+ * role (user-group code) — for the incoming request.
  *
- * <p>Abstracting {@link SecurityContextHolder} access behind this interface allows
- * service and controller classes to avoid static calls to
- * {@code SecurityContextHolder.getContext().getAuthentication()}, making them fully
- * testable without requiring a real security context to be populated.</p>
+ * <p>The returned {@link AuthenticationContext} bundles:</p>
+ * <ul>
+ *   <li>the Spring Security {@link org.springframework.security.core.Authentication} object
+ *       (used for username, authorities, and authenticated flag), and</li>
+ *   <li>the user-group {@code role} string resolved by looking up the full {@code User}
+ *       entity via {@code UserBrowsingManager.getUserByName(username)} and reading
+ *       {@code user.getUserGroupName().getCode()}.</li>
+ * </ul>
  *
- * <p>The default Spring bean is registered in {@link PluginSecurityConfig} and simply
- * delegates to {@code SecurityContextHolder.getContext().getAuthentication()}.</p>
+ * <p>If role resolution fails (e.g. database error) the {@code role} field is {@code null}.
+ * The authorization checker treats a {@code null} role as an unknown group and denies
+ * access.</p>
+ *
+ * <p>Abstracting this behind an interface allows controller and service classes to avoid
+ * static calls to {@code SecurityContextHolder}, making them fully testable without
+ * requiring a real security context or database.</p>
+ *
+ * <p>The default Spring bean is registered in {@link PluginSecurityConfig}.</p>
  *
  * @author Steve Tsala
  */
@@ -42,9 +51,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public interface IAuthenticationSupplier {
 
 	/**
-	 * Returns the {@link Authentication} currently stored in the security context.
+	 * Returns the current {@link AuthenticationContext} for the active request.
 	 *
-	 * @return the current {@link Authentication}, or {@code null} if none is present
+	 * @return the authentication context (authentication + role); never {@code null},
+	 *         but {@link AuthenticationContext#authentication()} may be {@code null}
+	 *         if no principal is present, and {@link AuthenticationContext#role()} may
+	 *         be {@code null} if role resolution failed
 	 */
-	Authentication get();
+	AuthenticationContext get();
 }

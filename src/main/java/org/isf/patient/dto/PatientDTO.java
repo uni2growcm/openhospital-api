@@ -21,13 +21,12 @@
  */
 package org.isf.patient.dto;
 
-import java.time.LocalDate;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import java.time.LocalDate;
 
 @Schema(description = "Class representing a patient")
 public class PatientDTO {
@@ -56,7 +55,7 @@ public class PatientDTO {
 	private String agetype;
 
 	@NotNull
-	@Schema(description = "Sex", allowableValues = { "M", "F" }, example = "M")
+	@Schema(description = "Sex", allowableValues = {"M", "F"}, example = "M")
 	private char sex;
 
 	@Schema(description = "Address", example = "Via Roma, 12", maxLength = 50)
@@ -79,25 +78,25 @@ public class PatientDTO {
 	@Schema(description = "Mother's name", example = "Roberta", maxLength = 50)
 	private String motherName;
 
-	@Schema(description = "Mother's status (D=dead, A=alive)", allowableValues = { "D", "A" }, example = "A")
+	@Schema(description = "Mother's status (D=dead, A=alive)", allowableValues = {"D", "A"}, example = "A")
 	private char mother;
 
 	@NotNull
 	@Schema(description = "Father's name", example = "Giuseppe", maxLength = 50)
 	private String fatherName;
 
-	@Schema(description = "Father's status (D=dead, A=alive)", allowableValues = { "D", "A" }, example = "D")
+	@Schema(description = "Father's status (D=dead, A=alive)", allowableValues = {"D", "A"}, example = "D")
 	private char father;
 
 	@NotNull
-	@Schema(description = "Blood type (0-/+, A-/+ , B-/+, AB-/+)", allowableValues = { "0-", "0+", "A-", "A+", "B-",
-			"B+", "AB-", "AB+" }, example = "A+")
+	@Schema(description = "Blood type (0-/+, A-/+ , B-/+, AB-/+)", allowableValues = {"0-", "0+", "A-", "A+", "B-",
+		"B+", "AB-", "AB+"}, example = "A+")
 	private String bloodType;
 
-	@Schema(description = "HasInsurance (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
+	@Schema(description = "HasInsurance (Y=Yes, N=no)", allowableValues = {"Y", "N"}, example = "N")
 	private char hasInsurance;
 
-	@Schema(description = "Parent together (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
+	@Schema(description = "Parent together (Y=Yes, N=no)", allowableValues = {"Y", "N"}, example = "N")
 	private char parentTogether;
 
 	@Schema(description = "Tax code", example = "RSSMRA79E01L781N", maxLength = 30)
@@ -148,6 +147,10 @@ public class PatientDTO {
 		return lock;
 	}
 
+	public void setLock(int lock) {
+		this.lock = lock;
+	}
+
 	public String getAllergies() {
 		return allergies;
 	}
@@ -169,9 +172,17 @@ public class PatientDTO {
 		return code;
 	}
 
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
 	@Schema(accessMode = AccessMode.READ_ONLY)
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Schema(accessMode = AccessMode.READ_ONLY)
@@ -179,157 +190,145 @@ public class PatientDTO {
 		return nextKin;
 	}
 
+	public void setNextKin(String nextKin) {
+		this.nextKin = nextKin;
+	}
+
 	@Schema(accessMode = AccessMode.READ_ONLY)
 	public int getHashCode() {
 		return hashCode;
+	}
+
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
 	}
 
 	public String getFirstName() {
 		return this.firstName;
 	}
 
-	public String getSecondName() {
-		return this.secondName;
-	}
-
-	public LocalDate getBirthDate() {
-		return this.birthDate;
-	}
-
-	public int getAge() {
-		return this.age;
-	}
-
-	public String getAgetype() {
-		return this.agetype;
-	}
-
-	public char getSex() {
-		return this.sex;
-	}
-
-	public String getAddress() {
-		return this.address;
-	}
-
-	public String getCity() {
-		return this.city;
-	}
-
-	public String getTelephone() {
-		return this.telephone;
-	}
-
-	public String getNote() {
-		return this.note;
-	}
-
-	public char getMother() {
-		return this.mother;
-	}
-
-	public char getFather() {
-		return this.father;
-	}
-
-	public String getBloodType() {
-		return this.bloodType;
-	}
-
-	public char getHasInsurance() {
-		return this.hasInsurance;
-	}
-
-	public char getParentTogether() {
-		return this.parentTogether;
-	}
-
-	public String getTaxCode() {
-		return this.taxCode;
-	}
-
-	public void setCode(Integer code) {
-		this.code = code;
-	}
-
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public String getSecondName() {
+		return this.secondName;
 	}
 
 	public void setSecondName(String secondName) {
 		this.secondName = secondName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public LocalDate getBirthDate() {
+		return this.birthDate;
 	}
 
 	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
 
+	public int getAge() {
+		return this.age;
+	}
+
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public String getAgetype() {
+		return this.agetype;
 	}
 
 	public void setAgetype(String agetype) {
 		this.agetype = agetype;
 	}
 
+	public char getSex() {
+		return this.sex;
+	}
+
 	public void setSex(char sex) {
 		this.sex = sex;
+	}
+
+	public String getAddress() {
+		return this.address;
 	}
 
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
+	public String getCity() {
+		return this.city;
+	}
+
 	public void setCity(String city) {
 		this.city = city;
 	}
 
-	public void setNextKin(String nextKin) {
-		this.nextKin = nextKin;
+	public String getTelephone() {
+		return this.telephone;
 	}
 
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
 	}
 
+	public String getNote() {
+		return this.note;
+	}
+
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public char getMother() {
+		return this.mother;
 	}
 
 	public void setMother(char mother) {
 		this.mother = mother;
 	}
 
+	public char getFather() {
+		return this.father;
+	}
+
 	public void setFather(char father) {
 		this.father = father;
+	}
+
+	public String getBloodType() {
+		return this.bloodType;
 	}
 
 	public void setBloodType(String bloodType) {
 		this.bloodType = bloodType;
 	}
 
+	public char getHasInsurance() {
+		return this.hasInsurance;
+	}
+
 	public void setHasInsurance(char hasInsurance) {
 		this.hasInsurance = hasInsurance;
+	}
+
+	public char getParentTogether() {
+		return this.parentTogether;
 	}
 
 	public void setParentTogether(char parentTogether) {
 		this.parentTogether = parentTogether;
 	}
 
+	public String getTaxCode() {
+		return this.taxCode;
+	}
+
 	public void setTaxCode(String taxCode) {
 		this.taxCode = taxCode;
-	}
-
-	public void setLock(int lock) {
-		this.lock = lock;
-	}
-
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
 	}
 
 	public PatientSTATUS getStatus() {

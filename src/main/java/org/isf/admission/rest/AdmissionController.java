@@ -21,11 +21,11 @@
  */
 package org.isf.admission.rest;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.admission.dto.AdmissionDTO;
 import org.isf.admission.dto.AdmittedPatientDTO;
 import org.isf.admission.manager.AdmissionBrowserManager;
@@ -59,22 +59,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @Tag(name = "Admissions")
@@ -82,11 +70,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdmissionController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AdmissionController.class);
-
 	// TODO: to centralize
 	protected static final String DEFAULT_PAGE_SIZE = "80";
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(AdmissionController.class);
 	private final AdmissionBrowserManager admissionManager;
 
 	private final PatientBrowserManager patientManager;
@@ -154,7 +140,7 @@ public class AdmissionController {
 	 *
 	 * @param patientCode Patient Code
 	 * @return found {@link Admission}, NO_CONTENT if there is no {@link Admission}
-	 *         found or message error.
+	 * found or message error.
 	 * @throws OHServiceException When failed to get patient current admission
 	 */
 	@GetMapping("/admissions/current")
@@ -175,7 +161,7 @@ public class AdmissionController {
 	/**
 	 * Get all admitted {@link Patient}s based on the applied filters.
 	 *
-	 * @param searchTerms Search keywords
+	 * @param searchTerms    Search keywords
 	 * @param admissionRange Admission range
 	 * @param dischargeRange Discharge range
 	 * @return the {@link List} of found {@link Patient} or NO_CONTENT otherwise.

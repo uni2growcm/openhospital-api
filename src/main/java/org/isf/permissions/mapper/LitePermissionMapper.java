@@ -28,9 +28,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LitePermissionMapper extends GenericMapper<Permission, LitePermissionDTO> {
-		
+
 	public LitePermissionMapper() {
-			super(Permission.class, LitePermissionDTO.class);
-		}
-	
+		super(Permission.class, LitePermissionDTO.class);
 	}
+
+}

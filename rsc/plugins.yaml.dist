@@ -12,13 +12,20 @@
 #          → GET http://localhost:8042/api/document-types
 #
 # Fields per plugin:
-#   id          Unique identifier used as the URL path segment.
-#               Must be URL-safe (lowercase letters, digits, hyphens).
-#   url         Base URL of the upstream service. No trailing slash.
-#   health      Path on the upstream service used for the startup health probe.
-#               A 2xx response marks the plugin as available.
-#   permissions List of role/privilege groups. A plugin with an
-#               empty permissions list is accessible to any authenticated user.
+#   id            Unique identifier used as the URL path segment.
+#                 Must be URL-safe (lowercase letters, digits, hyphens).
+#   url           Base URL of the upstream service. No trailing slash.
+#   health        Path on the upstream service used for the startup health probe.
+#                 A 2xx response marks the plugin as available.
+#   configuration
+#     permissions Restrictive access-control rules per user-group role.
+#                 Routes NOT listed here are blocked. A plugin with no permissions
+#                 configured is inaccessible to all users.
+#       role      The user-group name (UserGroup.code) that this entry applies to.
+#       routes    List of upstream path + method combinations the role may access.
+#         path    Path prefix on the upstream service (e.g. /documents).
+#                 Any sub-path is allowed (e.g. /documents/123 matches /documents).
+#         methods HTTP methods permitted on this path (e.g. GET, POST, DELETE).
 #
 # =============================================================================
 
@@ -31,9 +38,17 @@ plugins:
     - id: smart-doc
       url: http://localhost:8042/api
       health: /actuator/health
-      permissions:
-        - role: admin
-          privileges:
-            - patients.read
-            - patients.create
-            - patients.update
+      configuration:
+        permissions:
+          - role: admin
+            routes:
+              - path: /documents
+                methods:
+                  - GET
+                  - POST
+                  - DELETE
+          - role: doctor
+            routes:
+              - path: /documents
+                methods:
+                  - GET
