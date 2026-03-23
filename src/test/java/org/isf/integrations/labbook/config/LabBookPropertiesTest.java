@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Steve Tsala
  */
 @SpringBootTest(classes = OpenHospitalApiApplication.class,
-	properties = {"labbook.enabled=true"})
+	properties = {"labbook.enabled=true", "labbook.base-url=http://localhost:5000/sigl", "labbook.oauth.client-id=OH2-API", "labbook.oauth.client-secret=OH2-API-SECRET"})
 class LabBookPropertiesTest {
 
 	@Autowired

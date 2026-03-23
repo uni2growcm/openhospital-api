@@ -28,8 +28,10 @@ import org.isf.integrations.labbook.ports.IOauthTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.time.Instant;
 
@@ -39,33 +41,27 @@ import static org.mockito.Mockito.when;
 /**
  * @author Steve Tsala
  */
-@SpringBootTest(classes = OpenHospitalApiApplication.class,
-	properties = {"labbook.enabled=true"})
+@SpringBootTest(classes = OpenHospitalApiApplication.class, properties = {"labbook.enabled=true", "labbook.oauth.client-id=test-client-id", "labbook.oauth.client-secret=test-client-secret"})
 class TokenServiceTest {
 
 	@MockitoBean
 	private IOauthTokenService oauthTokenService;
 
-	private LabBookProperties.Oauth oauth;
+	@Autowired
+	private LabBookProperties properties;
 
-	@MockitoBean
+	@MockitoSpyBean
 	private TokenService tokenService;
 
 	private OauthTokenResponse tokenResponse;
 
 	@BeforeEach
 	void setUp() {
-		// Create real properties object instead of mocking it
-		LabBookProperties properties = new LabBookProperties();
-		oauth = new LabBookProperties.Oauth();
-		oauth.setClientId("test-client-id");
-		oauth.setClientSecret("test-client-secret");
-		properties.setOauth(oauth);
-
 		tokenResponse = new OauthTokenResponse("test-token", "Bearer", 3600);
 
-		when(oauthTokenService.obtainToken("client_credentials", "test-client-id", "test-client-secret"))
-			.thenReturn(tokenResponse);
+		var auth = properties.getOauth();
+
+		when(oauthTokenService.obtainToken("client_credentials", auth.getClientId(), auth.getClientSecret())).thenReturn(tokenResponse);
 	}
 
 	@Test
@@ -124,10 +120,7 @@ class TokenServiceTest {
 		// Expiration should be now + (3600 - 60) = 3540 seconds from now
 		Instant expectedExpiration = Instant.now().plusSeconds(3540);
 
-		// Access private field via reflection
-		var expirationField = TokenService.class.getDeclaredField("tokenExpiration");
-		expirationField.setAccessible(true);
-		Instant actualExpiration = (Instant) expirationField.get(tokenService);
+		Instant actualExpiration = tokenService.getTokenExpiration();
 
 		// Allow for small time difference in test execution
 		assertThat(actualExpiration).isBeforeOrEqualTo(expectedExpiration.plusSeconds(1));
@@ -140,8 +133,7 @@ class TokenServiceTest {
 		tokenService.getAccessToken();
 
 		// Verify the correct parameters were passed
-		when(oauthTokenService.obtainToken("client_credentials", "test-client-id", "test-client-secret"))
-			.thenReturn(tokenResponse);
+		when(oauthTokenService.obtainToken("client_credentials", "test-client-id", "test-client-secret")).thenReturn(tokenResponse);
 	}
 
 	@Test
@@ -150,7 +142,7 @@ class TokenServiceTest {
 		tokenService.getAccessToken();
 
 		// The mock setup verifies this, but let's be explicit
-		assertThat(oauth.getClientId()).isEqualTo("test-client-id");
-		assertThat(oauth.getClientSecret()).isEqualTo("test-client-secret");
+		assertThat(properties.getOauth().getClientId()).isEqualTo("test-client-id");
+		assertThat(properties.getOauth().getClientSecret()).isEqualTo("test-client-secret");
 	}
 }

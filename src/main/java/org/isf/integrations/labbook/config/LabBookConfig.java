@@ -44,39 +44,39 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @ConditionalOnProperty(name = "labbook.enabled", havingValue = "true")
 public class LabBookConfig {
 
-    /**
-     * RestClient for OAuth token requests (no authentication needed).
-     */
-    @Bean(LabBookBeanNames.OAUTH_REST_CLIENT)
-    public RestClient labbookOauthRestClient(LabBookProperties properties) {
-        return RestClient.builder()
-            .baseUrl(properties.getBaseUrl())
-            .build();
-    }
+	/**
+	 * RestClient for OAuth token requests (no authentication needed).
+	 */
+	@Bean(LabBookBeanNames.OAUTH_REST_CLIENT)
+	public RestClient labbookOauthRestClient(LabBookProperties properties) {
+		return RestClient.builder()
+			.baseUrl(properties.getBaseUrl())
+			.build();
+	}
 
-    /**
-     * HttpExchange proxy for OAuth token service.
-     */
-    @Bean(LabBookBeanNames.OAUTH_TOKEN_SERVICE)
-    public IOauthTokenService oauthTokenService(@Qualifier(LabBookBeanNames.OAUTH_REST_CLIENT) RestClient client) {
-        return HttpServiceProxyFactory.builderFor(
-            RestClientAdapter.create(client)
-        ).build().createClient(IOauthTokenService.class);
-    }
+	/**
+	 * HttpExchange proxy for OAuth token service.
+	 */
+	@Bean(LabBookBeanNames.OAUTH_TOKEN_SERVICE)
+	public IOauthTokenService oauthTokenService(@Qualifier(LabBookBeanNames.OAUTH_REST_CLIENT) RestClient client) {
+		return HttpServiceProxyFactory.builderFor(
+			RestClientAdapter.create(client)
+		).build().createClient(IOauthTokenService.class);
+	}
 
-    /**
-     * Main RestClient for LabBook API calls with automatic token injection.
-     */
-    @Bean(LabBookBeanNames.REST_CLIENT)
-    public RestClient labBookRestClient(LabBookProperties properties,
-            @Qualifier(LabBookBeanNames.TOKEN_SERVICE) ITokenService tokenService) {
-        return RestClient.builder()
-            .baseUrl(properties.getBaseUrl())
-            .requestInterceptor((request, body, execution) -> {
-                String token = tokenService.getAccessToken();
-                request.getHeaders().setBearerAuth(token);
-                return execution.execute(request, body);
-            })
-            .build();
-    }
+	/**
+	 * Main RestClient for LabBook API calls with automatic token injection.
+	 */
+	@Bean(LabBookBeanNames.REST_CLIENT)
+	public RestClient labBookRestClient(LabBookProperties properties,
+										@Qualifier(LabBookBeanNames.TOKEN_SERVICE) ITokenService tokenService) {
+		return RestClient.builder()
+			.baseUrl(properties.getBaseUrl())
+			.requestInterceptor((request, body, execution) -> {
+				String token = tokenService.getAccessToken();
+				request.getHeaders().setBearerAuth(token);
+				return execution.execute(request, body);
+			})
+			.build();
+	}
 }

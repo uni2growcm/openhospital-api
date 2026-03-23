@@ -21,14 +21,14 @@
  */
 package org.isf.integrations.labbook.services;
 
-import java.time.Instant;
-
 import org.isf.integrations.labbook.config.LabBookBeanNames;
 import org.isf.integrations.labbook.config.LabBookProperties;
 import org.isf.integrations.labbook.models.OauthTokenResponse;
 import org.isf.integrations.labbook.ports.IOauthTokenService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 /**
  * Token service implementation with caching and automatic refresh.
@@ -40,34 +40,43 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(name = "labbook.enabled", havingValue = "true")
 public class TokenService implements ITokenService {
 
-    private final IOauthTokenService oauthTokenService;
-    private final LabBookProperties properties;
+	private final IOauthTokenService oauthTokenService;
+	private final LabBookProperties properties;
 
-    private volatile String cachedToken;
-    private volatile Instant tokenExpiration;
+	private volatile String cachedToken;
 
-    public TokenService(IOauthTokenService oauthTokenService, LabBookProperties properties) {
-        this.oauthTokenService = oauthTokenService;
-        this.properties = properties;
-    }
+	private volatile Instant tokenExpiration;
 
-    @Override
-    public String getAccessToken() {
-        if (cachedToken != null && Instant.now().isBefore(tokenExpiration)) {
-            return cachedToken;
-        }
+	public TokenService(IOauthTokenService oauthTokenService, LabBookProperties properties) {
+		this.oauthTokenService = oauthTokenService;
+		this.properties = properties;
+	}
 
-        // Token expired or not cached, fetch new one
-        OauthTokenResponse tokenResponse = oauthTokenService.obtainToken(
-            "client_credentials",
-            properties.getOauth().getClientId(),
-            properties.getOauth().getClientSecret()
-        );
+	@Override
+	public String getAccessToken() {
+		if (cachedToken != null && Instant.now().isBefore(tokenExpiration)) {
+			return cachedToken;
+		}
 
-        cachedToken = tokenResponse.accessToken();
-        // Set expiration to now + expires_in - 60 seconds buffer
-        tokenExpiration = Instant.now().plusSeconds(tokenResponse.expiresIn() - 60);
+		// Token expired or not cached, fetch new one
+		OauthTokenResponse tokenResponse = oauthTokenService.obtainToken(
+			"client_credentials",
+			properties.getOauth().getClientId(),
+			properties.getOauth().getClientSecret()
+		);
 
-        return cachedToken;
-    }
+		cachedToken = tokenResponse.accessToken();
+		// Set expiration to now + expires_in - 60 seconds buffer
+		tokenExpiration = Instant.now().plusSeconds(tokenResponse.expiresIn() - 60);
+
+		return cachedToken;
+	}
+
+	public String getCachedToken() {
+		return cachedToken;
+	}
+
+	public Instant getTokenExpiration() {
+		return tokenExpiration;
+	}
 }

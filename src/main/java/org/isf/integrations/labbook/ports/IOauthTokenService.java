@@ -36,10 +36,10 @@ import org.springframework.web.service.annotation.PostExchange;
 
 @HttpExchange
 public interface IOauthTokenService {
-    @PostExchange(url = "/services/oauth/token", contentType = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    OauthTokenResponse obtainToken(
-        @RequestParam("grant_type") String grantType,
-        @RequestParam("client_id") String clientId,
-        @RequestParam("client_secret") String clientSecret
-    );
+	@PostExchange(url = "/services/oauth/token", contentType = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	OauthTokenResponse obtainToken(
+		@RequestParam("grant_type") String grantType,
+		@RequestParam("client_id") String clientId,
+		@RequestParam("client_secret") String clientSecret
+	);
 }

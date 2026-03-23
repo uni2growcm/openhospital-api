@@ -30,7 +30,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Steve Tsala
  */
 public record OauthTokenResponse(
-    @JsonProperty("access_token") String accessToken,
-    @JsonProperty("token_type") String tokenType,
-    @JsonProperty("expires_in") long expiresIn
-) {}
+	@JsonProperty("access_token") String accessToken,
+	@JsonProperty("token_type") String tokenType,
+	@JsonProperty("expires_in") long expiresIn
+) {
+}

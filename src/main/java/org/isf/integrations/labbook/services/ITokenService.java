@@ -28,11 +28,11 @@ package org.isf.integrations.labbook.services;
  * @author Steve Tsala
  */
 public interface ITokenService {
-    /**
-     * Returns a valid access token for LabBook API calls.
-     * Automatically refreshes the token if expired.
-     *
-     * @return valid OAuth access token
-     */
-    String getAccessToken();
+	/**
+	 * Returns a valid access token for LabBook API calls.
+	 * Automatically refreshes the token if expired.
+	 *
+	 * @return valid OAuth access token
+	 */
+	String getAccessToken();
 }

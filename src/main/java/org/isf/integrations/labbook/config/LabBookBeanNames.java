@@ -25,14 +25,14 @@ package org.isf.integrations.labbook.config;
  * Constants for bean names used in the LabBook integration.
  * Used to avoid hardcoded bean names scattered across annotations.
  *
- *  @author Steve Tsala
+ * @author Steve Tsala
  */
 public final class LabBookBeanNames {
-    private LabBookBeanNames() {}
-
-    public static final String LABBOOK_PROPERTIES   = "labBookProperties";
-    public static final String OAUTH_REST_CLIENT   = "labbookOauthRestClient";
-    public static final String OAUTH_TOKEN_SERVICE = "labbookOauthTokenService";
-    public static final String TOKEN_SERVICE       = "labbookTokenService";
-    public static final String REST_CLIENT         = "labbookRestClient";
+	public static final String LABBOOK_PROPERTIES = "labBookProperties";
+	public static final String OAUTH_REST_CLIENT = "labbookOauthRestClient";
+	public static final String OAUTH_TOKEN_SERVICE = "labbookOauthTokenService";
+	public static final String TOKEN_SERVICE = "labbookTokenService";
+	public static final String REST_CLIENT = "labbookRestClient";
+	private LabBookBeanNames() {
+	}
 }
