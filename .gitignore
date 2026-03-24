@@ -4,6 +4,7 @@ HELP.md
 !.mvn/wrapper/maven-wrapper.jar
 /oh-rest-api.log.*.gz
 logs/
+LOG_DEST
 bin
 *.log
 /static
