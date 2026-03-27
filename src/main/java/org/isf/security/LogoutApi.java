@@ -21,13 +21,12 @@
  */
 package org.isf.security;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Here only for swagger
@@ -39,13 +38,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Login")
 public class LogoutApi {
 
-    /**
-     * Implemented by Spring Security
-     */
-    @Operation(method = "Logout", description = "Logout the current user.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
-    @PostMapping(value = "/auth/logout")
-    void logout() {
-        throw new IllegalStateException("Add Spring Security to handle authentication");
-    }
+	/**
+	 * Implemented by Spring Security
+	 */
+	@Operation(method = "Logout", description = "Logout the current user.")
+	@ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
+	@PostMapping(value = "/auth/logout")
+	void logout() {
+		throw new IllegalStateException("Add Spring Security to handle authentication");
+	}
 }

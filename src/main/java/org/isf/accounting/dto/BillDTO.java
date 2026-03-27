@@ -21,13 +21,11 @@
  */
 package org.isf.accounting.dto;
 
-import java.time.LocalDateTime;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-
 import org.isf.patient.dto.PatientDTO;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 
 @Schema(description = "Class representing a bill")
 public class BillDTO {
@@ -85,100 +83,100 @@ public class BillDTO {
 		return this.id;
 	}
 
-	public PatientDTO getPatient() {
-		return this.patient;
-	}
-
-	public Integer getListId() {
-		return this.listId;
-	}
-
-	public LocalDateTime getDate() {
-		return this.date;
-	}
-
-	public LocalDateTime getUpdate() {
-		return this.update;
-	}
-
-	public boolean isList() {
-		return this.isList;
-	}
-
-	public String getListName() {
-		return this.listName;
-	}
-
-	public boolean isPatientTrue() {
-		return this.patientTrue;
-	}
-
-	public String getPatName() {
-		return this.patName;
-	}
-
-	public String getStatus() {
-		return this.status;
-	}
-
-	public Double getAmount() {
-		return this.amount;
-	}
-
-	public Double getBalance() {
-		return this.balance;
-	}
-
-	public String getUser() {
-		return this.user;
-	}
-
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public PatientDTO getPatient() {
+		return this.patient;
 	}
 
 	public void setPatient(PatientDTO patient) {
 		this.patient = patient;
 	}
 
+	public Integer getListId() {
+		return this.listId;
+	}
+
 	public void setListId(Integer listId) {
 		this.listId = listId;
+	}
+
+	public LocalDateTime getDate() {
+		return this.date;
 	}
 
 	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
 
+	public LocalDateTime getUpdate() {
+		return this.update;
+	}
+
 	public void setUpdate(LocalDateTime update) {
 		this.update = update;
+	}
+
+	public boolean isList() {
+		return this.isList;
 	}
 
 	public void setList(boolean isList) {
 		this.isList = isList;
 	}
 
+	public String getListName() {
+		return this.listName;
+	}
+
 	public void setListName(String listName) {
 		this.listName = listName;
+	}
+
+	public boolean isPatientTrue() {
+		return this.patientTrue;
 	}
 
 	public void setPatientTrue(boolean isPatientBill) {
 		this.patientTrue = isPatientBill;
 	}
 
+	public String getPatName() {
+		return this.patName;
+	}
+
 	public void setPatName(String patName) {
 		this.patName = patName;
+	}
+
+	public String getStatus() {
+		return this.status;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
+	public Double getAmount() {
+		return this.amount;
+	}
+
 	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 
+	public Double getBalance() {
+		return this.balance;
+	}
+
 	public void setBalance(Double balance) {
 		this.balance = balance;
+	}
+
+	public String getUser() {
+		return this.user;
 	}
 
 	public void setUser(String user) {

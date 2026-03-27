@@ -21,10 +21,9 @@
  */
 package org.isf.distype.rest;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.distype.dto.DiseaseTypeDTO;
 import org.isf.distype.manager.DiseaseTypeBrowserManager;
 import org.isf.distype.mapper.DiseaseTypeMapper;
@@ -34,18 +33,9 @@ import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 
 @RestController
 @Tag(name = "Disease Types")
@@ -64,6 +54,7 @@ public class DiseaseTypeController {
 
 	/**
 	 * Returns all the stored {@link DiseaseType}s.
+	 *
 	 * @return a list of disease type.
 	 * @throws OHServiceException When failed to get disease type
 	 */
@@ -74,6 +65,7 @@ public class DiseaseTypeController {
 
 	/**
 	 * Create a new {@link DiseaseType}.
+	 *
 	 * @param diseaseTypeDTO Disease type payload
 	 * @return the disease type created
 	 * @throws OHServiceException - in case of duplicated code or in case of error
@@ -97,6 +89,7 @@ public class DiseaseTypeController {
 
 	/**
 	 * Updates the specified {@link DiseaseType}.
+	 *
 	 * @param diseaseTypeDTO - the disease type to update.
 	 * @return the updated disease type
 	 * @throws OHServiceException When failed to update disease type
@@ -117,6 +110,7 @@ public class DiseaseTypeController {
 
 	/**
 	 * Deletes the specified {@link DiseaseType}.
+	 *
 	 * @param code - the code of the disease type to remove.
 	 * @return {@code true} if the disease has been removed, {@code false} otherwise.
 	 * @throws OHServiceException When failed to delete disease type

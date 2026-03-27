@@ -31,18 +31,18 @@ import org.modelmapper.module.jsr310.Jsr310Module;
  */
 public class OHModelMapper {
 
-    private static ModelMapper modelMapper;
+	private static ModelMapper modelMapper;
 
-    private static ModelMapper getInstance() {
-        modelMapper = new ModelMapper();
-        modelMapper.addConverter(new BlobToByteArrayConverter());
-        modelMapper.addConverter(new ByteArrayToBlobConverter());
-        modelMapper.registerModule(new Jsr310Module());
-        return modelMapper;
-    }
+	private static ModelMapper getInstance() {
+		modelMapper = new ModelMapper();
+		modelMapper.addConverter(new BlobToByteArrayConverter());
+		modelMapper.addConverter(new ByteArrayToBlobConverter());
+		modelMapper.registerModule(new Jsr310Module());
+		return modelMapper;
+	}
 
-    public static ModelMapper getObjectMapper() {
-        return modelMapper == null ? getInstance() : modelMapper;
-    }
+	public static ModelMapper getObjectMapper() {
+		return modelMapper == null ? getInstance() : modelMapper;
+	}
 
 }

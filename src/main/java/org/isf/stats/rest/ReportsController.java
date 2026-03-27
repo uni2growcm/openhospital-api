@@ -21,13 +21,9 @@
  */
 package org.isf.stats.rest;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import org.apache.poi.util.IOUtils;
@@ -54,8 +50,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @Tag(name = "Reports")
@@ -63,11 +61,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ReportsController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ReportsController.class);
 	private final JasperReportsManager reportsManager;
 	private final ExaminationBrowserManager examinationBrowserManager;
 	private final PatientBrowserManager patientBrowserManager;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ReportsController.class);
 
 	public ReportsController(JasperReportsManager reportsManager, ExaminationBrowserManager examinationBrowserManager, PatientBrowserManager patientBrowserManager) {
 		this.reportsManager = reportsManager;

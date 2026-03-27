@@ -21,9 +21,9 @@
  */
 package org.isf.lab.dto;
 
-import java.time.LocalDateTime;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.LocalDateTime;
 
 public class LaboratoryForPrintDTO {
 
@@ -49,16 +49,24 @@ public class LaboratoryForPrintDTO {
 		return this.exam;
 	}
 
+	public void setExam(String exam) {
+		this.exam = exam;
+	}
+
 	public String getResult() {
 		return this.result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
 	}
 
 	public Integer getCode() {
 		return this.code;
 	}
 
-	public void setExam(String exam) {
-		this.exam = exam;
+	public void setCode(Integer code) {
+		this.code = code;
 	}
 
 	public LocalDateTime getDate() {
@@ -67,14 +75,6 @@ public class LaboratoryForPrintDTO {
 
 	public void setDate(LocalDateTime date) {
 		this.date = date;
-	}
-
-	public void setResult(String result) {
-		this.result = result;
-	}
-
-	public void setCode(Integer code) {
-		this.code = code;
 	}
 
 	public String getPatName() {

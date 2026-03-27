@@ -21,21 +21,21 @@
  */
 package org.isf.usergroups.data;
 
-import java.util.List;
-
-import org.isf.menu.TestUserGroup;
-import org.isf.menu.model.UserGroup;
-import org.isf.usergroups.dto.UserGroupDTO;
-import org.isf.utils.exception.OHException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.isf.menu.TestUserGroup;
+import org.isf.menu.model.UserGroup;
+import org.isf.usergroups.dto.UserGroupDTO;
+import org.isf.utils.exception.OHException;
+
+import java.util.List;
 
 /**
  * Helper class to generate DTOs and Entities for users endpoints test
+ *
  * @author Silevester D.
  * @since 1.15
  */
@@ -48,10 +48,10 @@ public class UserGroupHelper {
 	public static String asJsonString(UserGroupDTO userGroupDTO) {
 		try {
 			return new ObjectMapper()
-							.registerModule(new ParameterNamesModule())
-							.registerModule(new Jdk8Module())
-							.registerModule(new JavaTimeModule())
-							.writeValueAsString(userGroupDTO);
+				.registerModule(new ParameterNamesModule())
+				.registerModule(new Jdk8Module())
+				.registerModule(new JavaTimeModule())
+				.writeValueAsString(userGroupDTO);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -62,10 +62,10 @@ public class UserGroupHelper {
 	public static String asJsonString(List<UserGroupDTO> userGroupDTOs) {
 		try {
 			return new ObjectMapper()
-							.registerModule(new ParameterNamesModule())
-							.registerModule(new Jdk8Module())
-							.registerModule(new JavaTimeModule())
-							.writeValueAsString(userGroupDTOs);
+				.registerModule(new ParameterNamesModule())
+				.registerModule(new Jdk8Module())
+				.registerModule(new JavaTimeModule())
+				.writeValueAsString(userGroupDTOs);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}

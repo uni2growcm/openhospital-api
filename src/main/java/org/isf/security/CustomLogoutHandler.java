@@ -21,13 +21,9 @@
  */
 package org.isf.security;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import org.isf.sessionaudit.manager.SessionAuditManager;
 import org.isf.sessionaudit.model.SessionAudit;
 import org.isf.utils.exception.OHServiceException;
@@ -40,16 +36,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Service
 public class CustomLogoutHandler implements LogoutHandler {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(CustomLogoutHandler.class);
 	@Autowired
 	private HttpSession httpSession;
-
 	@Autowired
 	private SessionAuditManager sessionAuditManager;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(CustomLogoutHandler.class);
 
 	@Override
 	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {

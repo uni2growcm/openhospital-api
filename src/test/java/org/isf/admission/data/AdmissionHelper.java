@@ -21,10 +21,11 @@
  */
 package org.isf.admission.data;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.isf.admission.TestAdmission;
 import org.isf.admission.dto.AdmissionDTO;
 import org.isf.admission.mapper.AdmissionMapper;
@@ -49,11 +50,9 @@ import org.isf.utils.exception.OHException;
 import org.isf.ward.TestWard;
 import org.isf.ward.model.Ward;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class AdmissionHelper {
 
@@ -84,21 +83,21 @@ public class AdmissionHelper {
 		DeliveryResultType deliveryResult = null;
 
 		return testAdmission.setup(ward, patient, admissionType, diseaseIn, diseaseOut1, diseaseOut2, diseaseOut3, operation, dischargeType, pregTreatmentType,
-				deliveryType, deliveryResult, false);
+			deliveryType, deliveryResult, false);
 	}
 
 	public static List<Admission> setupAdmissionList(int size) {
 		return IntStream.range(1, size + 1)
-				.mapToObj(i -> {
-							Admission ep = null;
-							try {
-								ep = AdmissionHelper.setup();
-							} catch (OHException e) {
-								e.printStackTrace();
-							}
-							return ep;
-						}
-				).collect(Collectors.toList());
+			.mapToObj(i -> {
+					Admission ep = null;
+					try {
+						ep = AdmissionHelper.setup();
+					} catch (OHException e) {
+						e.printStackTrace();
+					}
+					return ep;
+				}
+			).collect(Collectors.toList());
 	}
 
 	public static String asJsonString(AdmissionDTO admissionDTO) {
@@ -109,7 +108,7 @@ public class AdmissionHelper {
 		}
 		return null;
 	}
-	
+
 	public static String asJsonString(List<?> list) {
 		try {
 			return getObjectMapper().writeValueAsString(list);
@@ -126,9 +125,9 @@ public class AdmissionHelper {
 	public static ObjectMapper getObjectMapper() {
 		if (objectMapper == null) {
 			objectMapper = new ObjectMapper()
-					.registerModule(new ParameterNamesModule())
-					.registerModule(new Jdk8Module())
-					.registerModule(new JavaTimeModule());
+				.registerModule(new ParameterNamesModule())
+				.registerModule(new Jdk8Module())
+				.registerModule(new JavaTimeModule());
 		}
 		return objectMapper;
 	}

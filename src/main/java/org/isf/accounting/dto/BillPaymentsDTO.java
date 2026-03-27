@@ -21,12 +21,11 @@
  */
 package org.isf.accounting.dto;
 
-import java.time.LocalDateTime;
-
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
 
 @Schema(description = "Class representing a billPayment")
 public class BillPaymentsDTO {
@@ -55,45 +54,45 @@ public class BillPaymentsDTO {
 		return this.id;
 	}
 
-	public Integer getBillId() {
-		return this.billId;
-	}
-
-	public LocalDateTime getDate() {
-		return this.date;
-	}
-
-	public double getAmount() {
-		return this.amount;
-	}
-
-	public String getUser() {
-		return this.user;
-	}
-
-	@Schema(accessMode = AccessMode.READ_ONLY)
-	public int getHashCode() {
-		return hashCode;
-	}
-
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Integer getBillId() {
+		return this.billId;
 	}
 
 	public void setBillId(Integer billId) {
 		this.billId = billId;
 	}
 
+	public LocalDateTime getDate() {
+		return this.date;
+	}
+
 	public void setDate(LocalDateTime date) {
 		this.date = date;
+	}
+
+	public double getAmount() {
+		return this.amount;
 	}
 
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 
+	public String getUser() {
+		return this.user;
+	}
+
 	public void setUser(String user) {
 		this.user = user;
+	}
+
+	@Schema(accessMode = AccessMode.READ_ONLY)
+	public int getHashCode() {
+		return hashCode;
 	}
 
 	public void setHashCode(int hashCode) {

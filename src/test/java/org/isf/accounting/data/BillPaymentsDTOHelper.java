@@ -21,10 +21,7 @@
  */
 package org.isf.accounting.data;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.isf.accounting.TestBillPayments;
 import org.isf.accounting.dto.BillPaymentsDTO;
 import org.isf.accounting.mapper.BillPaymentsMapper;
@@ -32,7 +29,9 @@ import org.isf.accounting.model.Bill;
 import org.isf.accounting.model.BillPayments;
 import org.isf.utils.exception.OHException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class BillPaymentsDTOHelper {
 
@@ -67,14 +66,14 @@ public class BillPaymentsDTOHelper {
 
 	public static List<BillPaymentsDTO> genList(int n, BillPaymentsMapper billPaymentsMapper) throws OHException {
 		return IntStream.range(0, n)
-				.mapToObj(i -> {
-					try {
-						return BillPaymentsDTOHelper.setup(billPaymentsMapper);
-					} catch (OHException e) {
-						e.printStackTrace();
-					}
-					return null;
-				}).collect(Collectors.toList());
+			.mapToObj(i -> {
+				try {
+					return BillPaymentsDTOHelper.setup(billPaymentsMapper);
+				} catch (OHException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}).collect(Collectors.toList());
 	}
 
 	public static List<BillPayments> genListModel(int n, BillPaymentsMapper billPaymentsMapper) throws OHException {

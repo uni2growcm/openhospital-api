@@ -21,11 +21,10 @@
  */
 package org.isf.pricesothers.dto;
 
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Class representing a price others")
 public class PricesOthersDTO {
@@ -63,72 +62,72 @@ public class PricesOthersDTO {
 		return hashCode;
 	}
 
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
+	}
+
 	public int getId() {
 		return this.id;
-	}
-
-	public String getCode() {
-		return this.code;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public boolean isOpdInclude() {
-		return this.opdInclude;
-	}
-
-	public boolean isIpdInclude() {
-		return this.ipdInclude;
-	}
-
-	public boolean isDaily() {
-		return this.daily;
-	}
-
-	public boolean isDischarge() {
-		return this.discharge;
-	}
-
-	public boolean isUndefined() {
-		return this.undefined;
 	}
 
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	public String getCode() {
+		return this.code;
+	}
+
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	public boolean isOpdInclude() {
+		return this.opdInclude;
+	}
+
 	public void setOpdInclude(boolean opdInclude) {
 		this.opdInclude = opdInclude;
+	}
+
+	public boolean isIpdInclude() {
+		return this.ipdInclude;
 	}
 
 	public void setIpdInclude(boolean ipdInclude) {
 		this.ipdInclude = ipdInclude;
 	}
 
+	public boolean isDaily() {
+		return this.daily;
+	}
+
 	public void setDaily(boolean daily) {
 		this.daily = daily;
+	}
+
+	public boolean isDischarge() {
+		return this.discharge;
 	}
 
 	public void setDischarge(boolean discharge) {
 		this.discharge = discharge;
 	}
 
-	public void setUndefined(boolean undefined) {
-		this.undefined = undefined;
+	public boolean isUndefined() {
+		return this.undefined;
 	}
 
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
+	public void setUndefined(boolean undefined) {
+		this.undefined = undefined;
 	}
 
 	public int getLock() {
