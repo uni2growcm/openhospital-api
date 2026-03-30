@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Type-safe binding of the {@code plugins} namespace from {@code plugins.yaml}.
  *
- * <p>Activated by {@link PluginsYamlConfig} via {@code @EnableConfigurationProperties}.
+ * <p>Activated by {@link PluginsConfig} via {@code @EnableConfigurationProperties}.
  *
  * <p>Example {@code plugins.yaml}:</p>
  * <pre>{@code

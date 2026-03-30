@@ -1,0 +1,18 @@
+{
+	"plugins": [
+		{
+			"label": "Smart Doc",
+			"path": "smart-doc",
+			"file": "mf-manifest.json",
+			"cssUrl": "assets/style.css",
+			"type": "module"
+		},
+		{
+			"label": "NXGT",
+			"path": "mfe-remote-demo",
+			"file": "mf-manifest.json",
+			"cssUrl": "assets/style.css",
+			"type": "module"
+		}
+	]
+}
