@@ -332,6 +332,9 @@ public class SecurityConfig {
 
 				// Assets
 				.requestMatchers("/assets/**").permitAll()
+				// Plugins
+				.requestMatchers(HttpMethod.GET, "/plugins").permitAll()
+
 				.anyRequest().authenticated()
 
 			)
