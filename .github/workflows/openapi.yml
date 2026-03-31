@@ -49,7 +49,7 @@ jobs:
                 echo "Branch $BRANCH_NAME exists in $FORK_REPO."
               else
                 # Fallback to the main repository if the branch doesn’t exist in the fork
-                FORK_REPO="informatici/openhospital-core"
+                # FORK_REPO="informatici/openhospital-core"
               fi
             fi
           fi
