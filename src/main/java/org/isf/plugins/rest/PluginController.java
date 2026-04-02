@@ -51,47 +51,6 @@ import java.util.Collection;
 /**
  * Controller for all {@code /plugins} routes.
  *
- * <h3>Endpoints</h3>
- * <ul>
- *   <li>{@code GET /plugins} — lists every plugin registered and healthy at startup.</li>
- *   <li>{@code ANY /plugins/{id}/**} — gateway that proxies a request to the upstream
- *       plugin identified by {@code id}.</li>
- * </ul>
- *
- * <h3>Proxy request lifecycle</h3>
- * <ol>
- *   <li><strong>Resolve plugin</strong> — looks up {@code pluginId} in the
- *       {@link IPluginRegistry}; returns {@code 404} if not found or unhealthy at startup.</li>
- *   <li><strong>Authorize</strong> — delegates to {@link IPluginAuthorizationChecker} to verify
- *       the authenticated user holds at least one required privilege; returns {@code 403}
- *       on failure.</li>
- *   <li><strong>Extract sub-path</strong> — strips the {@code /plugins/{id}} prefix from
- *       the request URI to obtain the upstream path segment.</li>
- *   <li><strong>Forward</strong> — proxies the full request (method, headers, body, query
- *       string) to the plugin via {@link IPluginRequestForwarder}, adding {@code X-User} and
- *       {@code X-Permissions} identity headers.</li>
- *   <li><strong>Return</strong> — the upstream response (status, headers, body) is returned
- *       to the client unmodified.</li>
- * </ol>
- *
- * <h3>Route examples</h3>
- * <pre>
- *   GET /plugins
- *       → [ { "id": "smart-doc", "url": "...", ... }, ... ]
- *
- *   GET /plugins/smart-doc/document-types
- *       → GET http://localhost:8042/api/document-types
- *
- *   POST /plugins/smart-doc/documents?personId=123&type=RX
- *       → POST http://localhost:8042/api/documents?personId=123&type=RX
- * </pre>
- *
- * <h3>Security</h3>
- * All plugin routes fall under the existing {@code .anyRequest().authenticated()} rule in
- * {@link org.isf.config.SecurityConfig} — the {@code JWTFilter} validates the bearer token
- * before this controller is reached. Plugin-specific permission checks are performed inside
- * this controller via {@link IPluginAuthorizationChecker}.
- *
  * @author Steve Tsala
  */
 @RestController
@@ -113,10 +72,6 @@ public class PluginController {
 		this.requestForwarder = requestForwarder;
 		this.authenticationSupplier = authenticationSupplier;
 	}
-
-	// -------------------------------------------------------------------------
-	// GET /plugins — list all registered plugins
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Reads the raw request body, bypassing any servlet wrapper layers.
@@ -141,27 +96,19 @@ public class PluginController {
 		return target.getInputStream().readAllBytes();
 	}
 
-	// -------------------------------------------------------------------------
-	// ANY /plugins/{id}/** — proxy handler
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Returns the full list of plugins that are registered and healthy.
 	 * Any authenticated user may call this endpoint.
 	 *
 	 * @return {@code 200 OK} with a JSON array of {@link PluginDefinition}
 	 */
-	@GetMapping
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "List all registered plugins",
 		description = "Returns all plugins that passed the startup health check and are currently available through the gateway.")
 	@ApiResponse(responseCode = "200", description = "Plugin list returned successfully")
 	public Collection<PluginDefinition> listPlugins() {
 		return pluginRegistry.all();
 	}
-
-	// -------------------------------------------------------------------------
-	// Exception handlers (controller-scoped, highest precedence for plugin errors)
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Catch-all handler for every HTTP method under {@code /plugins/{id}/**}.
@@ -212,10 +159,6 @@ public class PluginController {
 		LOGGER.warn("Plugin access denied: {}", ex.getMessage());
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.APPLICATION_JSON).body(new PluginErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage()));
 	}
-
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
 
 	@ExceptionHandler(RestClientResponseException.class)
 	public ResponseEntity<byte[]> handleUpstreamError(RestClientResponseException ex) {
