@@ -6,7 +6,7 @@ public record PluginBundle(
 	@NotNull String label,
 	@NotNull String manifest,
 	@NotNull String type,
-	@NotNull String location,
+	@NotNull PluginLocation location,
 	String styles
 ) {
 }

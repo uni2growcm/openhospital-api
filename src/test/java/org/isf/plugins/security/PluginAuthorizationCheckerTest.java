@@ -55,7 +55,7 @@ class PluginAuthorizationCheckerTest {
 	 */
 	private final Map<String, String> userRoles = new HashMap<>();
 
-	private static final PluginBundle PLUGIN_BUNDLE = new PluginBundle("Smart Doc", "mf-manifest.json", "module", "main", "assets/styles.css");
+	private static final PluginBundle PLUGIN_BUNDLE = new PluginBundle("Smart Doc", "mf-manifest.json", "module", PluginLocation.MAIN, "assets/styles.css");
 
 	private IPluginAuthorizationChecker checker;
 

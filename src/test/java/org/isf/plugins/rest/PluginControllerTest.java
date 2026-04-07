@@ -61,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PluginControllerTest {
 
 
-	private static final PluginBundle PLUGIN_BUNDLE = new PluginBundle("Smart Doc", "mf-manifest.json", "module", "main", "assets/styles.css");
+	private static final PluginBundle PLUGIN_BUNDLE = new PluginBundle("Smart Doc", "mf-manifest.json", "module", PluginLocation.MAIN, "assets/styles.css");
 
 	/**
 	 * A plugin definition with admin-only GET/POST/DELETE on /documents.
