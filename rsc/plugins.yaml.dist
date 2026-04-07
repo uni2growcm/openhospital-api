@@ -42,7 +42,7 @@ plugins:
         bundle:
           label: Smart Doc
           manifest: mf-manifest.json
-          styles: assets/styles.css
+          styles: assets/style.css
           type: module
           location: main
         permissions:

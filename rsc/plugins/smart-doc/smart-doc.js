@@ -1,18 +1,23 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/index-JdM9gL9A.js","assets/smart_mf_2_doc__loadShare__react__loadShare__.mjs_commonjs-proxy-CEJIZLYi.js","assets/smart_mf_2_doc__loadShare__react__loadShare__.mjs-BkoayUfL.js","assets/runtimeInit-CEsLEwNP.js","assets/index-BxNQRtV4.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/index-DKED6x3r.js","assets/smart_mf_2_doc__loadShare__react__loadShare__.mjs_commonjs-proxy-COy7YPAX.js","assets/smart_mf_2_doc__loadShare__react__loadShare__.mjs-DmYY4-fW.js","assets/runtimeInit-CEsLEwNP.js","assets/index-h4knIJhJ.js","assets/index-olZPlFFL.js"])))=>i.map(i=>d[i]);
 import { i as init_1 } from './assets/index.cjs-C_kOjFta.js';
-import exposesMap from './assets/virtualExposes-rEA4reEJ.js';
+import exposesMap from './assets/virtualExposes--h0-h7GL.js';
 import { _ as __vitePreload } from './assets/preload-helper-BgB2ycR-.js';
 import { a as initResolve } from './assets/runtimeInit-CEsLEwNP.js';
 
 const importMap = {
       
         "react": async () => {
-          let pkg = await __vitePreload(() => import('./assets/index-JdM9gL9A.js').then(n => n.i),true              ?__vite__mapDeps([0,1,2,3]):void 0);
+          let pkg = await __vitePreload(() => import('./assets/index-DKED6x3r.js').then(n => n.i),true              ?__vite__mapDeps([0,1,2,3]):void 0);
             return pkg;
         }
       ,
         "react-dom": async () => {
-          let pkg = await __vitePreload(() => import('./assets/index-BxNQRtV4.js').then(n => n.i),true              ?__vite__mapDeps([4,1,2,3]):void 0);
+          let pkg = await __vitePreload(() => import('./assets/index-h4knIJhJ.js').then(n => n.i),true              ?__vite__mapDeps([4,1,2,3]):void 0);
+            return pkg;
+        }
+      ,
+        "react-router": async () => {
+          let pkg = await __vitePreload(() => import('./assets/index-olZPlFFL.js'),true              ?__vite__mapDeps([5,2,3]):void 0);
             return pkg;
         }
       
@@ -69,6 +74,33 @@ const importMap = {
             shareConfig: {
               singleton: true,
               requiredVersion: "^19.2.4",
+              
+            }
+          }
+        ,
+          "react-router": {
+            name: "react-router",
+            version: "7.13.1",
+            scope: ["default"],
+            loaded: false,
+            from: "smart-doc",
+            async get () {
+              usedShared["react-router"].loaded = true;
+              const {"react-router": pkgDynamicImport} = importMap;
+              const res = await pkgDynamicImport();
+              const exportModule = {...res};
+              // All npm packages pre-built by vite will be converted to esm
+              Object.defineProperty(exportModule, "__esModule", {
+                value: true,
+                enumerable: false
+              });
+              return function () {
+                return exportModule
+              }
+            },
+            shareConfig: {
+              singleton: true,
+              requiredVersion: "^7.12.0",
               
             }
           }
