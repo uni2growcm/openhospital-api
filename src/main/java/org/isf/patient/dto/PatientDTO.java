@@ -36,6 +36,9 @@ public class PatientDTO {
 	@Schema(description = "Code of the Patient", example = "1")
 	private Integer code;
 
+	@Schema(description = "Code of the Patient in labBook software", example = "1")
+	private Integer labBookId;
+
 	@NotNull
 	@Schema(description = "First name of the patient", example = "Mario", maxLength = 50)
 	private String firstName;
@@ -249,6 +252,8 @@ public class PatientDTO {
 		return this.taxCode;
 	}
 
+	public Integer getLabBookId() { return this.labBookId; }
+
 	public void setCode(Integer code) {
 		this.code = code;
 	}
@@ -332,6 +337,8 @@ public class PatientDTO {
 	public void setHashCode(int hashCode) {
 		this.hashCode = hashCode;
 	}
+
+	public void setLabBookId(Integer labBookId) { this.labBookId = labBookId; }
 
 	public PatientSTATUS getStatus() {
 		return status;
