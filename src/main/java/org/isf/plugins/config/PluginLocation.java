@@ -1,7 +1,9 @@
 package org.isf.plugins.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum PluginLocation {
-	MAIN("main"), PATIENT("patient");
+	@JsonProperty("main") MAIN("main"), @JsonProperty("patient") PATIENT("patient");
 	final String value;
 
 	PluginLocation(String value) {
