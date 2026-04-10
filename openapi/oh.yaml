@@ -5410,9 +5410,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PatientAnalysisResponse"
+                $ref: "#/components/schemas/PatientHistoricResponse"
       security:
       - bearerAuth: []
   /hospitals:
@@ -8905,7 +8903,7 @@ components:
             $ref: "#/components/schemas/LabWithRowsDTO"
         pageInfo:
           $ref: "#/components/schemas/PageInfoDTO"
-    PatientAnalysisResponse:
+    AnalysisResponse:
       type: object
       properties:
         id_rec:
@@ -8923,6 +8921,85 @@ components:
           type: string
         result:
           type: string
+    LabbookRawPatient:
+      type: object
+      properties:
+        id_data:
+          type: integer
+          format: int32
+        id_user:
+          type: integer
+          format: int32
+        pat_ano:
+          type: integer
+          format: int32
+        pat_code:
+          type: string
+        pat_code_lab:
+          type: string
+        pat_name:
+          type: string
+        pat_firstname:
+          type: string
+        pat_birth:
+          type: string
+          format: date
+        pat_sex:
+          type: integer
+          format: int32
+        pat_address:
+          type: string
+        pat_zipcode:
+          type: string
+        pat_city:
+          type: string
+        pat_phone1:
+          type: string
+        pat_phone2:
+          type: string
+        pat_profession:
+          type: string
+        pat_maiden:
+          type: string
+        pat_district:
+          type: string
+        pat_pbox:
+          type: string
+        pat_birth_approx:
+          type: integer
+          format: int32
+        pat_age:
+          type: integer
+          format: int32
+        pat_age_unit:
+          type: integer
+          format: int32
+        pat_email:
+          type: string
+        pat_agreement:
+          type: string
+        pat_midname:
+          type: string
+        pat_nationality:
+          type: integer
+          format: int32
+        pat_resident:
+          type: string
+        pat_blood_group:
+          type: integer
+          format: int32
+        pat_blood_rhesus:
+          type: integer
+          format: int32
+    PatientHistoricResponse:
+      type: object
+      properties:
+        patient:
+          $ref: "#/components/schemas/LabbookRawPatient"
+        analyzes:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalysisResponse"
     PagePatientExaminationDTO:
       type: object
       properties:
