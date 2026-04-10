@@ -3055,6 +3055,27 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
+  /labbook/reports/grouped/download:
+    post:
+      tags:
+      - Labbook
+      operationId: generateReportGrouped
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportGroupedRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
   /examtypes:
     get:
       tags:
@@ -8517,6 +8538,16 @@ components:
       - quantity
       - units
       - ward
+    ReportGroupedRequest:
+      type: object
+      properties:
+        l_id_rec_vld:
+          type: array
+          items:
+            type: integer
+            format: int32
+        filename:
+          type: string
     ExamRowDTO:
       type: object
       properties:
