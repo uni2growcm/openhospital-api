@@ -5371,6 +5371,29 @@ paths:
                   $ref: "#/components/schemas/LabWithRowsDTO"
       security:
       - bearerAuth: []
+  /labbook/patients/{id}/analysis:
+    get:
+      tags:
+      - Labbook
+      operationId: getPatientAnalysis
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PatientAnalysisResponse"
+      security:
+      - bearerAuth: []
   /hospitals:
     get:
       tags:
@@ -8846,6 +8869,24 @@ components:
             $ref: "#/components/schemas/LabWithRowsDTO"
         pageInfo:
           $ref: "#/components/schemas/PageInfoDTO"
+    PatientAnalysisResponse:
+      type: object
+      properties:
+        id_rec:
+          type: integer
+          format: int32
+        type_rec:
+          type: string
+        date_prescr:
+          type: string
+        analysis:
+          type: string
+        rec_num:
+          type: string
+        variable:
+          type: string
+        result:
+          type: string
     PagePatientExaminationDTO:
       type: object
       properties:
