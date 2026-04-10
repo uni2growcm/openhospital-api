@@ -15,17 +15,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Tag(name = "Labbook")
 @SecurityRequirement(name = "bearerAuth")
-@RequestMapping
-public class ReportController {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ReportController.class);
+@RequestMapping("/labbook/reports")
+public class LabbookReportController {
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabbookReportController.class);
 
 	private final ReportSyncService reportSyncService;
 
-	public ReportController(ReportSyncService reportSyncService) {
+	public LabbookReportController(ReportSyncService reportSyncService) {
 		this.reportSyncService = reportSyncService;
 	}
 
-	@PostMapping("/labbook/reports/grouped/download")
+	@PostMapping("/grouped/download")
 	public ResponseEntity<byte[]> generateReportGrouped(@RequestBody ReportGroupedRequest request) throws OHException {
 		LOGGER.info("Received request for grouped report download");
 		byte[] pdfContent = reportSyncService.generateReportGrouped(request);
