@@ -9,7 +9,7 @@ info:
     url: https://github.com/informatici/openhospital-api?tab=GPL-3.0-1-ov-file#readme
   version: 0.1.0
 servers:
-- url: http://API_HOST:API_PORT
+- url: http://localhost:8080
 security:
 - bearerAuth: []
 paths:
@@ -3053,6 +3053,27 @@ paths:
             application/json:
               schema:
                 type: boolean
+      security:
+      - bearerAuth: []
+  /labbook/reports/grouped/download:
+    post:
+      tags:
+      - Labbook
+      operationId: generateReportGrouped
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportGroupedRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
       security:
       - bearerAuth: []
   /examtypes:
@@ -6533,9 +6554,9 @@ components:
           example: 0
         opd:
           type: boolean
-        female:
-          type: boolean
         male:
+          type: boolean
+        female:
           type: boolean
         pharmacy:
           type: boolean
@@ -6553,6 +6574,11 @@ components:
           type: integer
           format: int32
           readOnly: true
+        labBookId:
+          type: integer
+          format: int32
+          description: Code of the Patient in labBook software
+          example: 1
         firstName:
           type: string
           description: First name of the patient
@@ -8540,6 +8566,16 @@ components:
       - quantity
       - units
       - ward
+    ReportGroupedRequest:
+      type: object
+      properties:
+        l_id_rec_vld:
+          type: array
+          items:
+            type: integer
+            format: int32
+        filename:
+          type: string
     ExamRowDTO:
       type: object
       properties:
