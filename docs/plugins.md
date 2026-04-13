@@ -121,55 +121,6 @@ plugins:
                 methods: [GET]
 ```
 
-### Example: same plugin in both locations
-
-A single plugin can appear both as a top-level route and as a patient tab. Register it twice with different `location` values and the same `id`:
-
-```yaml
-plugins:
-  definitions:
-    - id: smart-doc
-      url: http://localhost:8042/api
-      health: /actuator/health
-      configuration:
-        bundle:
-          label: Smart Doc
-          manifest: mf-manifest.json
-          type: module
-          location: main
-          styles: assets/style.css
-        permissions:
-          - role: admin
-            routes:
-              - path: /documents
-                methods: [GET, POST, DELETE]
-
-    - id: smart-doc
-      url: http://localhost:8042/api
-      health: /actuator/health
-      configuration:
-        bundle:
-          label: Smart Doc
-          manifest: mf-manifest.json
-          type: module
-          location: patient
-          styles: assets/style.css
-        permissions:
-          - role: admin
-            routes:
-              - path: /documents
-                methods: [GET, POST, DELETE]
-          - role: doctor
-            routes:
-              - path: /documents
-                methods: [GET]
-```
-
-> Both entries share the same backend service URL and health endpoint.
-> The frontend registers two separate MF remotes from the same `mf-manifest.json`.
-
----
-
 ## Authorization Model
 
 ### Principals
@@ -249,12 +200,12 @@ On every `ApplicationReadyEvent` (after Spring Boot fully starts):
 flowchart TD
     A[ApplicationReadyEvent] --> B[Read plugins.yaml definitions]
     B --> C{For each plugin}
-    C --> D[GET url+health — 3s timeout]
+    C --> D[GET url+health - 3s timeout]
     D --> E{HTTP 2xx?}
     E -->|Yes| F[Register in PluginRegistry]
-    E -->|No / timeout / error| G[WARN log — skip plugin]
+    E -->|No / timeout / error| G[WARN log - skip plugin]
     F --> H[Available in GET /plugins]
-    G --> I[Not registered — 404 on proxy]
+    G --> I[Not registered - 404 on proxy]
     H --> C
     I --> C
 ```
@@ -413,7 +364,7 @@ sequenceDiagram
     Note over B,G: User navigates to /<plugin-id>
     B->>G: GET /assets/plugins/my-plugin/mf-manifest.json
     G-->>B: mf-manifest.json (served from classpath:/plugins/)
-    B->>G: GET /assets/plugins/my-plugin/my-plugin.js
+    B->>G: GET /assets/plugins/my-plugin/[scripts].js
     G-->>B: remote JS bundle
 
     Note over B,G: Plugin makes an API call
