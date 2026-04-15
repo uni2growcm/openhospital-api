@@ -294,6 +294,10 @@ GET /assets/plugins/{plugin-id}/**
 
 These are served from `classpath:/plugins/{plugin-id}/` — concretely, from `rsc/plugins/` in the repository (packaged into the jar).
 
+> **Note:** `rsc/plugins/` is not tracked in git. Plugin MFE bundles are external artifacts
+> that must be placed here before building or starting the application. The mechanism for
+> obtaining them (e.g. downloading from a release, a CI step) is left to the deployment workflow.
+
 ### Directory layout
 
 ```
@@ -408,13 +412,13 @@ The `vite.plugin.config.ts` must set:
 
 See [openhospital-ui/docs/plugins.md](../../openhospital-ui/docs/plugins.md) for the full frontend build guide.
 
-### 3. Copy MFE assets into the API
+### 3. Place MFE assets in the API
 
-```bash
-cp -r dist/<plugin-id>/ openhospital-api/rsc/plugins/<plugin-id>/
-```
+Plugin MFE assets are not tracked in git. Place the built bundle for your plugin at
+`rsc/plugins/<plugin-id>/` before building or starting the OH API. How you obtain the
+bundle (local build, CI artifact, release download, etc.) is up to your deployment workflow.
 
-After this, the plugin's `mf-manifest.json` will be served at:
+After placing the files, the plugin's `mf-manifest.json` will be served at:
 ```
 GET /assets/plugins/<plugin-id>/mf-manifest.json
 ```
