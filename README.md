@@ -13,11 +13,6 @@ This is the API project of [Open Hospital][openhospital]: it exposes a REST API 
   * [How to deploy backend in docker environment](#how-to-deploy-backend-in-docker-environment)
   * [How to generate openapi specs](#how-to-generate-openapi-specs)
   * [Plugin gateway](#plugin-gateway)
-    + [How it works](#how-it-works)
-    + [Configuring plugins](#configuring-plugins)
-    + [Authorization](#authorization)
-    + [Identity headers](#identity-headers)
-    + [Health checks](#health-checks)
   * [Cleaning](#cleaning)
   * [How to contribute](#how-to-contribute)
   * [Community](#community)
@@ -170,89 +165,15 @@ To redirect the output to another file, use:
 ## Plugin gateway
 
 The API includes a built-in gateway that proxies requests to external plugin services.
-Plugins are defined in `rsc/plugins.yaml` and are health-checked at startup.
-Only reachable plugins are registered; an unreachable plugin produces a startup warning
-and its routes simply return `404` — the application continues normally.
+Plugins are defined in `rsc/plugins.yaml` and health-checked at startup. Only reachable
+plugins are registered; unreachable plugins produce a startup warning and their routes
+return `404`.
 
-### How it works
+All plugin routes require a valid JWT. The gateway injects `X-User` and `X-Permissions`
+headers into every forwarded request so the upstream plugin can identify the caller.
 
-All routes under `/plugins/{id}/**` are forwarded to the corresponding upstream service:
-
-```
-GET  /plugins/smart-doc/document-types  →  GET  http://localhost:8042/api/document-types
-POST /plugins/smart-doc/documents     →  POST http://localhost:8042/api/documents
-```
-
-The full request is forwarded transparently: HTTP method, headers, query string, and body
-are all passed through unchanged, and the upstream response (status, headers, body) is
-returned to the client as-is.
-
-### Configuring plugins
-
-Add entries to `rsc/plugins.yaml`:
-
-```yaml
-plugins:
-  definitions:
-    - id: smart-doc            # used as the URL path segment: /plugins/smart-doc/**
-      url: http://localhost:8042/api   # upstream base URL, no trailing slash
-      health: /actuator/health         # path probed at startup for reachability
-      permissions:
-        - role: admin
-          privileges:
-            - smart-doc.read
-            - smart-doc.write
-            - smart-doc.delete
-        - role: user
-          privileges:
-            - smart-doc.read
-```
-
-| Field | Required | Description |
-|---|---|---|
-| `id` | yes | URL-safe identifier (lowercase, hyphens). Used as `/plugins/{id}`. |
-| `url` | yes | Base URL of the upstream service. No trailing slash. |
-| `health` | yes | Path on the upstream service probed at startup. A `2xx` response marks the plugin as available. |
-| `permissions` | no | List of role/privilege groups (see [Authorization](#authorization)). Omit or leave empty to allow any authenticated user. |
-
-### Authorization
-
-All plugin routes require a valid JWT — they fall under the existing
-`anyRequest().authenticated()` rule and the JWT is validated by the standard filter
-before the request reaches the gateway.
-
-Plugin-level access control uses the same fine-grained permission strings as the rest of
-the application (e.g. `patients.read`). A user is granted access to a plugin if their JWT
-carries **at least one** authority that appears in **any** of the plugin's `privileges`
-lists. This is an OR-across-groups, OR-within-group model.
-
-A plugin with an empty (or absent) `permissions` list is accessible to any authenticated user.
-
-To grant a user access to a plugin, assign the corresponding privilege strings through the
-standard permission management API (e.g. `smart-doc.read`).
-
-### Identity headers
-
-The gateway adds two headers to every forwarded request so that the upstream plugin can
-identify the caller without re-validating the JWT:
-
-| Header | Value |
-|---|---|
-| `X-User` | Authenticated username |
-| `X-Permissions` | Comma-separated list of the user's granted authorities |
-
-The original `Authorization: Bearer <token>` header is also forwarded, so the upstream
-service can optionally re-validate it independently.
-
-### Health checks
-
-At startup, the gateway probes `{url}{health}` for each configured plugin.
-A `2xx` response marks the plugin as healthy and registers its routes.
-Any other response or a connection failure produces a `WARN` log entry and the plugin is
-skipped — its routes will return `404 Not Found` for the lifetime of that process.
-
-To make a plugin available after a failed health check, restart the application once the
-upstream service is reachable.
+For full configuration reference, authorization model, MFE asset serving, and a
+step-by-step guide to adding a new plugin, see **[docs/plugins.md](docs/plugins.md)**.
 
 ## Cleaning
 
