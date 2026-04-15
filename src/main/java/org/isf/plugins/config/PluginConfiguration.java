@@ -35,6 +35,12 @@ import java.util.List;
  * <p>Example YAML fragment:</p>
  * <pre>{@code
  * configuration:
+ * 	 bundle:
+ * 	 	label: "Document Manager"
+ * 	 	manifest: "mf-manifest.json"
+ * 	    type: "module"
+ * 	    location: "main"
+ * 	    styles: "assets/styles.css"
  *   permissions:
  *     - role: admin
  *       routes:
@@ -46,5 +52,6 @@ import java.util.List;
  * @author Steve Tsala
  */
 public record PluginConfiguration(
+	PluginBundle bundle,
 	@DefaultValue List<PluginPermission> permissions) {
 }

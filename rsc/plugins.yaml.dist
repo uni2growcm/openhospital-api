@@ -39,6 +39,12 @@ plugins:
       url: http://localhost:8042/api
       health: /actuator/health
       configuration:
+        bundle:
+          label: Smart Doc
+          manifest: mf-manifest.json
+          styles: assets/style.css
+          type: module
+          location: main
         permissions:
           - role: admin
             routes:

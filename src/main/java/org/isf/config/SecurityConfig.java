@@ -330,6 +330,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.PUT, "/wards/**").hasAuthority("wards.update")
 				.requestMatchers(HttpMethod.DELETE, "/wards/**").hasAuthority("wards.delete")
 
+				// Assets
+				.requestMatchers("/assets/**").permitAll()
+				// Plugins
+				.requestMatchers(HttpMethod.GET, "/plugins").permitAll()
+
 				.anyRequest().authenticated()
 
 			)

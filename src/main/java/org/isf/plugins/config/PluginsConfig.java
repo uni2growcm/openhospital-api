@@ -21,8 +21,19 @@
  */
 package org.isf.plugins.config;
 
+import org.isf.security.jwt.JWTFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Loads {@code rsc/plugins.yaml} into the Spring {@link org.springframework.core.env.Environment}
@@ -32,5 +43,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(PluginProperties.class)
-public class PluginsYamlConfig {
+public class PluginsConfig implements WebMvcConfigurer {
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/assets/plugins/**")
+			.addResourceLocations("classpath:/plugins/");
+	}
 }

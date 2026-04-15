@@ -9,7 +9,7 @@ info:
     url: https://github.com/informatici/openhospital-api?tab=GPL-3.0-1-ov-file#readme
   version: 0.1.0
 servers:
-- url: http://API_HOST:API_PORT
+- url: http://localhost
 security:
 - bearerAuth: []
 tags:
@@ -4149,7 +4149,7 @@ paths:
         "200":
           description: Plugin list returned successfully
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -9136,6 +9136,36 @@ components:
       - item
       - list
       - price
+    PluginBundle:
+      type: object
+      properties:
+        label:
+          type: string
+        manifest:
+          type: string
+        type:
+          type: string
+        location:
+          type: string
+          enum:
+          - main
+          - patient
+        styles:
+          type: string
+      required:
+      - label
+      - location
+      - manifest
+      - type
+    PluginConfiguration:
+      type: object
+      properties:
+        bundle:
+          $ref: "#/components/schemas/PluginBundle"
+        permissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PluginPermission"
     PluginDefinition:
       type: object
       properties:
@@ -9145,16 +9175,23 @@ components:
           type: string
         health:
           type: string
-        permissions:
-          type: array
-          items:
-            $ref: "#/components/schemas/PluginPermission"
+        configuration:
+          $ref: "#/components/schemas/PluginConfiguration"
     PluginPermission:
       type: object
       properties:
         role:
           type: string
-        privileges:
+        routes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PluginRoute"
+    PluginRoute:
+      type: object
+      properties:
+        path:
+          type: string
+        methods:
           type: array
           items:
             type: string

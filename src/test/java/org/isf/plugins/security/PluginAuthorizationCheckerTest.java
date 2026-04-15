@@ -21,10 +21,7 @@
  */
 package org.isf.plugins.security;
 
-import org.isf.plugins.config.PluginConfiguration;
-import org.isf.plugins.config.PluginDefinition;
-import org.isf.plugins.config.PluginPermission;
-import org.isf.plugins.config.PluginRoute;
+import org.isf.plugins.config.*;
 import org.isf.plugins.exception.PluginAccessDeniedException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +55,8 @@ class PluginAuthorizationCheckerTest {
 	 */
 	private final Map<String, String> userRoles = new HashMap<>();
 
+	private static final PluginBundle PLUGIN_BUNDLE = new PluginBundle("Smart Doc", "mf-manifest.json", "module", PluginLocation.MAIN, "assets/styles.css");
+
 	private IPluginAuthorizationChecker checker;
 
 	/**
@@ -66,8 +65,7 @@ class PluginAuthorizationCheckerTest {
 	private static PluginDefinition pluginWithRoute(String role, String path, String... methods) {
 		PluginRoute route = new PluginRoute(path, List.of(methods));
 		PluginPermission perm = new PluginPermission(role, List.of(route));
-		return new PluginDefinition("smart-doc", "http://localhost:4000", "/health",
-			new PluginConfiguration(List.of(perm)));
+		return new PluginDefinition("smart-doc", "http://localhost:4000", "/health", new PluginConfiguration(PLUGIN_BUNDLE, List.of(perm)));
 	}
 
 	/**
@@ -85,8 +83,7 @@ class PluginAuthorizationCheckerTest {
 	 * Build a PluginDefinition with an empty permissions list.
 	 */
 	private static PluginDefinition pluginWithEmptyPermissions() {
-		return new PluginDefinition("smart-doc", "http://localhost:4000", "/health",
-			new PluginConfiguration(List.of()));
+		return new PluginDefinition("smart-doc", "http://localhost:4000", "/health", new PluginConfiguration(PLUGIN_BUNDLE, List.of()));
 	}
 
 	@BeforeEach
@@ -114,8 +111,7 @@ class PluginAuthorizationCheckerTest {
 	 */
 	private void authenticateAs(String username, String groupCode) {
 		userRoles.put(username, groupCode);
-		var auth = new UsernamePasswordAuthenticationToken(username, null,
-			List.of(new SimpleGrantedAuthority("ROLE_USER")));
+		var auth = new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
 
@@ -128,10 +124,7 @@ class PluginAuthorizationCheckerTest {
 	void shouldDenyAccessWhenNoConfiguration() {
 		authenticateAs("alice", "admin");
 
-		assertThatThrownBy(() -> checker.assertAccess(pluginWithNoConfiguration(), "/documents", "GET"))
-			.isInstanceOf(PluginAccessDeniedException.class)
-			.hasMessageContaining("alice")
-			.hasMessageContaining("smart-doc");
+		assertThatThrownBy(() -> checker.assertAccess(pluginWithNoConfiguration(), "/documents", "GET")).isInstanceOf(PluginAccessDeniedException.class).hasMessageContaining("alice").hasMessageContaining("smart-doc");
 	}
 
 	@Test
@@ -139,8 +132,7 @@ class PluginAuthorizationCheckerTest {
 	void shouldDenyAccessWhenEmptyPermissions() {
 		authenticateAs("alice", "admin");
 
-		assertThatThrownBy(() -> checker.assertAccess(pluginWithEmptyPermissions(), "/documents", "GET"))
-			.isInstanceOf(PluginAccessDeniedException.class);
+		assertThatThrownBy(() -> checker.assertAccess(pluginWithEmptyPermissions(), "/documents", "GET")).isInstanceOf(PluginAccessDeniedException.class);
 	}
 
 	// -------------------------------------------------------------------------
@@ -162,10 +154,7 @@ class PluginAuthorizationCheckerTest {
 		authenticateAs("bob", "nurse");
 		PluginDefinition plugin = pluginWithRoute("admin", "/documents", "GET");
 
-		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "GET"))
-			.isInstanceOf(PluginAccessDeniedException.class)
-			.hasMessageContaining("bob")
-			.hasMessageContaining("smart-doc");
+		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "GET")).isInstanceOf(PluginAccessDeniedException.class).hasMessageContaining("bob").hasMessageContaining("smart-doc");
 	}
 
 	@Test
@@ -177,8 +166,7 @@ class PluginAuthorizationCheckerTest {
 		PluginRoute doctorRoute = new PluginRoute("/documents", List.of("GET"));
 		PluginPermission adminPerm = new PluginPermission("admin", List.of(adminRoute));
 		PluginPermission doctorPerm = new PluginPermission("doctor", List.of(doctorRoute));
-		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health",
-			new PluginConfiguration(List.of(adminPerm, doctorPerm)));
+		PluginDefinition plugin = new PluginDefinition("smart-doc", "http://localhost:4000", "/health", new PluginConfiguration(PLUGIN_BUNDLE, List.of(adminPerm, doctorPerm)));
 
 		assertThatNoException().isThrownBy(() -> checker.assertAccess(plugin, "/documents/42", "GET"));
 	}
@@ -211,8 +199,7 @@ class PluginAuthorizationCheckerTest {
 		authenticateAs("alice", "admin");
 		PluginDefinition plugin = pluginWithRoute("admin", "/documents", "DELETE");
 
-		assertThatNoException().isThrownBy(
-			() -> checker.assertAccess(plugin, "/documents/123/attachments", "DELETE"));
+		assertThatNoException().isThrownBy(() -> checker.assertAccess(plugin, "/documents/123/attachments", "DELETE"));
 	}
 
 	@Test
@@ -221,8 +208,7 @@ class PluginAuthorizationCheckerTest {
 		authenticateAs("alice", "admin");
 		PluginDefinition plugin = pluginWithRoute("admin", "/documents", "GET");
 
-		assertThatThrownBy(() -> checker.assertAccess(plugin, "/reports", "GET"))
-			.isInstanceOf(PluginAccessDeniedException.class);
+		assertThatThrownBy(() -> checker.assertAccess(plugin, "/reports", "GET")).isInstanceOf(PluginAccessDeniedException.class);
 	}
 
 	@Test
@@ -232,8 +218,7 @@ class PluginAuthorizationCheckerTest {
 		// /documents-other must NOT match /documents
 		PluginDefinition plugin = pluginWithRoute("admin", "/documents", "GET");
 
-		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents-other", "GET"))
-			.isInstanceOf(PluginAccessDeniedException.class);
+		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents-other", "GET")).isInstanceOf(PluginAccessDeniedException.class);
 	}
 
 	// -------------------------------------------------------------------------
@@ -246,8 +231,7 @@ class PluginAuthorizationCheckerTest {
 		authenticateAs("alice", "doctor");
 		PluginDefinition plugin = pluginWithRoute("doctor", "/documents", "GET");
 
-		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "DELETE"))
-			.isInstanceOf(PluginAccessDeniedException.class);
+		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "DELETE")).isInstanceOf(PluginAccessDeniedException.class);
 	}
 
 	@Test
@@ -268,9 +252,7 @@ class PluginAuthorizationCheckerTest {
 	void shouldThrowIllegalStateWhenNoAuthentication() {
 		SecurityContextHolder.clearContext();
 
-		assertThatThrownBy(() -> checker.assertAccess(pluginWithRoute("admin", "/documents", "GET"), "/documents", "GET"))
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessageContaining("No authenticated principal");
+		assertThatThrownBy(() -> checker.assertAccess(pluginWithRoute("admin", "/documents", "GET"), "/documents", "GET")).isInstanceOf(IllegalStateException.class).hasMessageContaining("No authenticated principal");
 	}
 
 	@Test
@@ -278,8 +260,7 @@ class PluginAuthorizationCheckerTest {
 	void shouldThrowIllegalStateWhenPrincipalIsNotAuthenticated() {
 		SecurityContextHolder.clearContext();
 
-		assertThatThrownBy(() -> checker.assertAccess(pluginWithEmptyPermissions(), "/documents", "GET"))
-			.isInstanceOf(IllegalStateException.class);
+		assertThatThrownBy(() -> checker.assertAccess(pluginWithEmptyPermissions(), "/documents", "GET")).isInstanceOf(IllegalStateException.class);
 	}
 
 	// -------------------------------------------------------------------------
@@ -290,29 +271,25 @@ class PluginAuthorizationCheckerTest {
 	@DisplayName("Should deny access when the user has no role mapping (simulates OHServiceException / user not found)")
 	void shouldDenyWhenRoleResolutionFails() {
 		// "eve" is authenticated but has no entry in userRoles → supplier returns role=null
-		var auth = new UsernamePasswordAuthenticationToken("eve", null,
-			List.of(new SimpleGrantedAuthority("ROLE_USER")));
+		var auth = new UsernamePasswordAuthenticationToken("eve", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		// intentionally do NOT call userRoles.put("eve", ...) so role resolves to null
 
 		PluginDefinition plugin = pluginWithRoute("admin", "/documents", "GET");
 
-		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "GET"))
-			.isInstanceOf(PluginAccessDeniedException.class);
+		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "GET")).isInstanceOf(PluginAccessDeniedException.class);
 	}
 
 	@Test
 	@DisplayName("Should deny access when user is not found in the database (null returned)")
 	void shouldDenyWhenUserNotFound() {
 		// "ghost" is authenticated but has no role mapping → role=null → access denied
-		var auth = new UsernamePasswordAuthenticationToken("ghost", null,
-			List.of(new SimpleGrantedAuthority("ROLE_USER")));
+		var auth = new UsernamePasswordAuthenticationToken("ghost", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		// intentionally do NOT add "ghost" to userRoles
 
 		PluginDefinition plugin = pluginWithRoute("admin", "/documents", "GET");
 
-		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "GET"))
-			.isInstanceOf(PluginAccessDeniedException.class);
+		assertThatThrownBy(() -> checker.assertAccess(plugin, "/documents", "GET")).isInstanceOf(PluginAccessDeniedException.class);
 	}
 }
