@@ -1,2 +1,0 @@
-[10/avr./2026 08:01:10] [:] WARN - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9h39m11s29ms381µs400ns). (com.zaxxer.hikari.pool.HikariPool$HouseKeeper.run(HikariPool.java:797))
-[10/avr./2026 22:24:22] [:] WARN - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3h28s193ms37µs200ns). (com.zaxxer.hikari.pool.HikariPool$HouseKeeper.run(HikariPool.java:797))
