@@ -7,6 +7,8 @@ import org.isf.integrations.labbook.services.ReportSyncService;
 import org.isf.utils.exception.OHException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +28,18 @@ public class LabbookReportController {
 	}
 
 	@PostMapping("/grouped/download")
-	public ResponseEntity<byte[]> generateReportGrouped(@RequestBody ReportGroupedRequest request) throws OHException {
+	public ResponseEntity<Resource> generateReportGrouped(@RequestBody ReportGroupedRequest request) throws OHException {
 		LOGGER.info("Received request for grouped report download");
 		byte[] pdfContent = reportSyncService.generateReportGrouped(request);
 
 		String filename = request.filename() != null ? request.filename() : "report.pdf";
 
+		Resource resource = new ByteArrayResource(pdfContent);
+
 		return ResponseEntity.ok()
 			.contentType(MediaType.APPLICATION_PDF)
 			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-			.body(pdfContent);
+			.contentLength(pdfContent.length)
+			.body(resource);
 	}
 }
