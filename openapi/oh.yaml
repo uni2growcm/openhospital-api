@@ -9,7 +9,7 @@ info:
     url: https://github.com/informatici/openhospital-api?tab=GPL-3.0-1-ov-file#readme
   version: 0.1.0
 servers:
-- url: http://localhost:8080
+- url: http://API_HOST:API_PORT
 security:
 - bearerAuth: []
 paths:
@@ -5392,6 +5392,27 @@ paths:
                   $ref: "#/components/schemas/LabWithRowsDTO"
       security:
       - bearerAuth: []
+  /labbook/patients/{id}/analysis:
+    get:
+      tags:
+      - Labbook
+      operationId: getPatientAnalysis
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabbookPatientHistoricDTO"
+      security:
+      - bearerAuth: []
   /hospitals:
     get:
       tags:
@@ -8882,6 +8903,103 @@ components:
             $ref: "#/components/schemas/LabWithRowsDTO"
         pageInfo:
           $ref: "#/components/schemas/PageInfoDTO"
+    LabbookAnalysisDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        recordType:
+          type: string
+        prescriptionDate:
+          type: string
+        analysis:
+          type: string
+        recordNumber:
+          type: string
+        variable:
+          type: string
+        result:
+          type: string
+    LabbookPatientHistoricDTO:
+      type: object
+      properties:
+        patient:
+          $ref: "#/components/schemas/LabbookRawPatientDTO"
+        analyzes:
+          type: array
+          items:
+            $ref: "#/components/schemas/LabbookAnalysisDTO"
+    LabbookRawPatientDTO:
+      type: object
+      properties:
+        idData:
+          type: integer
+          format: int32
+        idUser:
+          type: integer
+          format: int32
+        ano:
+          type: integer
+          format: int32
+        code:
+          type: string
+        codeLab:
+          type: string
+        name:
+          type: string
+        firstname:
+          type: string
+        birth:
+          type: string
+          format: date
+        sex:
+          type: integer
+          format: int32
+        address:
+          type: string
+        zipcode:
+          type: string
+        city:
+          type: string
+        phone1:
+          type: string
+        phone2:
+          type: string
+        profession:
+          type: string
+        maiden:
+          type: string
+        district:
+          type: string
+        pbox:
+          type: string
+        birthApprox:
+          type: integer
+          format: int32
+        age:
+          type: integer
+          format: int32
+        ageUnit:
+          type: integer
+          format: int32
+        email:
+          type: string
+        agreement:
+          type: string
+        midname:
+          type: string
+        nationality:
+          type: integer
+          format: int32
+        resident:
+          type: string
+        bloodGroup:
+          type: integer
+          format: int32
+        bloodRhesus:
+          type: integer
+          format: int32
     PagePatientExaminationDTO:
       type: object
       properties:
