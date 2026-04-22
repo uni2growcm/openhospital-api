@@ -111,9 +111,17 @@ public class PluginRequestForwarder implements IPluginRequestForwarder {
 				requestSpec.body(inputStream::transferTo);
 			}
 
-			return requestSpec.retrieve().onStatus(status -> true, (req, res) -> {
+			var response =  requestSpec.retrieve().onStatus(status -> true, (req, res) -> {
 				// Pass all statuses through — do not throw on 4xx/5xx from upstream.
 			}).toEntity(byte[].class);
+
+			var headers = new HttpHeaders(response.getHeaders());
+
+			headers.set("Access-Control-Allow-Origin", null);
+			headers.set("Access-Control-Allow-Credentials", null);
+
+			return  new ResponseEntity<>(response.getBody(), headers, response.getStatusCode());
+
 
 		} catch (RestClientResponseException ex) {
 			LOGGER.warn("Upstream plugin '{}' returned error {}: {}", plugin.id(), ex.getStatusCode(), ex.getMessage());
