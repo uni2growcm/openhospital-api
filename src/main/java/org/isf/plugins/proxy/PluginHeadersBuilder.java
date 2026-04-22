@@ -50,7 +50,7 @@ abstract class PluginHeadersBuilder {
 	 * Headers that must not be forwarded to the upstream plugin.
 	 */
 	private static final Set<String> EXCLUDED_REQUEST_HEADERS = Set.of(
-		HttpHeaders.HOST.toLowerCase()
+		HttpHeaders.HOST.toLowerCase(), HttpHeaders.AUTHORIZATION.toLowerCase()
 	);
 
 	/**
