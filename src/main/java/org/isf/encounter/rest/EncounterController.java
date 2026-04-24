@@ -30,6 +30,10 @@ import org.isf.admission.dto.AdmissionDTO;
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.mapper.AdmissionMapper;
 import org.isf.admission.model.Admission;
+import org.isf.care.dto.CareDTO;
+import org.isf.care.mapper.CareMapper;
+import org.isf.cares.manager.CareManager;
+import org.isf.cares.model.Care;
 import org.isf.conditioning.dto.ConditioningDTO;
 import org.isf.conditioning.manager.ConditioningBrowserManager;
 import org.isf.conditioning.mapper.ConditioningMapper;
@@ -112,12 +116,13 @@ public class EncounterController {
 	private final LaboratoryMapper laboratoryMapper;
 	private final OperationRowBrowserManager operationRowManager;
 	private final OperationRowMapper opRowMapper;
+	private final CareManager careManager;
+	private final CareMapper careMapper;
 
 	public EncounterController(
 		EncounterBrowserManager encounterBrowserManager,
 		EncounterMapper encounterMapper,
 		PatientBrowserManager patientBrowserManager,
-
 		ExaminationBrowserManager examinationBrowserManager,
 		PatientExaminationMapper examinationMapper,
 		OpdBrowserManager opdManager,
@@ -131,8 +136,9 @@ public class EncounterController {
 		LabManager labManager,
 		LaboratoryMapper laboratoryMapper,
 		OperationRowMapper opRowMapper,
-		OperationRowBrowserManager operationRowManager
-
+		OperationRowBrowserManager operationRowManager,
+		CareMapper careMapper,
+		CareManager careManager
 	) {
 		this.encounterBrowserManager = encounterBrowserManager;
 		this.encounterMapper = encounterMapper;
@@ -151,6 +157,8 @@ public class EncounterController {
 		this.laboratoryMapper = laboratoryMapper;
 		this.opRowMapper = opRowMapper;
 		this.operationRowManager = operationRowManager;
+		this.careManager = careManager;
+		this.careMapper = careMapper;
 	}
 
 	@PostMapping(value = "/encounters")
@@ -342,6 +350,27 @@ public class EncounterController {
 		List<Conditioning> conditioningList = conditioningManager.getConditioningByPatientEncounter(encounter);
 
 		return conditioningMapper.map2DTOList(conditioningList);
+	}
+
+	/**
+	 * Retrieves the list of {@link CareDTO} objects associated with a specific encounter,
+	 * identified by its unique code.
+	 *
+	 * @param code the unique encounter code used to identify the encounter
+	 * @return a {@link List} of {@link CareDTO} objects associated with the given encounter
+	 * @throws OHServiceException if an error occurs while retrieving patient examinations
+	 * @throws OHAPIException if no encounter is found with the provided code
+	 */
+	@GetMapping("/encounters/{code}/cares")
+	public List<CareDTO> getCareByPatientEncounter(@PathVariable String code) throws OHServiceException {
+		Encounter encounter = encounterBrowserManager.getEncountersByCode(code);
+		if (encounter == null) {
+			throw new OHAPIException(new OHExceptionMessage("Encounter not found with code " + code), HttpStatus.NOT_FOUND);
+		}
+
+		List<Care> careList = careManager.getCareByPatientEncounter(encounter);
+
+		return careMapper.map2DTOList(careList);
 	}
 
 	/**
