@@ -151,7 +151,7 @@ public class CareControllerTest {
 			.thenReturn(patient);
 
 		List<Care> cares = CareHelper.setupCareList(2);
-		cares.forEach(care -> care.getPatient().setCode(patientCode)); // ✅ fix
+		cares.forEach(care -> care.getPatient().setCode(patientCode));
 		when(careManager.getCaresByPatient(patientCode))
 			.thenReturn(cares);
 
