@@ -1,0 +1,208 @@
+/*
+ * Open Hospital (www.open-hospital.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ *
+ * Open Hospital is a free and open source software for healthcare data management.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+package org.isf.care.rest;
+
+import org.isf.care.data.CareHelper;
+import org.isf.care.dto.CareDTO;
+import org.isf.care.mapper.CareMapper;
+import org.isf.cares.manager.CareManager;
+import org.isf.cares.model.Care;
+import org.isf.menu.manager.UserBrowsingManager;
+import org.isf.menu.model.User;
+import org.isf.patient.data.PatientHelper;
+import org.isf.patient.dto.PatientDTO;
+import org.isf.patient.manager.PatientBrowserManager;
+import org.isf.patient.model.Patient;
+import org.isf.shared.exceptions.OHResponseEntityExceptionHandler;
+import org.isf.shared.mapper.converter.BlobToByteArrayConverter;
+import org.isf.shared.mapper.converter.ByteArrayToBlobConverter;
+import org.isf.shared.mapper.mappings.PatientMapping;
+import org.isf.users.dto.UserDTO;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+public class CareControllerTest {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(CareControllerTest.class);
+
+	@Mock
+	protected CareManager careManager;
+
+	@Mock
+	protected PatientBrowserManager patientBrowserManagerMock;
+
+	@Mock
+	protected UserBrowsingManager userBrowsingManagerMock;
+
+	private final CareMapper careMapper = new CareMapper();
+
+	private MockMvc mockMvc;
+
+	private AutoCloseable closeable;
+
+	@BeforeEach
+	void setup() {
+		closeable = MockitoAnnotations.openMocks(this);
+		this.mockMvc = MockMvcBuilders
+			.standaloneSetup(new CareController(patientBrowserManagerMock, careMapper,careManager, userBrowsingManagerMock))
+			.setControllerAdvice(new OHResponseEntityExceptionHandler())
+			.build();
+
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.addConverter(new BlobToByteArrayConverter());
+		modelMapper.addConverter(new ByteArrayToBlobConverter());
+		PatientMapping.addMapping(modelMapper);
+		ReflectionTestUtils.setField(careMapper, "modelMapper", modelMapper);
+	}
+
+	@AfterEach
+	void closeService() throws Exception {
+		closeable.close();
+	}
+
+	@Test
+	void testNewCare_success() throws Exception {
+		String request = "/cares";
+
+		CareDTO body = CareHelper.setup(careMapper);
+		body.setCareDate(LocalDateTime.now());
+
+		User user = new User();
+		user.setUserName("admin");
+		body.setTeam(List.of(user.getUserName()));
+
+		PatientDTO patient = new PatientDTO();
+		patient.setCode(1);
+		body.setPatient(patient);
+
+		Care care = careMapper.map2Model(body);
+
+		when(patientBrowserManagerMock.getPatientById(body.getPatient().getCode()))
+			.thenReturn(care.getPatient());
+
+		when(userBrowsingManagerMock.getUserByName(body.getTeam().get(0)))
+			.thenReturn(user);
+
+		when(careManager.saveCare(any(Care.class)))
+			.thenReturn(care);
+
+		MvcResult result = this.mockMvc
+			.perform(post(request)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(Objects.requireNonNull(CareHelper.asJsonString(body)))
+			)
+			.andDo(log())
+			.andExpect(status().isOk())
+			.andReturn();
+
+		LOGGER.debug("result: {}", result);
+	}
+
+	@Test
+	void testGetCareByPatientCode_success() throws Exception {
+		int patientCode = 1;
+		String request = "/cares/{patientCode}";
+
+		Patient patient = PatientHelper.setup();
+		patient.setCode(patientCode);
+		when(patientBrowserManagerMock.getPatientById(patientCode))
+			.thenReturn(patient);
+
+		List<Care> cares = CareHelper.setupCareList(2);
+		cares.forEach(care -> care.getPatient().setCode(patientCode));
+		when(careManager.getCaresByPatient(patientCode))
+			.thenReturn(cares);
+
+		MvcResult result = this.mockMvc
+			.perform(get(request, patientCode)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(log())
+			.andExpect(status().is2xxSuccessful())
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString(CareHelper.asJsonString(careMapper.map2DTOList(cares)))))
+			.andReturn();
+
+		LOGGER.debug("result: {}", result);
+	}
+
+	@Test
+	void testUpdateCare_success() throws Exception {
+		int id = 1;
+		String request = "/cares/{id}";
+
+		CareDTO body = CareHelper.setup(careMapper);
+		body.setId(id);
+		body.setCareDate(LocalDateTime.now());
+
+		PatientDTO patient = new PatientDTO();
+		patient.setCode(1);
+		body.setPatient(patient);
+
+		User user = new User();
+		user.setUserName("admin");
+		body.setTeam(List.of(user.getUserName()));
+
+		Care care = careMapper.map2Model(body);
+
+		when(careManager.getCareById(id)).thenReturn(care);
+
+		when(patientBrowserManagerMock.getPatientById(body.getPatient().getCode())).thenReturn(care.getPatient());
+
+		when(userBrowsingManagerMock.getUserByName(body.getTeam().get(0)))
+			.thenReturn(user);
+
+		when(careManager.updateCare(any(Care.class))).thenReturn(care);
+
+		MvcResult result = this.mockMvc
+			.perform(put(request, id)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(Objects.requireNonNull(CareHelper.asJsonString(body))))
+			.andDo(log())
+			.andExpect(status().isOk())
+			.andReturn();
+
+		LOGGER.debug("result: {}", result);
+	}
+}

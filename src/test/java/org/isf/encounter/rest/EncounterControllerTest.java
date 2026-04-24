@@ -26,6 +26,11 @@ import org.isf.admission.dto.AdmissionDTO;
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.mapper.AdmissionMapper;
 import org.isf.admission.model.Admission;
+import org.isf.care.data.CareHelper;
+import org.isf.care.dto.CareDTO;
+import org.isf.care.mapper.CareMapper;
+import org.isf.cares.manager.CareManager;
+import org.isf.cares.model.Care;
 import org.isf.conditioning.data.ConditioningHelper;
 import org.isf.conditioning.dto.ConditioningDTO;
 import org.isf.conditioning.manager.ConditioningBrowserManager;
@@ -119,6 +124,9 @@ public class EncounterControllerTest {
 	@Mock
 	protected OperationRowBrowserManager operationRowManager;
 
+	@Mock
+	protected CareManager careManager;
+
 	protected OpdMapper opdMapper = new OpdMapper();
 	protected AdmissionMapper admissionMapper = new AdmissionMapper();
 	protected PatientExaminationMapper examinationMapper = new PatientExaminationMapper();
@@ -127,6 +135,7 @@ public class EncounterControllerTest {
 	protected ConditioningMapper conditioningMapper = new ConditioningMapper();
 	protected MedicalHistoryMapper medicalHistoryMapper = new MedicalHistoryMapper();
 	private final OperationRowMapper opRowMapper = new OperationRowMapper();
+	protected CareMapper careMapper = new CareMapper();
 
 	private MockMvc mockMvc;
 
@@ -136,7 +145,7 @@ public class EncounterControllerTest {
 	void setup() {
 		closeable = MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders
-			.standaloneSetup(new EncounterController(encounterBrowserManagerMock, encounterMapper, patientBrowserManagerMock, examinationBrowserManagerMock, examinationMapper, opdManagerMock, opdMapper, admissionBrowserManagerMock, admissionMapper, browserManagerMock, conditioningMapper, medicalHistoryBrowsingManager, medicalHistoryMapper, labManager, laboratoryMapper,opRowMapper,operationRowManager))
+			.standaloneSetup(new EncounterController(encounterBrowserManagerMock, encounterMapper, patientBrowserManagerMock, examinationBrowserManagerMock, examinationMapper, opdManagerMock, opdMapper, admissionBrowserManagerMock, admissionMapper, browserManagerMock, conditioningMapper, medicalHistoryBrowsingManager, medicalHistoryMapper, labManager, laboratoryMapper,opRowMapper,operationRowManager, careMapper, careManager))
 			.setControllerAdvice(new OHResponseEntityExceptionHandler())
 			.build();
 
@@ -152,6 +161,7 @@ public class EncounterControllerTest {
 		ReflectionTestUtils.setField(conditioningMapper, "modelMapper", modelMapper);
 		ReflectionTestUtils.setField(medicalHistoryMapper, "modelMapper", modelMapper);
 		ReflectionTestUtils.setField(opRowMapper, "modelMapper", modelMapper);
+		ReflectionTestUtils.setField(careMapper, "modelMapper", modelMapper);
 	}
 
 	@AfterEach
@@ -554,6 +564,36 @@ public class EncounterControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$[0].id").value(conditioning1.getId()))
 			.andExpect(jsonPath("$[1].id").value(conditioning2.getId()))
+			.andReturn();
+
+		LOGGER.debug("result: {}", result);
+	}
+
+	@Test
+	void testGetCaresByEncounter_success() throws Exception {
+		String request = "/encounters/{code}/cares";
+		String encounterCode = "ENC_123";
+
+		Encounter encounter = encounterMapper.map2Model(EncounterHelper.setup(encounterMapper));
+		CareDTO careDTO1 = careMapper.map2DTO(CareHelper.setup());
+		CareDTO careDTO2 = careMapper.map2DTO(CareHelper.setup());
+		Care care1 = careMapper.map2Model(careDTO1);
+		Care care2 = careMapper.map2Model(careDTO2);
+		care1.setId(1);
+		care2.setId(2);
+		List<Care> cares = Arrays.asList(care1, care2);
+
+		when(encounterBrowserManagerMock.getEncountersByCode(encounterCode))
+			.thenReturn(encounter);
+		when(careManager.getCareByPatientEncounter(encounter))
+			.thenReturn(cares);
+
+		MvcResult result = this.mockMvc
+			.perform(get(request, encounterCode))
+			.andDo(log())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].id").value(care1.getId()))
+			.andExpect(jsonPath("$[1].id").value(care2.getId()))
 			.andReturn();
 
 		LOGGER.debug("result: {}", result);
