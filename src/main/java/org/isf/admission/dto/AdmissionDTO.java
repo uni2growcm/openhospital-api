@@ -179,6 +179,9 @@ public class AdmissionDTO {
 	@Schema(description = "course of action prescribed by the doctor", example = "Probabilistic antibiotic therapy with amoxicillin for 7 days.")
 	private String courseOfAction;
 
+	@Schema(description = "Next appointment date", example = "string")
+	private LocalDateTime nextAppointment;
+
 	public int getId() {
 		return this.id;
 	}
@@ -500,7 +503,14 @@ public class AdmissionDTO {
 		this.qualifiedAgent = qualifiedAgent;
 	}
 
-	
+	public LocalDateTime getNextAppointment() {
+		return nextAppointment;
+	}
+
+	public void setNextAppointment(LocalDateTime nextAppointment) {
+		this.nextAppointment = nextAppointment;
+	}
+
 	public String getPhysicalExam() {
 		return physicalExam;
 	}
