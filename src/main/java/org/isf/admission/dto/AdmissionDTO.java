@@ -182,6 +182,30 @@ public class AdmissionDTO {
 	@Schema(description = "Next appointment date", example = "string")
 	private LocalDateTime nextAppointment;
 
+	@Schema(description = "Referring center", example = "Regional Hospital")
+	private String referringCenter;
+
+	@Schema(description = "Referral alert", example = "Urgent referral needed")
+	private String referralAlert;
+
+	@Schema(description = "Transportation mode", example = "Ambulance")
+	private String transportationMode;
+
+	@Schema(description = "Referral reason", example = "Specialized treatment required")
+	private String referralReason;
+
+	@Schema(description = "Diagnosis", example = "Pneumonia")
+	private String diagnosis;
+
+	@Schema(description = "Treatment received", example = "Antibiotic therapy")
+	private String treatmentReceived;
+
+	@Schema(description = "Outcome", example = "Recovered")
+	private String outcome;
+
+	@Schema(description = "Improvement feedback", example = "Patient showing significant improvement")
+	private String improvementFeedback;
+
 	public int getId() {
 		return this.id;
 	}
@@ -525,5 +549,69 @@ public class AdmissionDTO {
 
 	public void setCourseOfAction(String courseOfAction) {
 		this.courseOfAction = courseOfAction;
+	}
+
+	public String getReferringCenter() {
+		return referringCenter;
+	}
+
+	public void setReferringCenter(String referringCenter) {
+		this.referringCenter = referringCenter;
+	}
+
+	public String getReferralAlert() {
+		return referralAlert;
+	}
+
+	public void setReferralAlert(String referralAlert) {
+		this.referralAlert = referralAlert;
+	}
+
+	public String getTransportationMode() {
+		return transportationMode;
+	}
+
+	public void setTransportationMode(String transportationMode) {
+		this.transportationMode = transportationMode;
+	}
+
+	public String getReferralReason() {
+		return referralReason;
+	}
+
+	public void setReferralReason(String referralReason) {
+		this.referralReason = referralReason;
+	}
+
+	public String getDiagnosis() {
+		return diagnosis;
+	}
+
+	public void setDiagnosis(String diagnosis) {
+		this.diagnosis = diagnosis;
+	}
+
+	public String getTreatmentReceived() {
+		return treatmentReceived;
+	}
+
+	public void setTreatmentReceived(String treatmentReceived) {
+		this.treatmentReceived = treatmentReceived;
+	}
+
+	public String getOutcome() {
+		return outcome;
+	}
+
+	public void setOutcome(String outcome) {
+		this.outcome = outcome;
+	}
+
+	public String getImprovementFeedback() {
+		return improvementFeedback;
+	}
+
+	public void setImprovementFeedback(String improvementFeedback) {
+		this.improvementFeedback = improvementFeedback;
 	}
 }
