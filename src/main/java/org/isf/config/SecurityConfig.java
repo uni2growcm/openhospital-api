@@ -338,6 +338,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/wards/**").hasAnyAuthority("wards.read")
 				.requestMatchers(HttpMethod.PUT, "/wards/**").hasAuthority("wards.update")
 				.requestMatchers(HttpMethod.DELETE, "/wards/**").hasAuthority("wards.delete")
+				// statistics
+				.requestMatchers(HttpMethod.GET, "/statistics/**").hasAuthority("statistics.access")
 
 				.anyRequest().authenticated()
 			)
