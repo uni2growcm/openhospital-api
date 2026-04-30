@@ -37,6 +37,7 @@ import org.isf.patient.model.Patient;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
+import org.isf.stats.dto.DischargeAgainstMedicalAdviceDTO;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.springframework.core.io.Resource;
@@ -45,10 +46,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -129,5 +127,24 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.getGenericReportForEncounterPdf(encounter, request.getLocale()), request);
+	}
+
+	@PostMapping("/reports/dischargeagainstmedicaladvice")
+	public ResponseEntity<Resource> printDischargeAgainstMedicalAdvicePdf(@RequestBody DischargeAgainstMedicalAdviceDTO dischargeAgainstMedicalAdviceDTO, HttpServletRequest request) throws OHServiceException, IOException {
+		return getReport(reportsManager.getGenericReportDischargeAgainstAdvicePdf(
+			dischargeAgainstMedicalAdviceDTO.getPatID(),
+			dischargeAgainstMedicalAdviceDTO.getLocalisation(),
+			dischargeAgainstMedicalAdviceDTO.getReference(),
+			dischargeAgainstMedicalAdviceDTO.getDistrict(),
+			dischargeAgainstMedicalAdviceDTO.getCommune(),
+			dischargeAgainstMedicalAdviceDTO.getPhoneNumber(),
+			dischargeAgainstMedicalAdviceDTO.getHospitalisationDate(),
+			dischargeAgainstMedicalAdviceDTO.getPatientRelationshipOccupation(),
+			dischargeAgainstMedicalAdviceDTO.getPatientRelationshipType(),
+			dischargeAgainstMedicalAdviceDTO.getPatientRelationshipName(),
+			dischargeAgainstMedicalAdviceDTO.getMadeOnDate(),
+			request.getLocale()),
+			request
+		);
 	}
 }
