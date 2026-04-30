@@ -139,6 +139,6 @@ public class ReportsController {
 			throw new OHAPIException(new OHExceptionMessage("Patient not found."), HttpStatus.NOT_FOUND);
 		}
 
-		return getReport(reportsManager.getAdmissionReportPdf(patientId), request);
+		return getReport(reportsManager.getAdmissionReportPdf(patientId, request.getLocale()), request);
 	}
 }
