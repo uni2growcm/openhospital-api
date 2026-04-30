@@ -38,10 +38,16 @@ public class StatisticsController {
 		this.reportsManager = reportsManager;
 	}
 
-	@GetMapping("/reports/admittedPatientReport")
+	@GetMapping("/statistics/admittedPatientReport")
 	public ResponseEntity<Resource> printAdmittedPatientPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
 		throws OHServiceException, JRException, IOException {
 		return getReport(reportsManager.getAdmittedPatientReportFromDateToDatePdf(fromDate, toDate, "AdmittedPatientReport", request.getLocale()), request);
+	}
+
+	@GetMapping("/statistics/pathologiesReport")
+	public ResponseEntity<Resource> printPathologiesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
+		throws OHServiceException, JRException, IOException {
+		return getReport(reportsManager.getPathologiesByAgeGenderFromDateToDatePdf(fromDate, toDate, "PathologyByAgeGender", request.getLocale()), request);
 	}
 
 	private ResponseEntity<Resource> getReport(
