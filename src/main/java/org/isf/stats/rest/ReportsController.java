@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.isf.admission.model.Admission;
 import org.isf.encounter.manager.EncounterBrowserManager;
 import org.isf.encounter.model.Encounter;
 import org.isf.examination.manager.ExaminationBrowserManager;
@@ -146,5 +147,15 @@ public class ReportsController {
 			request.getLocale()),
 			request
 		);
+	}
+
+	@GetMapping("/reports/cross-reference/{patId}/{admId}")
+	public ResponseEntity<Resource> printCrossReferenceReportPdf(@PathVariable("patId") Integer patId, @PathVariable("admId") Integer admId, HttpServletRequest request) throws OHServiceException, IOException {
+		Patient patient = patientBrowserManager.getPatientById(patId);
+		if (patient == null) {
+			throw new OHAPIException(new OHExceptionMessage("Patient not found."), HttpStatus.NOT_FOUND);
+		}
+
+		return getReport(reportsManager.getGenericReportForCrossReferencePdf(admId, patId, request.getLocale()), request);
 	}
 }

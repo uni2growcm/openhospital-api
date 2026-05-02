@@ -4655,6 +4655,34 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
+  /reports/cross-reference/{patId}/{admId}:
+    get:
+      tags:
+      - Reports
+      operationId: printCrossReferenceReportPdf
+      parameters:
+      - name: patId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: admId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
   /radiology/studies/{id}/series:
     get:
       tags:
@@ -7542,9 +7570,9 @@ components:
           format: int32
           description: lock
           example: 0
-        female:
-          type: boolean
         opd:
+          type: boolean
+        female:
           type: boolean
         male:
           type: boolean
