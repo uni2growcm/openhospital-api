@@ -41,13 +41,19 @@ public class StatisticsController {
 	@GetMapping("/statistics/admittedPatientReport")
 	public ResponseEntity<Resource> printAdmittedPatientPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
 		throws OHServiceException, JRException, IOException {
-		return getReport(reportsManager.getAdmittedPatientReportFromDateToDatePdf(fromDate, toDate, "AdmittedPatientReport", request.getLocale()), request);
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "AdmittedPatientReport", request.getLocale()), request);
 	}
 
 	@GetMapping("/statistics/pathologiesReport")
 	public ResponseEntity<Resource> printPathologiesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
 		throws OHServiceException, JRException, IOException {
-		return getReport(reportsManager.getPathologiesByAgeGenderFromDateToDatePdf(fromDate, toDate, "PathologyByAgeGender", request.getLocale()), request);
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "PathologyByAgeGender", request.getLocale()), request);
+	}
+
+	@GetMapping("/statistics/dischargesReport")
+	public ResponseEntity<Resource> printDischargesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
+		throws OHServiceException, JRException, IOException {
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "DischargeReport", request.getLocale()), request);
 	}
 
 	private ResponseEntity<Resource> getReport(
