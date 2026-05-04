@@ -120,7 +120,6 @@ public class ReportsController {
 				"attachment; filename=\"" + resource.getFilename() + '"')
 			.body(resource);
 	}
-
 	@GetMapping("/reports/encounter/{encounterCode}")
 	public ResponseEntity<Resource> printEncounterReportPdf(@PathVariable("encounterCode") String encounterCode, HttpServletRequest request) throws OHServiceException, IOException {
 		Encounter encounter = encounterBrowserManager.getEncountersByCode(encounterCode);
@@ -129,5 +128,10 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.getGenericReportForEncounterPdf(encounter, request.getLocale()), request);
+	}
+
+	@GetMapping("/reports/death")
+	public ResponseEntity<Resource> printDeathReportPdf(HttpServletRequest request) throws OHServiceException, IOException {
+		return getReport(reportsManager.getDeathReportPdf(request.getLocale()), request);
 	}
 }
