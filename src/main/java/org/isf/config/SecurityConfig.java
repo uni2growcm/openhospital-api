@@ -333,6 +333,14 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/visits/**").hasAnyAuthority("visits.read")
 				.requestMatchers(HttpMethod.PUT, "/visits/**").hasAuthority("visits.update")
 				.requestMatchers(HttpMethod.DELETE, "/visits/**").hasAuthority("visits.delete")
+				// cares
+				.requestMatchers(HttpMethod.POST, "/cares/**").hasAuthority("care.create")
+				.requestMatchers(HttpMethod.GET, "/cares/**").hasAnyAuthority("care.read")
+				.requestMatchers(HttpMethod.PUT, "/cares/**").hasAuthority("care.update")
+				// Hospitalisation consultation
+				.requestMatchers(HttpMethod.POST, "/hospitalisationconsultation/**").hasAuthority("hospitalisationconsultation.create")
+				.requestMatchers(HttpMethod.GET, "/hospitalisationconsultation/**").hasAnyAuthority("hospitalisationconsultation.read")
+				.requestMatchers(HttpMethod.PUT, "/hospitalisationconsultation/**").hasAuthority("hospitalisationconsultation.update")
 				// wards
 				.requestMatchers(HttpMethod.POST, "/wards/**").hasAuthority("wards.create")
 				.requestMatchers(HttpMethod.GET, "/wards/**").hasAnyAuthority("wards.read")
