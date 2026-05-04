@@ -4655,6 +4655,21 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
+  /reports/death:
+    get:
+      tags:
+      - Reports
+      operationId: printDeathReportPdf
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
   /reports/cross-reference/{patId}/{admId}:
     get:
       tags:
@@ -7570,23 +7585,13 @@ components:
           format: int32
           description: lock
           example: 0
-<<<<<<< HEAD
-        pharmacy:
-          type: boolean
-        male:
-          type: boolean
-        female:
-          type: boolean
-        opd:
-=======
-        opd:
-          type: boolean
         female:
           type: boolean
         male:
           type: boolean
+        opd:
+          type: boolean
         pharmacy:
->>>>>>> sokponta
           type: boolean
       required:
       - beds
@@ -8532,11 +8537,11 @@ components:
         deathPeriod:
           type: string
           description: Death period
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
