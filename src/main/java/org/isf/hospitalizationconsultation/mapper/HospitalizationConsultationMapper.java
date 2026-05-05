@@ -19,20 +19,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.encounter.mapper;
+package org.isf.hospitalizationconsultation.mapper;
 
 import jakarta.annotation.PostConstruct;
-import org.isf.encounter.dto.EncounterDTO;
-import org.isf.encounter.model.Encounter;
+import org.isf.hospitalizationconsultation.dto.HospitalizationConsultationDTO;
+import org.isf.hospitalizationconsultation.model.HospitalizationConsultation;
 import org.isf.shared.GenericMapper;
 import org.isf.shared.mapper.mappings.PatientMapping;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EncounterMapper extends GenericMapper<Encounter, EncounterDTO> {
+public class HospitalizationConsultationMapper extends GenericMapper<HospitalizationConsultation, HospitalizationConsultationDTO> {
 
-	public EncounterMapper() {
-		super(Encounter.class, EncounterDTO.class);
+	public HospitalizationConsultationMapper() {
+		super(HospitalizationConsultation.class, HospitalizationConsultationDTO.class);
 	}
 	
 	@PostConstruct
