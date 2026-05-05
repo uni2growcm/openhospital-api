@@ -182,20 +182,11 @@ public class AdmissionDTO {
 	@Schema(description = "Next appointment date", example = "string")
 	private LocalDateTime nextAppointment;
 
-	@Schema(description = "Referring center", example = "Regional Hospital")
-	private String referringCenter;
-
 	@Schema(description = "Referral alert", example = "Urgent referral needed")
 	private String referralAlert;
 
-	@Schema(description = "Transportation mode", example = "Ambulance")
-	private String transportationMode;
-
 	@Schema(description = "Referral reason", example = "Specialized treatment required")
 	private String referralReason;
-
-	@Schema(description = "Diagnosis", example = "Pneumonia")
-	private String diagnosis;
 
 	@Schema(description = "Treatment received", example = "Antibiotic therapy")
 	private String treatmentReceived;
@@ -551,14 +542,6 @@ public class AdmissionDTO {
 		this.courseOfAction = courseOfAction;
 	}
 
-	public String getReferringCenter() {
-		return referringCenter;
-	}
-
-	public void setReferringCenter(String referringCenter) {
-		this.referringCenter = referringCenter;
-	}
-
 	public String getReferralAlert() {
 		return referralAlert;
 	}
@@ -567,28 +550,12 @@ public class AdmissionDTO {
 		this.referralAlert = referralAlert;
 	}
 
-	public String getTransportationMode() {
-		return transportationMode;
-	}
-
-	public void setTransportationMode(String transportationMode) {
-		this.transportationMode = transportationMode;
-	}
-
 	public String getReferralReason() {
 		return referralReason;
 	}
 
 	public void setReferralReason(String referralReason) {
 		this.referralReason = referralReason;
-	}
-
-	public String getDiagnosis() {
-		return diagnosis;
-	}
-
-	public void setDiagnosis(String diagnosis) {
-		this.diagnosis = diagnosis;
 	}
 
 	public String getTreatmentReceived() {
