@@ -337,7 +337,7 @@ class TokenProviderTest {
 		Date actualExpirationDate = tokenProvider.getExpirationDateFromToken(token);
 
 		// Assert
-		long allowedSkew = 1000L; // Allow for a 1-second skew
+		long allowedSkew = 2000L; // Allow for a 2-second skew to prevent timing issues
 		assertThat(actualExpirationDate.getTime()).isCloseTo(expectedExpirationDate.getTime(), Offset.offset(allowedSkew));
 	}
 

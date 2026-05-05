@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.isf.admission.model.Admission;
 import org.isf.encounter.manager.EncounterBrowserManager;
 import org.isf.encounter.model.Encounter;
 import org.isf.examination.manager.ExaminationBrowserManager;
@@ -159,7 +158,7 @@ public class ReportsController {
 	}
 
 	@GetMapping("/reports/death")
-	public ResponseEntity<Resource> printDeathReportPdf(HttpServletRequest request) throws OHServiceException, IOException {
-		return getReport(reportsManager.getDeathReportPdf(request.getLocale()), request);
+	public ResponseEntity<Resource> printDeathReportPdf(@RequestParam String firstDateTime, @RequestParam String secondDateTime, HttpServletRequest request) throws OHServiceException, IOException {
+		return getReport(reportsManager.getDeathReportPdf(request.getLocale(), firstDateTime, secondDateTime), request);
 	}
 }
