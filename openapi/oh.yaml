@@ -4655,6 +4655,34 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
+  /reports/discharge/{patId}/{admId}:
+    get:
+      tags:
+      - Reports
+      operationId: printDischargeReportPdf
+      parameters:
+      - name: patId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: admId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
   /reports/cross-reference/{patId}/{admId}:
     get:
       tags:
@@ -7570,13 +7598,13 @@ components:
           format: int32
           description: lock
           example: 0
-        opd:
+        pharmacy:
           type: boolean
-        male:
+        opd:
           type: boolean
         female:
           type: boolean
-        pharmacy:
+        male:
           type: boolean
       required:
       - beds
