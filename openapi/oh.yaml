@@ -4660,6 +4660,17 @@ paths:
       tags:
       - Reports
       operationId: printDeathReportPdf
+      parameters:
+      - name: firstDateTime
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: secondDateTime
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -8537,11 +8548,11 @@ components:
         deathPeriod:
           type: string
           description: Death period
+        fhu:
+          type: string
         yprog:
           type: integer
           format: int32
-        fhu:
-          type: string
       required:
       - admDate
       - admitted
