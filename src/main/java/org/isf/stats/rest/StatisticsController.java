@@ -44,10 +44,16 @@ public class StatisticsController {
 		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "AdmittedPatientReport", request.getLocale()), request);
 	}
 
+	@GetMapping("/statistics/pathologiesByAgeGenderReport")
+	public ResponseEntity<Resource> printPathologiesByAgeGenderPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
+		throws OHServiceException, JRException, IOException {
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "PathologyByAgeGender", request.getLocale()), request);
+	}
+
 	@GetMapping("/statistics/pathologiesReport")
 	public ResponseEntity<Resource> printPathologiesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
 		throws OHServiceException, JRException, IOException {
-		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "PathologyByAgeGender", request.getLocale()), request);
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "PathologyReport", request.getLocale()), request);
 	}
 
 	@GetMapping("/statistics/dischargesReport")
