@@ -4655,50 +4655,24 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
-  /reports/discharge/{patId}/{admId}:
-    get:
-      tags:
-      - Reports
-      operationId: printDischargeReportPdf
-      parameters:
-      - name: patId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: admId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      responses:
-        "200":
-          description: OK
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
-      security:
-      - bearerAuth: []
   /reports/death:
     get:
       tags:
       - Reports
       operationId: printDeathReportPdf
       parameters:
-      - name: firstDateTime
+      - name: fromDate
         in: query
         required: true
         schema:
           type: string
-      - name: secondDateTime
+          format: date-time
+      - name: toDate
         in: query
         required: true
         schema:
           type: string
+          format: date-time
       responses:
         "200":
           description: OK
@@ -4727,6 +4701,34 @@ paths:
         schema:
           type: integer
           format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
+  /reports/admission:
+    get:
+      tags:
+      - Reports
+      operationId: getAdmissionReportPdf
+      parameters:
+      - name: fromDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: toDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
       responses:
         "200":
           description: OK
