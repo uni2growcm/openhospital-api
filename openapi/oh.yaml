@@ -4655,6 +4655,34 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
+  /reports/discharge/{patId}/{admId}:
+    get:
+      tags:
+      - Reports
+      operationId: printDischargeReportPdf
+      parameters:
+      - name: patId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: admId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
   /reports/death:
     get:
       tags:
@@ -7596,11 +7624,11 @@ components:
           format: int32
           description: lock
           example: 0
+        opd:
+          type: boolean
         female:
           type: boolean
         male:
-          type: boolean
-        opd:
           type: boolean
         pharmacy:
           type: boolean
@@ -8548,11 +8576,11 @@ components:
         deathPeriod:
           type: string
           description: Death period
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted

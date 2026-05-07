@@ -157,6 +157,16 @@ public class ReportsController {
 		return getReport(reportsManager.getGenericReportForCrossReferencePdf(admId, patId, request.getLocale()), request);
 	}
 
+	@GetMapping("/reports/discharge/{patId}/{admId}")
+	public ResponseEntity<Resource> printDischargeReportPdf(@PathVariable("patId") Integer patId, @PathVariable("admId") Integer admId, HttpServletRequest request) throws OHServiceException, IOException {
+		Patient patient = patientBrowserManager.getPatientById(patId);
+		if (patient == null) {
+			throw new OHAPIException(new OHExceptionMessage("Patient not found."), HttpStatus.NOT_FOUND);
+		}
+
+		return getReport(reportsManager.getGenericReportForDischargePdf(admId, patId, request.getLocale()), request);
+	}
+
 	@GetMapping("/reports/death")
 	public ResponseEntity<Resource> printDeathReportPdf(@RequestParam String firstDateTime, @RequestParam String secondDateTime, HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getDeathReportPdf(request.getLocale(), firstDateTime, secondDateTime), request);
