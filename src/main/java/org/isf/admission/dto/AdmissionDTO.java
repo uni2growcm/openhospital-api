@@ -182,6 +182,9 @@ public class AdmissionDTO {
 	@Schema(description = "Next appointment date", example = "string")
 	private LocalDateTime nextAppointment;
 
+	@Schema(description = "Death period")
+	private String deathPeriod;
+
 	@Schema(description = "Referral alert", example = "Urgent referral needed")
 	private String referralAlert;
 
@@ -540,6 +543,14 @@ public class AdmissionDTO {
 
 	public void setCourseOfAction(String courseOfAction) {
 		this.courseOfAction = courseOfAction;
+	}
+
+	public String getDeathPeriod() {
+		return deathPeriod;
+	}
+
+	public void setDeathPeriod(String deathPeriod) {
+		this.deathPeriod = deathPeriod;
 	}
 
 	public String getReferralAlert() {
