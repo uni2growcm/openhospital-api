@@ -30,7 +30,6 @@ import org.isf.care.dto.CareDTO;
 import org.isf.care.mapper.CareMapper;
 import org.isf.cares.TestCare;
 import org.isf.cares.model.Care;
-import org.isf.conditioning.dto.ConditioningDTO;
 import org.isf.patient.TestPatient;
 import org.isf.patient.model.Patient;
 import org.isf.utils.exception.OHException;
