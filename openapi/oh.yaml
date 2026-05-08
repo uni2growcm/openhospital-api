@@ -4655,24 +4655,24 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
-  /reports/discharge/{patId}/{admId}:
+  /reports/death:
     get:
       tags:
       - Reports
-      operationId: printDischargeReportPdf
+      operationId: printDeathReportPdf
       parameters:
-      - name: patId
-        in: path
+      - name: fromDate
+        in: query
         required: true
         schema:
-          type: integer
-          format: int32
-      - name: admId
-        in: path
+          type: string
+          format: date-time
+      - name: toDate
+        in: query
         required: true
         schema:
-          type: integer
-          format: int32
+          type: string
+          format: date-time
       responses:
         "200":
           description: OK
@@ -4701,6 +4701,34 @@ paths:
         schema:
           type: integer
           format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
+  /reports/admission:
+    get:
+      tags:
+      - Reports
+      operationId: getAdmissionReportPdf
+      parameters:
+      - name: fromDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: toDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
       responses:
         "200":
           description: OK
@@ -7598,13 +7626,13 @@ components:
           format: int32
           description: lock
           example: 0
-        pharmacy:
-          type: boolean
         opd:
           type: boolean
         female:
           type: boolean
         male:
+          type: boolean
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -8547,6 +8575,9 @@ components:
           format: date-time
           description: Next appointment date
           example: string
+        deathPeriod:
+          type: string
+          description: Death period
         yprog:
           type: integer
           format: int32

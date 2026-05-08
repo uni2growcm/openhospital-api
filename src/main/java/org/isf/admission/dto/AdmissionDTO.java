@@ -182,6 +182,9 @@ public class AdmissionDTO {
 	@Schema(description = "Next appointment date", example = "string")
 	private LocalDateTime nextAppointment;
 
+	@Schema(description = "Death period")
+	private String deathPeriod;
+
 	public int getId() {
 		return this.id;
 	}
@@ -525,5 +528,13 @@ public class AdmissionDTO {
 
 	public void setCourseOfAction(String courseOfAction) {
 		this.courseOfAction = courseOfAction;
+	}
+
+	public String getDeathPeriod() {
+		return deathPeriod;
+	}
+
+	public void setDeathPeriod(String deathPeriod) {
+		this.deathPeriod = deathPeriod;
 	}
 }
