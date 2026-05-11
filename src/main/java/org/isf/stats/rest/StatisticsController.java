@@ -1,5 +1,25 @@
+/*
+ * Open Hospital (www.open-hospital.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ *
+ * Open Hospital is a free and open source software for healthcare data management.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * https://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package org.isf.stats.rest;
-
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,28 +58,22 @@ public class StatisticsController {
 		this.reportsManager = reportsManager;
 	}
 
-	@GetMapping("/statistics/admittedPatientReport")
-	public ResponseEntity<Resource> printAdmittedPatientPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
-		throws OHServiceException, JRException, IOException {
-		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "AdmittedPatientReport", request.getLocale()), request);
-	}
-
-	@GetMapping("/statistics/pathologiesByAgeGenderReport")
+	@GetMapping("/statistics/pathologiesbyagegender")
 	public ResponseEntity<Resource> printPathologiesByAgeGenderPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
 		throws OHServiceException, JRException, IOException {
-		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "PathologyByAgeGender", request.getLocale()), request);
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "pathology_by_age_gender", request.getLocale()), request);
 	}
 
-	@GetMapping("/statistics/pathologiesReport")
+	@GetMapping("/statistics/pathologies")
 	public ResponseEntity<Resource> printPathologiesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
 		throws OHServiceException, JRException, IOException {
-		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "PathologyReport", request.getLocale()), request);
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "pathology_report", request.getLocale()), request);
 	}
 
-	@GetMapping("/statistics/dischargesReport")
+	@GetMapping("/statistics/dischargesstatistics")
 	public ResponseEntity<Resource> printDischargesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
 		throws OHServiceException, JRException, IOException {
-		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "DischargeReport", request.getLocale()), request);
+		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "discharge_statistics_report", request.getLocale()), request);
 	}
 
 	private ResponseEntity<Resource> getReport(
