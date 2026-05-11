@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.isf.admission.model.Admission;
 import org.isf.encounter.manager.EncounterBrowserManager;
 import org.isf.encounter.model.Encounter;
 import org.isf.examination.manager.ExaminationBrowserManager;
@@ -121,7 +120,6 @@ public class ReportsController {
 				"attachment; filename=\"" + resource.getFilename() + '"')
 			.body(resource);
 	}
-
 	@GetMapping("/reports/encounter/{encounterCode}")
 	public ResponseEntity<Resource> printEncounterReportPdf(@PathVariable("encounterCode") String encounterCode, HttpServletRequest request) throws OHServiceException, IOException {
 		Encounter encounter = encounterBrowserManager.getEncountersByCode(encounterCode);
@@ -176,5 +174,14 @@ public class ReportsController {
 		}
 
 		return getReport(reportsManager.getAdmissionReportPdf(fromDate, toDate, request.getLocale()), request);
+	}
+
+	@GetMapping("/reports/death")
+	public ResponseEntity<Resource> printDeathReportPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+		return getReport(reportsManager.getDeathReportPdf(request.getLocale(), fromDate, toDate), request);
 	}
 }

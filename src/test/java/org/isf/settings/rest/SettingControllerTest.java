@@ -42,18 +42,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mockito.Mockito;
 
 /**
  * SettingController integration tests
  * @author Silevester D.
  */
-@SpringBootTest(classes = OpenHospitalApiApplication.class)
+@SpringBootTest(classes = {OpenHospitalApiApplication.class, SettingControllerTest.SettingManagerTestConfig.class})
 @AutoConfigureMockMvc
 public class SettingControllerTest {
 
@@ -66,7 +69,7 @@ public class SettingControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@MockBean
+	@Autowired
 	private SettingManager manager;
 
 	@Test
@@ -197,5 +200,15 @@ public class SettingControllerTest {
 			.andDo(log())
 			.andExpect(status().isForbidden())
 			.andReturn();
+	}
+	
+	@TestConfiguration
+	static class SettingManagerTestConfig {
+		
+		@Bean
+		@Primary
+		public SettingManager settingManager() {
+			return Mockito.mock(SettingManager.class);
+		}
 	}
 }
