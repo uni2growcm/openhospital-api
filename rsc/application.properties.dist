@@ -42,3 +42,9 @@ jwt.token.validityInSecondsForRememberMe=259200
 # needed to start application even without DB connection
 spring.jpa.database-platform=org.hibernate.dialect.MariaDBDialect
 spring.jpa.hibernate.ddl-auto=none
+
+# Plugins configuration
+# Plugin gateway definitions are loaded from rsc/plugins.yaml.
+# See PluginsConfig for how this file is parsed at startup.
+
+spring.config.import=classpath:plugins.yaml
