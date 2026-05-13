@@ -46,3 +46,7 @@ jwt.token.validityInSecondsForRememberMe=259200
 # needed to start application even without DB connection
 spring.jpa.database-platform=org.hibernate.dialect.MariaDBDialect
 spring.jpa.hibernate.ddl-auto=none
+
+# Extra config import
+
+spring.config.import=classpath:labbook.properties
