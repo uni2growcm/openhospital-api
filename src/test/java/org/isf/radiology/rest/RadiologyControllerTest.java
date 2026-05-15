@@ -53,18 +53,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mockito.Mockito;
 
 /**
  * Radiology Controller Test
  * @author Silevester D.
  */
-@SpringBootTest(classes = OpenHospitalApiApplication.class)
+@SpringBootTest(classes = {OpenHospitalApiApplication.class, RadiologyControllerTest.RadiologyTestConfig.class})
 @AutoConfigureMockMvc
 public class RadiologyControllerTest {
 	private final Logger LOGGER = LoggerFactory.getLogger(RadiologyControllerTest.class);
@@ -72,10 +75,10 @@ public class RadiologyControllerTest {
 	@Autowired
 	private MockMvc mvc;
 
-	@MockBean
+	@Autowired
 	private OrthancAPIClientService orthancAPIClientService;
 
-	@MockBean
+	@Autowired
 	private PatientBrowserManager patientBrowserManager;
 
 	@Autowired
@@ -206,5 +209,21 @@ public class RadiologyControllerTest {
 
 			return instanceResponse;
 		}).collect(Collectors.toList());
+	}
+	
+	@TestConfiguration
+	static class RadiologyTestConfig {
+		
+		@Bean
+		@Primary
+		public OrthancAPIClientService orthancAPIClientService() {
+			return Mockito.mock(OrthancAPIClientService.class);
+		}
+		
+		@Bean
+		@Primary
+		public PatientBrowserManager patientBrowserManager() {
+			return Mockito.mock(PatientBrowserManager.class);
+		}
 	}
 }

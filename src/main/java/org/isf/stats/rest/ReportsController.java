@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.isf.admission.model.Admission;
 import org.isf.encounter.manager.EncounterBrowserManager;
 import org.isf.encounter.model.Encounter;
 import org.isf.examination.manager.ExaminationBrowserManager;
@@ -43,6 +43,7 @@ import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -119,7 +120,6 @@ public class ReportsController {
 				"attachment; filename=\"" + resource.getFilename() + '"')
 			.body(resource);
 	}
-
 	@GetMapping("/reports/encounter/{encounterCode}")
 	public ResponseEntity<Resource> printEncounterReportPdf(@PathVariable("encounterCode") String encounterCode, HttpServletRequest request) throws OHServiceException, IOException {
 		Encounter encounter = encounterBrowserManager.getEncountersByCode(encounterCode);
@@ -159,13 +159,29 @@ public class ReportsController {
 		return getReport(reportsManager.getGenericReportForCrossReferencePdf(admId, patId, request.getLocale()), request);
 	}
 
-	@GetMapping("/reports/discharge/{patId}/{admId}")
-	public ResponseEntity<Resource> printDischargeReportPdf(@PathVariable("patId") Integer patId, @PathVariable("admId") Integer admId, HttpServletRequest request) throws OHServiceException, IOException {
-		Patient patient = patientBrowserManager.getPatientById(patId);
-		if (patient == null) {
-			throw new OHAPIException(new OHExceptionMessage("Patient not found."), HttpStatus.NOT_FOUND);
+	@GetMapping("/reports/admission")
+	public ResponseEntity<Resource> getAdmissionReportPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+
+		if (fromDate == null) {
+			fromDate = LocalDateTime.now().minusDays(7);
+		}
+		if (toDate == null) {
+			toDate = LocalDateTime.now();
 		}
 
-		return getReport(reportsManager.getGenericReportForDischargePdf(admId, patId, request.getLocale()), request);
+		return getReport(reportsManager.getAdmissionReportPdf(fromDate, toDate, request.getLocale()), request);
+	}
+
+	@GetMapping("/reports/death")
+	public ResponseEntity<Resource> printDeathReportPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+		return getReport(reportsManager.getDeathReportPdf(request.getLocale(), fromDate, toDate), request);
 	}
 }
