@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -33,10 +33,5 @@ public class HospitalizationConsultationMapper extends GenericMapper<Hospitaliza
 
 	public HospitalizationConsultationMapper() {
 		super(HospitalizationConsultation.class, HospitalizationConsultationDTO.class);
-	}
-	
-	@PostConstruct
-	private void postConstruct() {
-		PatientMapping.addMapping(modelMapper);
 	}
 }

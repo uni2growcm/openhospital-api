@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -27,9 +27,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.isf.encounter.data.EncounterHelper;
-import org.isf.encounter.dto.EncounterDTO;
 import org.isf.encounter.mapper.EncounterMapper;
-import org.isf.encounter.model.Encounter;
 import org.isf.hospitalizationconsultation.dto.HospitalizationConsultationDTO;
 import org.isf.hospitalizationconsultation.mapper.HospitalizationConsultationMapper;
 import org.isf.hospitalizationconsultation.model.HospitalizationConsultation;
@@ -49,7 +47,7 @@ public class HospitalizationConsultationHelper {
 		consultation.setId(1);
 		consultation.setEncounter(EncounterHelper.setup());
 		consultation.setTeams("Cardiology, Neurology");
-		consultation.setDateTime(LocalDateTime.now());
+		consultation.setConsultationDate(LocalDateTime.now());
 		consultation.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		consultation.setPhysicalExamination("Normal heart sounds, clear lungs");
 		consultation.setDiagnosis("Acute myocardial infarction");

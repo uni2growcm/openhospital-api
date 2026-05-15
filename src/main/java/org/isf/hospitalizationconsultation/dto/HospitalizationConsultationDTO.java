@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -41,7 +41,7 @@ public class HospitalizationConsultationDTO {
 
 	@NotNull
 	@Schema(description = "Date and time of the consultation", example = "2025-08-26T16:15:58")
-	private LocalDateTime dateTime;
+	private LocalDateTime consultationDate;
 
 	@Schema(description = "Parent complaints", example = "Patient complains of chest pain and shortness of breath")
 	private String parentComplaints;
@@ -82,12 +82,12 @@ public class HospitalizationConsultationDTO {
 		this.teams = teams;
 	}
 
-	public LocalDateTime getDateTime() {
-		return dateTime;
+	public LocalDateTime getConsultationDate() {
+		return consultationDate;
 	}
 
-	public void setDateTime(LocalDateTime dateTime) {
-		this.dateTime = dateTime;
+	public void setConsultationDate(LocalDateTime dateTime) {
+		this.consultationDate = dateTime;
 	}
 
 	public String getParentComplaints() {

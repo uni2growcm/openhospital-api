@@ -34,9 +34,4 @@ public class EncounterMapper extends GenericMapper<Encounter, EncounterDTO> {
 	public EncounterMapper() {
 		super(Encounter.class, EncounterDTO.class);
 	}
-	
-	@PostConstruct
-	private void postConstruct() {
-		PatientMapping.addMapping(modelMapper);
-	}
 }

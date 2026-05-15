@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -46,7 +46,7 @@ class HospitalizationConsultationDTOTest {
 		// When
 		dto.setId(expectedId);
 		dto.setTeams(expectedTeams);
-		dto.setDateTime(expectedDateTime);
+		dto.setConsultationDate(expectedDateTime);
 		dto.setParentComplaints(expectedParentComplaints);
 		dto.setPhysicalExamination(expectedPhysicalExamination);
 		dto.setDiagnosis(expectedDiagnosis);
@@ -56,7 +56,7 @@ class HospitalizationConsultationDTOTest {
 		// Then
 		assertEquals(expectedId, dto.getId());
 		assertEquals(expectedTeams, dto.getTeams());
-		assertEquals(expectedDateTime, dto.getDateTime());
+		assertEquals(expectedDateTime, dto.getConsultationDate());
 		assertEquals(expectedParentComplaints, dto.getParentComplaints());
 		assertEquals(expectedPhysicalExamination, dto.getPhysicalExamination());
 		assertEquals(expectedDiagnosis, dto.getDiagnosis());
@@ -90,7 +90,7 @@ class HospitalizationConsultationDTOTest {
 		assertNotNull(dto);
 		assertNull(dto.getId());
 		assertNull(dto.getTeams());
-		assertNull(dto.getDateTime());
+		assertNull(dto.getConsultationDate());
 		assertNull(dto.getParentComplaints());
 		assertNull(dto.getPhysicalExamination());
 		assertNull(dto.getDiagnosis());
@@ -105,7 +105,7 @@ class HospitalizationConsultationDTOTest {
 		HospitalizationConsultationDTO dto = new HospitalizationConsultationDTO();
 		dto.setId(1);
 		dto.setTeams("test");
-		dto.setDateTime(LocalDateTime.now());
+		dto.setConsultationDate(LocalDateTime.now());
 		dto.setParentComplaints("test");
 		dto.setPhysicalExamination("test");
 		dto.setDiagnosis("test");
@@ -116,7 +116,7 @@ class HospitalizationConsultationDTOTest {
 		// When
 		dto.setId(null);
 		dto.setTeams(null);
-		dto.setDateTime(null);
+		dto.setConsultationDate(null);
 		dto.setParentComplaints(null);
 		dto.setPhysicalExamination(null);
 		dto.setDiagnosis(null);
@@ -127,7 +127,7 @@ class HospitalizationConsultationDTOTest {
 		// Then
 		assertNull(dto.getId());
 		assertNull(dto.getTeams());
-		assertNull(dto.getDateTime());
+		assertNull(dto.getConsultationDate());
 		assertNull(dto.getParentComplaints());
 		assertNull(dto.getPhysicalExamination());
 		assertNull(dto.getDiagnosis());

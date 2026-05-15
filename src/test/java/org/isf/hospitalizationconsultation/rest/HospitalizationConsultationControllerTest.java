@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -115,7 +115,7 @@ public class HospitalizationConsultationControllerTest {
 		HospitalizationConsultationDTO body = new HospitalizationConsultationDTO();
 		body.setEncounter(encounterDTO);
 		body.setTeams("Cardiology, Neurology");
-		body.setDateTime(java.time.LocalDateTime.now());
+		body.setConsultationDate(java.time.LocalDateTime.now());
 		body.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		body.setPhysicalExamination("Normal heart sounds, clear lungs");
 		body.setDiagnosis("Acute myocardial infarction");
@@ -341,7 +341,7 @@ public class HospitalizationConsultationControllerTest {
 		HospitalizationConsultationDTO updateDTO = new HospitalizationConsultationDTO();
 		updateDTO.setEncounter(encounterDTO);
 		updateDTO.setTeams("Cardiology, Neurology");
-		updateDTO.setDateTime(java.time.LocalDateTime.now());
+		updateDTO.setConsultationDate(java.time.LocalDateTime.now());
 		updateDTO.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		updateDTO.setPhysicalExamination("Normal heart sounds, clear lungs");
 		updateDTO.setDiagnosis("Acute myocardial infarction");
@@ -353,7 +353,7 @@ public class HospitalizationConsultationControllerTest {
 		existingConsultation.setId(1);
 		existingConsultation.setEncounter(new Encounter()); // This will be set by mock
 		existingConsultation.setTeams("Cardiology, Neurology");
-		existingConsultation.setDateTime(java.time.LocalDateTime.now());
+		existingConsultation.setConsultationDate(java.time.LocalDateTime.now());
 		existingConsultation.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		existingConsultation.setPhysicalExamination("Normal heart sounds, clear lungs");
 		existingConsultation.setDiagnosis("Acute myocardial infarction");
