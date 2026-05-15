@@ -21,11 +21,9 @@
  */
 package org.isf.hospitalizationconsultation.mapper;
 
-import jakarta.annotation.PostConstruct;
 import org.isf.hospitalizationconsultation.dto.HospitalizationConsultationDTO;
 import org.isf.hospitalizationconsultation.model.HospitalizationConsultation;
 import org.isf.shared.GenericMapper;
-import org.isf.shared.mapper.mappings.PatientMapping;
 import org.springframework.stereotype.Component;
 
 @Component
