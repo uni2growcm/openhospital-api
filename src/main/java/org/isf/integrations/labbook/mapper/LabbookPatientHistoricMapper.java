@@ -22,22 +22,26 @@
 package org.isf.integrations.labbook.mapper;
 
 import org.isf.integrations.labbook.dto.LabbookAnalysisDTO;
+import org.isf.integrations.labbook.dto.LabbookAnalysisVariableDTO;
 import org.isf.integrations.labbook.dto.LabbookPatientHistoricDTO;
 import org.isf.integrations.labbook.dto.LabbookRawPatientDTO;
+import org.isf.integrations.labbook.models.AnalysisResponse;
 import org.isf.integrations.labbook.models.PatientHistoricResponse;
 import org.isf.shared.GenericMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class LabbookPatientHistoricMapper extends GenericMapper<PatientHistoricResponse, LabbookPatientHistoricDTO> {
 
 	private final LabbookRawPatientMapper labbookRawPatientMapper;
-	private final LabbookAnalysisMapper labbookAnalysisMapper;
 
-	public LabbookPatientHistoricMapper(LabbookRawPatientMapper labbookRawPatientMapper, LabbookAnalysisMapper labbookAnalysisMapper) {
+	public LabbookPatientHistoricMapper(LabbookRawPatientMapper labbookRawPatientMapper) {
 		super(PatientHistoricResponse.class, LabbookPatientHistoricDTO.class);
 		this.labbookRawPatientMapper = labbookRawPatientMapper;
-		this.labbookAnalysisMapper = labbookAnalysisMapper;
 	}
 
 	@Override
@@ -49,12 +53,44 @@ public class LabbookPatientHistoricMapper extends GenericMapper<PatientHistoricR
 			labbookRawPatientMapper.map2DTO(fromObj.patient())
 		);
 
-		dto.setAnalyzes(
+		Map<String, List<AnalysisResponse>> grouped =
 			fromObj.analyzes()
 				.stream()
-				.map(labbookAnalysisMapper::map2DTO)
-				.toList()
-		);
+				.collect(Collectors.groupingBy(a ->
+					a.recordNumber() + "|" +
+						a.analysis() + "|" +
+						a.prescriptionDate()
+				));
+
+		List<LabbookAnalysisDTO> analyses = grouped.values()
+			.stream()
+			.map(list -> {
+
+				AnalysisResponse first = list.get(0);
+
+				LabbookAnalysisDTO analysisDTO = new LabbookAnalysisDTO();
+
+				analysisDTO.setId(first.id());
+				analysisDTO.setRecordType(first.recordType());
+				analysisDTO.setPrescriptionDate(first.prescriptionDate());
+				analysisDTO.setAnalysis(first.analysis());
+				analysisDTO.setRecordNumber(first.recordNumber());
+
+				List<LabbookAnalysisVariableDTO> variables =
+					list.stream()
+						.map(a -> new LabbookAnalysisVariableDTO(
+							a.variable(),
+							a.result()
+						))
+						.toList();
+
+				analysisDTO.setVariables(variables);
+
+				return analysisDTO;
+			})
+			.toList();
+
+		dto.setAnalyzes(analyses);
 
 		return dto;
 	}
