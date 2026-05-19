@@ -52,8 +52,8 @@ public class HospitalizationConsultationDTO {
 	@Schema(description = "Diagnosis", example = "Acute myocardial infarction")
 	private String diagnosis;
 
-	@Schema(description = "Management plan", example = "Start thrombolytic therapy, monitor vitals")
-	private String managementPlan;
+	@Schema(description = "Instructions", example = "Start thrombolytic therapy, monitor vitals")
+	private String instructions;
 
 	@Schema(description = "Lock version for optimistic locking", example = "1")
 	private Integer lock;
@@ -114,12 +114,12 @@ public class HospitalizationConsultationDTO {
 		this.diagnosis = diagnosis;
 	}
 
-	public String getManagementPlan() {
-		return managementPlan;
+	public String getInstructions() {
+		return instructions;
 	}
 
-	public void setManagementPlan(String managementPlan) {
-		this.managementPlan = managementPlan;
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
 	}
 
 	public Integer getLock() {

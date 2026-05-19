@@ -51,7 +51,7 @@ public class HospitalizationConsultationHelper {
 		consultation.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		consultation.setPhysicalExamination("Normal heart sounds, clear lungs");
 		consultation.setDiagnosis("Acute myocardial infarction");
-		consultation.setManagementPlan("Start thrombolytic therapy, monitor vitals");
+		consultation.setInstructions("Start thrombolytic therapy, monitor vitals");
 		consultation.setLock(1);
 		return consultation;
 	}

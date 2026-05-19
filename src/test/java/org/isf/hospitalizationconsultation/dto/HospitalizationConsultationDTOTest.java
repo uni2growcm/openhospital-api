@@ -32,7 +32,6 @@ class HospitalizationConsultationDTOTest {
 
 	@Test
 	void testGettersAndSetters() {
-		// Given
 		HospitalizationConsultationDTO dto = new HospitalizationConsultationDTO();
 		Integer expectedId = 1;
 		String expectedTeams = "Cardiology, Neurology";
@@ -40,42 +39,37 @@ class HospitalizationConsultationDTOTest {
 		String expectedParentComplaints = "Patient complains of chest pain";
 		String expectedPhysicalExamination = "Normal heart sounds";
 		String expectedDiagnosis = "Acute myocardial infarction";
-		String expectedManagementPlan = "Start thrombolytic therapy";
+		String expectedInstructions = "Start thrombolytic therapy";
 		Integer expectedLock = 1;
 
-		// When
 		dto.setId(expectedId);
 		dto.setTeams(expectedTeams);
 		dto.setConsultationDate(expectedDateTime);
 		dto.setParentComplaints(expectedParentComplaints);
 		dto.setPhysicalExamination(expectedPhysicalExamination);
 		dto.setDiagnosis(expectedDiagnosis);
-		dto.setManagementPlan(expectedManagementPlan);
+		dto.setInstructions(expectedInstructions);
 		dto.setLock(expectedLock);
 
-		// Then
 		assertEquals(expectedId, dto.getId());
 		assertEquals(expectedTeams, dto.getTeams());
 		assertEquals(expectedDateTime, dto.getConsultationDate());
 		assertEquals(expectedParentComplaints, dto.getParentComplaints());
 		assertEquals(expectedPhysicalExamination, dto.getPhysicalExamination());
 		assertEquals(expectedDiagnosis, dto.getDiagnosis());
-		assertEquals(expectedManagementPlan, dto.getManagementPlan());
+		assertEquals(expectedInstructions, dto.getInstructions());
 		assertEquals(expectedLock, dto.getLock());
 	}
 
 	@Test
 	void testEncounterGetterSetter() {
-		// Given
 		HospitalizationConsultationDTO dto = new HospitalizationConsultationDTO();
 		EncounterDTO expectedEncounter = new EncounterDTO();
 		expectedEncounter.setId(1);
 		expectedEncounter.setCode("ENC_001");
 
-		// When
 		dto.setEncounter(expectedEncounter);
 
-		// Then
 		assertEquals(expectedEncounter, dto.getEncounter());
 		assertEquals(expectedEncounter.getId(), dto.getEncounter().getId());
 		assertEquals(expectedEncounter.getCode(), dto.getEncounter().getCode());
@@ -83,10 +77,8 @@ class HospitalizationConsultationDTOTest {
 
 	@Test
 	void testDefaultConstructor() {
-		// When
 		HospitalizationConsultationDTO dto = new HospitalizationConsultationDTO();
 
-		// Then
 		assertNotNull(dto);
 		assertNull(dto.getId());
 		assertNull(dto.getTeams());
@@ -94,14 +86,13 @@ class HospitalizationConsultationDTOTest {
 		assertNull(dto.getParentComplaints());
 		assertNull(dto.getPhysicalExamination());
 		assertNull(dto.getDiagnosis());
-		assertNull(dto.getManagementPlan());
+		assertNull(dto.getInstructions());
 		assertNull(dto.getLock());
 		assertNull(dto.getEncounter());
 	}
 
 	@Test
 	void testSetNullValues() {
-		// Given
 		HospitalizationConsultationDTO dto = new HospitalizationConsultationDTO();
 		dto.setId(1);
 		dto.setTeams("test");
@@ -109,29 +100,27 @@ class HospitalizationConsultationDTOTest {
 		dto.setParentComplaints("test");
 		dto.setPhysicalExamination("test");
 		dto.setDiagnosis("test");
-		dto.setManagementPlan("test");
+		dto.setInstructions("test");
 		dto.setLock(1);
 		dto.setEncounter(new EncounterDTO());
 
-		// When
 		dto.setId(null);
 		dto.setTeams(null);
 		dto.setConsultationDate(null);
 		dto.setParentComplaints(null);
 		dto.setPhysicalExamination(null);
 		dto.setDiagnosis(null);
-		dto.setManagementPlan(null);
+		dto.setInstructions(null);
 		dto.setLock(null);
 		dto.setEncounter(null);
 
-		// Then
 		assertNull(dto.getId());
 		assertNull(dto.getTeams());
 		assertNull(dto.getConsultationDate());
 		assertNull(dto.getParentComplaints());
 		assertNull(dto.getPhysicalExamination());
 		assertNull(dto.getDiagnosis());
-		assertNull(dto.getManagementPlan());
+		assertNull(dto.getInstructions());
 		assertNull(dto.getLock());
 		assertNull(dto.getEncounter());
 	}

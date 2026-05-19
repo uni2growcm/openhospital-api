@@ -106,12 +106,10 @@ public class HospitalizationConsultationControllerTest {
 	void testCreateHospitalizationConsultation_success() throws Exception {
 		String request = "/hospitalizationconsultations";
 
-		// Create test encounter directly
 		EncounterDTO encounterDTO = new EncounterDTO();
 		encounterDTO.setId(1);
 		encounterDTO.setCode("ENC001");
-		
-		// Create test hospitalization consultation
+
 		HospitalizationConsultationDTO body = new HospitalizationConsultationDTO();
 		body.setEncounter(encounterDTO);
 		body.setTeams("Cardiology, Neurology");
@@ -119,7 +117,7 @@ public class HospitalizationConsultationControllerTest {
 		body.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		body.setPhysicalExamination("Normal heart sounds, clear lungs");
 		body.setDiagnosis("Acute myocardial infarction");
-		body.setManagementPlan("Start thrombolytic therapy, monitor vitals");
+		body.setInstructions("Start thrombolytic therapy, monitor vitals");
 		body.setLock(1);
 		
 		Encounter encounter = encounterMapper.map2Model(body.getEncounter());
@@ -332,12 +330,10 @@ public class HospitalizationConsultationControllerTest {
 		String request = "/hospitalizationconsultations/{id}";
 		int id = 1;
 
-		// Create test encounter directly
 		EncounterDTO encounterDTO = new EncounterDTO();
 		encounterDTO.setId(1);
 		encounterDTO.setCode("ENC001");
-		
-		// Create test hospitalization consultation
+
 		HospitalizationConsultationDTO updateDTO = new HospitalizationConsultationDTO();
 		updateDTO.setEncounter(encounterDTO);
 		updateDTO.setTeams("Cardiology, Neurology");
@@ -345,19 +341,18 @@ public class HospitalizationConsultationControllerTest {
 		updateDTO.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		updateDTO.setPhysicalExamination("Normal heart sounds, clear lungs");
 		updateDTO.setDiagnosis("Acute myocardial infarction");
-		updateDTO.setManagementPlan("Start thrombolytic therapy, monitor vitals");
+		updateDTO.setInstructions("Start thrombolytic therapy, monitor vitals");
 		updateDTO.setLock(1);
-		
-		// Create existing consultation directly to avoid missing TestEncounter class
+
 		HospitalizationConsultation existingConsultation = new HospitalizationConsultation();
 		existingConsultation.setId(1);
-		existingConsultation.setEncounter(new Encounter()); // This will be set by mock
+		existingConsultation.setEncounter(new Encounter());
 		existingConsultation.setTeams("Cardiology, Neurology");
 		existingConsultation.setConsultationDate(java.time.LocalDateTime.now());
 		existingConsultation.setParentComplaints("Patient complains of chest pain and shortness of breath");
 		existingConsultation.setPhysicalExamination("Normal heart sounds, clear lungs");
 		existingConsultation.setDiagnosis("Acute myocardial infarction");
-		existingConsultation.setManagementPlan("Start thrombolytic therapy, monitor vitals");
+		existingConsultation.setInstructions("Start thrombolytic therapy, monitor vitals");
 		existingConsultation.setLock(1);
 		HospitalizationConsultation updatedConsultation = hospitalizationConsultationMapper.map2Model(updateDTO);
 

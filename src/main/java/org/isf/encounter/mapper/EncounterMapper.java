@@ -21,11 +21,9 @@
  */
 package org.isf.encounter.mapper;
 
-import jakarta.annotation.PostConstruct;
 import org.isf.encounter.dto.EncounterDTO;
 import org.isf.encounter.model.Encounter;
 import org.isf.shared.GenericMapper;
-import org.isf.shared.mapper.mappings.PatientMapping;
 import org.springframework.stereotype.Component;
 
 @Component
