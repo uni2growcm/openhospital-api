@@ -32,6 +32,7 @@ import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @Tag(name = "Statistics")
@@ -59,21 +61,60 @@ public class StatisticsController {
 	}
 
 	@GetMapping("/statistics/pathologiesbyagegender")
-	public ResponseEntity<Resource> printPathologiesByAgeGenderPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
+	public ResponseEntity<Resource> printPathologiesByAgeGenderPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+		HttpServletRequest request
+	)
 		throws OHServiceException, JRException, IOException {
 		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "pathology_by_age_gender", request.getLocale()), request);
 	}
 
 	@GetMapping("/statistics/pathologies")
-	public ResponseEntity<Resource> printPathologiesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
+	public ResponseEntity<Resource> printPathologiesPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+		HttpServletRequest request
+	)
 		throws OHServiceException, JRException, IOException {
 		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "pathology_report", request.getLocale()), request);
 	}
 
 	@GetMapping("/statistics/dischargesstatistics")
-	public ResponseEntity<Resource> printDischargesPdf(@RequestParam LocalDate fromDate, @RequestParam LocalDate toDate, HttpServletRequest request)
+	public ResponseEntity<Resource> printDischargesPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+		HttpServletRequest request
+	)
 		throws OHServiceException, JRException, IOException {
 		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "discharge_statistics_report", request.getLocale()), request);
+	}
+
+	@GetMapping("/statistics/death")
+	public ResponseEntity<Resource> printDeathReportPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+		return getReport(reportsManager.getDeathReportPdf(request.getLocale(), fromDate, toDate), request);
+	}
+
+	@GetMapping("/statistics/admission")
+	public ResponseEntity<Resource> getAdmissionReportPdf(
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
+		HttpServletRequest request
+	) throws OHServiceException, IOException {
+
+		if (fromDate == null) {
+			fromDate = LocalDateTime.now().minusDays(7);
+		}
+		if (toDate == null) {
+			toDate = LocalDateTime.now();
+		}
+
+		System.out.println(request.getLocale());
+		return getReport(reportsManager.getAdmissionReportPdf(fromDate, toDate, request.getLocale()), request);
 	}
 
 	private ResponseEntity<Resource> getReport(

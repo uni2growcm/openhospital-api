@@ -158,30 +158,4 @@ public class ReportsController {
 
 		return getReport(reportsManager.getGenericReportForCrossReferencePdf(admId, patId, request.getLocale()), request);
 	}
-
-	@GetMapping("/reports/admission")
-	public ResponseEntity<Resource> getAdmissionReportPdf(
-		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
-		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
-		HttpServletRequest request
-	) throws OHServiceException, IOException {
-
-		if (fromDate == null) {
-			fromDate = LocalDateTime.now().minusDays(7);
-		}
-		if (toDate == null) {
-			toDate = LocalDateTime.now();
-		}
-
-		return getReport(reportsManager.getAdmissionReportPdf(fromDate, toDate, request.getLocale()), request);
-	}
-
-	@GetMapping("/reports/death")
-	public ResponseEntity<Resource> printDeathReportPdf(
-		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
-		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
-		HttpServletRequest request
-	) throws OHServiceException, IOException {
-		return getReport(reportsManager.getDeathReportPdf(request.getLocale(), fromDate, toDate), request);
-	}
 }
