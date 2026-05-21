@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -19,30 +19,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.patient.mapper;
+package org.isf.hospitalizationconsultation.mapper;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.isf.patient.dto.PatientDTO;
-import org.isf.patient.model.Patient;
+import org.isf.hospitalizationconsultation.dto.HospitalizationConsultationDTO;
+import org.isf.hospitalizationconsultation.model.HospitalizationConsultation;
 import org.isf.shared.GenericMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PatientMapper extends GenericMapper<Patient, PatientDTO> {
+public class HospitalizationConsultationMapper extends GenericMapper<HospitalizationConsultation, HospitalizationConsultationDTO> {
 
-	public PatientMapper() {
-		super(Patient.class, PatientDTO.class);
-	}
-
-	@Override
-	public List<PatientDTO> map2DTOList(List<Patient> list) {
-		return list.stream().map(it -> map2DTO(it)).collect(Collectors.toList());
-	}
-
-	@Override
-	public List<Patient> map2ModelList(List<PatientDTO> list) {
-		return list.stream().map(it -> map2Model(it)).collect(Collectors.toList());
+	public HospitalizationConsultationMapper() {
+		super(HospitalizationConsultation.class, HospitalizationConsultationDTO.class);
 	}
 }
