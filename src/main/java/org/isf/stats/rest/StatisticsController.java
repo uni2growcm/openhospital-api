@@ -67,6 +67,12 @@ public class StatisticsController {
 		HttpServletRequest request
 	)
 		throws OHServiceException, JRException, IOException {
+		if (fromDate == null) {
+			fromDate = LocalDate.now().minusDays(7);
+		}
+		if (toDate == null) {
+			toDate = LocalDate.now();
+		}
 		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "pathology_by_age_gender", request.getLocale()), request);
 	}
 
@@ -77,6 +83,12 @@ public class StatisticsController {
 		HttpServletRequest request
 	)
 		throws OHServiceException, JRException, IOException {
+		if (fromDate == null) {
+			fromDate = LocalDate.now().minusDays(7);
+		}
+		if (toDate == null) {
+			toDate = LocalDate.now();
+		}
 		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "pathology_report", request.getLocale()), request);
 	}
 
@@ -85,8 +97,13 @@ public class StatisticsController {
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
 		HttpServletRequest request
-	)
-		throws OHServiceException, JRException, IOException {
+	) throws OHServiceException, JRException, IOException {
+		if (fromDate == null) {
+			fromDate = LocalDate.now().minusDays(7);
+		}
+		if (toDate == null) {
+			toDate = LocalDate.now();
+		}
 		return getReport(reportsManager.getStatisticsReportPdf(fromDate, toDate, "discharge_statistics_report", request.getLocale()), request);
 	}
 
@@ -96,6 +113,12 @@ public class StatisticsController {
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
 		HttpServletRequest request
 	) throws OHServiceException, IOException {
+		if (fromDate == null) {
+			fromDate = LocalDateTime.now().minusDays(7);
+		}
+		if (toDate == null) {
+			toDate = LocalDateTime.now();
+		}
 		return getReport(reportsManager.getDeathReportPdf(request.getLocale(), fromDate, toDate), request);
 	}
 
