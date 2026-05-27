@@ -666,6 +666,11 @@ public class LaboratoryController {
 		laboratoryDTO.setInOutPatient(PatientSTATUS.valueOf(lab.getInOutPatient()));
 		laboratoryDTO.setStatus(LaboratoryStatus.valueOf(lab.getStatus()));
 
+		if(lab.getPatient() !=null){
+			laboratoryDTO.setPatientCode(lab.getPatient().getCode());
+			laboratoryDTO.setPatName(lab.getPatient().getName());
+		}
+
 		return laboratoryDTO;
 	}
 
@@ -690,6 +695,11 @@ public class LaboratoryController {
 		labDTO.setRegistrationDate(laboratory.getCreatedDate());
 		labDTO.setInOutPatient(PatientSTATUS.valueOf(laboratory.getInOutPatient()));
 		labDTO.setStatus(LaboratoryStatus.valueOf(laboratory.getStatus()));
+
+		if(laboratory.getPatient() !=null){
+			labDTO.setPatientCode(laboratory.getPatient().getCode());
+			labDTO.setPatName(laboratory.getPatient().getName());
+		}
 		lab.setLaboratoryDTO(labDTO);
 
 		List<String> labDescription = new ArrayList<>();
