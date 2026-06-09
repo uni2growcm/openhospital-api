@@ -19,17 +19,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.commune.mapper;
+package org.isf.municipality.mapper;
 
-import org.isf.commune.dto.CommuneDTO;
-import org.isf.commune.model.Commune;
-import org.isf.ethnic.model.Ethnic;
+import org.isf.municipality.dto.MunicipalityDTO;
+import org.isf.municipality.model.Municipality;
 import org.isf.shared.GenericMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CommuneMapper extends GenericMapper<Commune, CommuneDTO> {
-	public CommuneMapper() {
-		super(Commune.class, CommuneDTO.class);
+public class MunicipalityMapper extends GenericMapper<Municipality, MunicipalityDTO> {
+	public MunicipalityMapper() {
+		super(Municipality.class, MunicipalityDTO.class);
 	}
 }

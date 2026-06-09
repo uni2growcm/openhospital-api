@@ -19,24 +19,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.isf.commune.dto;
+package org.isf.municipality.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-@Schema(description = "Class representing a commune")
-public class CommuneDTO {
+@Schema(description = "Class representing a municipality")
+public class MunicipalityDTO {
 
-	@Schema(description = "id of the commune", example = "1")
+	@Schema(description = "id of the municipality", example = "1")
 	private Integer id;
 
 	@NotNull
-	@Schema(description = "name of the commune", example = "Dassa")
+	@Schema(description = "name of the municipality", example = "Dassa")
 	private String name;
 
 	@Override
 	public String toString() {
-		return "CommuneDTO{" + "id='" + id + '\'' + ", name='" + name + "'}";
+		return "MunicipalityDTO{" + "id='" + id + '\'' + ", name='" + name + "'}";
 	}
 
 	public Integer getId() {

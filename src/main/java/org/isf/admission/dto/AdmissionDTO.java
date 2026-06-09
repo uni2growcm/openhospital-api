@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -78,8 +78,8 @@ public class AdmissionDTO {
 	@Schema(description = "Disease in ")
 	private DiseaseDTO diseaseIn;
 
-	@Schema(description = "Disease out ")
-	private DiseaseDTO diseaseOut1;
+	@Schema(description = "Complication Diagnosis")
+	private List<DiseaseDTO> complicationDiagnosis;
 
 	@Schema(description = "Disease out ")
 	private DiseaseDTO diseaseOut2;
@@ -240,8 +240,8 @@ public class AdmissionDTO {
 		return this.diseaseIn;
 	}
 
-	public DiseaseDTO getDiseaseOut1() {
-		return this.diseaseOut1;
+	public List<DiseaseDTO> getComplicationDiagnosis() {
+		return this.complicationDiagnosis;
 	}
 
 	public DiseaseDTO getDiseaseOut2() {
@@ -369,8 +369,8 @@ public class AdmissionDTO {
 		this.diseaseIn = diseaseIn;
 	}
 
-	public void setDiseaseOut1(DiseaseDTO diseaseOut1) {
-		this.diseaseOut1 = diseaseOut1;
+	public void setComplicationDiagnosis(List<DiseaseDTO> complicationDiagnosis) {
+		this.complicationDiagnosis = complicationDiagnosis;
 	}
 
 	public void setDiseaseOut2(DiseaseDTO diseaseOut2) {
