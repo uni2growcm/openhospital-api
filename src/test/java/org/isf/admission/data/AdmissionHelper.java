@@ -69,7 +69,7 @@ public class AdmissionHelper {
 		TestDisease testDisease = new TestDisease();
 		DiseaseType diseaseType = (new TestDiseaseType()).setup(false);
 		Disease diseaseIn = testDisease.setup(diseaseType, false);
-		Disease diseaseOut1 = testDisease.setup(diseaseType, false);
+		Disease complicationDiagnosis = testDisease.setup(diseaseType, false);
 		Disease diseaseOut2 = testDisease.setup(diseaseType, false);
 		Disease diseaseOut3 = testDisease.setup(diseaseType, false);
 
@@ -83,7 +83,7 @@ public class AdmissionHelper {
 		DeliveryType deliveryType = null;
 		DeliveryResultType deliveryResult = null;
 
-		return testAdmission.setup(ward, patient, admissionType, diseaseIn, diseaseOut1, diseaseOut2, diseaseOut3, operation, dischargeType, pregTreatmentType,
+		return testAdmission.setup(ward, patient, admissionType, diseaseIn, List.of(complicationDiagnosis), diseaseOut2, diseaseOut3, operation, dischargeType, pregTreatmentType,
 				deliveryType, deliveryResult, false);
 	}
 

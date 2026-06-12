@@ -22,6 +22,7 @@
 package org.isf.admission.rest;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -35,6 +36,7 @@ import org.isf.admission.model.Admission;
 import org.isf.admtype.model.AdmissionType;
 import org.isf.disctype.manager.DischargeTypeBrowserManager;
 import org.isf.disctype.model.DischargeType;
+import org.isf.disease.dto.DiseaseDTO;
 import org.isf.disease.manager.DiseaseBrowserManager;
 import org.isf.disease.model.Disease;
 import org.isf.dlvrrestype.manager.DeliveryResultTypeBrowserManager;
@@ -345,7 +347,7 @@ public class AdmissionController {
 
 		// TODO: Use a appropriate DTO which includes validation and remove following lines
 		Admission adm = admissionMapper.map2Model(currentAdmissionDTO);
-		if (adm.getDiseaseOut1() == null) {
+		if (adm.getComplicationDiagnosis() == null || adm.getComplicationDiagnosis().isEmpty()) {
 			throw new OHAPIException(new OHExceptionMessage("at least one disease must be give."));
 		}
 
@@ -386,6 +388,17 @@ public class AdmissionController {
 		@Valid @RequestBody AdmissionDTO newAdmissionDTO
 	) throws OHServiceException {
 		Admission newAdmission = admissionMapper.map2Model(newAdmissionDTO);
+		if (newAdmissionDTO.getComplicationDiagnosis() != null && !newAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
+			List<Disease> diseaseList = new ArrayList<>();
+			for (DiseaseDTO diseaseOutCode : newAdmissionDTO.getComplicationDiagnosis()) {
+				Disease dOut1 = diseaseManager.getDiseaseByCode(diseaseOutCode.getCode());
+				if (dOut1 == null) {
+					throw new OHAPIException(new OHExceptionMessage("Disease out not found for code: " + diseaseOutCode));
+				}
+				diseaseList.add(dOut1);
+			}
+			newAdmission.setComplicationDiagnosis(diseaseList);
+		}
 
 		if (newAdmissionDTO.getWard() != null && newAdmissionDTO.getWard().getCode() != null
 			&& !newAdmissionDTO.getWard().getCode().trim().isEmpty()) {
@@ -436,14 +449,14 @@ public class AdmissionController {
 			newAdmission.setDiseaseIn(dIns.get(0));
 		}
 
-		if (newAdmissionDTO.getDiseaseOut1() != null && newAdmissionDTO.getDiseaseOut1().getCode() != null) {
-			List<Disease> dOut1 = diseases.stream()
-				.filter(d -> d.getCode().equals(newAdmissionDTO.getDiseaseOut1().getCode())).toList();
-			if (dOut1.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease out 1 not found."));
-			}
-			newAdmission.setDiseaseOut1(dOut1.get(0));
-		}
+//		if (newAdmissionDTO.getComplicationDiagnosis() != null && newAdmissionDTO.getComplicationDiagnosis().getCode() != null) {
+//			List<Disease> dOut1 = diseases.stream()
+//				.filter(d -> d.getCode().equals(newAdmissionDTO.getComplicationDiagnosis().getCode())).toList();
+//			if (dOut1.isEmpty()) {
+//				throw new OHAPIException(new OHExceptionMessage("Disease out 1 not found."));
+//			}
+//			newAdmission.setComplicationDiagnosis(dOut1.get(0));
+//		}
 
 		if (newAdmissionDTO.getDiseaseOut2() != null && newAdmissionDTO.getDiseaseOut2().getCode() != null) {
 			List<Disease> dOut2 = diseases.stream()
@@ -598,13 +611,16 @@ public class AdmissionController {
 			updateAdmission.setDiseaseIn(dIns.get(0));
 		}
 
-		if (updateAdmissionDTO.getDiseaseOut1() != null && updateAdmissionDTO.getDiseaseOut1().getCode() != null) {
-			List<Disease> dOut1s = diseases.stream()
-				.filter(d -> d.getCode().equals(updateAdmissionDTO.getDiseaseOut1().getCode())).toList();
-			if (dOut1s.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease out 1 not found."));
+		if (updateAdmissionDTO.getComplicationDiagnosis() != null && !updateAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
+			List<Disease> diseaseList = new ArrayList<>();
+			for (DiseaseDTO complicationDiagnosisCode : updateAdmissionDTO.getComplicationDiagnosis()) {
+				Disease d = diseaseManager.getDiseaseByCode(complicationDiagnosisCode.getCode());
+				if (d == null) {
+					throw new OHAPIException(new OHExceptionMessage("Complication diagnosis not found for code: " + complicationDiagnosisCode));
+				}
+				diseaseList.add(d);
 			}
-			updateAdmission.setDiseaseOut1(dOut1s.get(0));
+			updateAdmission.setComplicationDiagnosis(diseaseList);
 		}
 
 		if (updateAdmissionDTO.getDiseaseOut2() != null && updateAdmissionDTO.getDiseaseOut2().getCode() != null) {

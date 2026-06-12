@@ -351,9 +351,7 @@ class AdmissionControllerTest {
 		DischargeType dischargeType = DischargeTypeHelper.setup(dischargeTypeCode);
 		admission.setAdmitted(0);
 		admission.setDisDate(LocalDateTime.now());
-		admission.setDiseaseOut1(disease1);
-		admission.setDiseaseOut1(disease2);
-		admission.setDiseaseOut1(disease3);
+		admission.setComplicationDiagnosis(List.of(disease1, disease2, disease3));
 		admission.setDisType(dischargeType);
 
 		when(admissionManagerMock.updateAdmission(admission)).thenReturn(admission);
@@ -402,6 +400,8 @@ class AdmissionControllerTest {
 		List<Disease> diseaseList = DiseaseHelper.setupDiseaseList(3);
 		when(diseaseManagerMock.getDiseaseAll())
 			.thenReturn(diseaseList);
+		when(diseaseManagerMock.getDiseaseByCode(any()))
+			.thenReturn(diseaseList.get(0));
 
 		List<Operation> operationsList = OperationHelper.setupOperationList(3);
 		when(operationManagerMock.getOperation())
@@ -456,6 +456,8 @@ class AdmissionControllerTest {
 		List<Disease> diseaseList = DiseaseHelper.setupDiseaseList(3);
 		when(diseaseManagerMock.getDiseaseAll())
 			.thenReturn(diseaseList);
+		when(diseaseManagerMock.getDiseaseByCode(any()))
+			.thenReturn(diseaseList.get(0));
 
 		List<Operation> operationsList = OperationHelper.setupOperationList(3);
 		when(operationManagerMock.getOperation())
