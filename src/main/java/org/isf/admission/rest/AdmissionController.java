@@ -611,17 +611,17 @@ public class AdmissionController {
 			updateAdmission.setDiseaseIn(dIns.get(0));
 		}
 
-		if (updateAdmissionDTO.getComplicationDiagnosis() != null && !updateAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
-			List<Disease> diseaseList = new ArrayList<>();
-			for (DiseaseDTO complicationDiagnosisCode : updateAdmissionDTO.getComplicationDiagnosis()) {
-				Disease d = diseaseManager.getDiseaseByCode(complicationDiagnosisCode.getCode());
-				if (d == null) {
-					throw new OHAPIException(new OHExceptionMessage("Complication diagnosis not found for code: " + complicationDiagnosisCode));
-				}
-				diseaseList.add(d);
-			}
-			updateAdmission.setComplicationDiagnosis(diseaseList);
-		}
+//		if (updateAdmissionDTO.getComplicationDiagnosis() != null && !updateAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
+//			List<Disease> diseaseList = new ArrayList<>();
+//			for (DiseaseDTO complicationDiagnosisCode : updateAdmissionDTO.getComplicationDiagnosis()) {
+//				Disease d = diseaseManager.getDiseaseByCode(complicationDiagnosisCode.getCode());
+//				if (d == null) {
+//					throw new OHAPIException(new OHExceptionMessage("Complication diagnosis not found for code: " + complicationDiagnosisCode));
+//				}
+//				diseaseList.add(d);
+//			}
+//			updateAdmission.setComplicationDiagnosis(diseaseList);
+//		}
 
 		if (updateAdmissionDTO.getDiseaseOut2() != null && updateAdmissionDTO.getDiseaseOut2().getCode() != null) {
 			List<Disease> dOut2s = diseases.stream()
