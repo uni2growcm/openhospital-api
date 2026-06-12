@@ -84,7 +84,7 @@ public class AdmissionHelper {
 		DeliveryResultType deliveryResult = null;
 
 		return testAdmission.setup(ward, patient, admissionType, diseaseIn, List.of(complicationDiagnosis), diseaseOut2, diseaseOut3, operation, dischargeType, pregTreatmentType,
-				deliveryType, deliveryResult, false);
+				deliveryType, deliveryResult, List.of(diseaseOut2), List.of(diseaseOut3), false);
 	}
 
 	public static List<Admission> setupAdmissionList(int size) {
