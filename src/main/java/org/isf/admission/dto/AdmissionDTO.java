@@ -75,9 +75,6 @@ public class AdmissionDTO {
 	@Schema(description = "FromHealthUnit")
 	private String FHU;
 
-	@Schema(description = "Disease in ")
-	private DiseaseDTO diseaseIn;
-
 	@Schema(description = "Complication Diagnosis")
 	private List<DiseaseDTO> complicationDiagnosis;
 
@@ -86,12 +83,6 @@ public class AdmissionDTO {
 
 	@Schema(description = "Diagnosis in")
 	private List<DiseaseDTO> diagnosisIn;
-
-	@Schema(description = "Disease out ")
-	private DiseaseDTO diseaseOut2;
-
-	@Schema(description = "Disease out ")
-	private DiseaseDTO diseaseOut3;
 
 	@Schema(description = "Operation ")
 	private OperationDTO operation;
@@ -242,20 +233,8 @@ public class AdmissionDTO {
 		return this.FHU;
 	}
 
-	public DiseaseDTO getDiseaseIn() {
-		return this.diseaseIn;
-	}
-
 	public List<DiseaseDTO> getComplicationDiagnosis() {
 		return this.complicationDiagnosis;
-	}
-
-	public DiseaseDTO getDiseaseOut2() {
-		return this.diseaseOut2;
-	}
-
-	public DiseaseDTO getDiseaseOut3() {
-		return this.diseaseOut3;
 	}
 
 	public OperationDTO getOperation() {
@@ -373,20 +352,8 @@ public class AdmissionDTO {
 		this.FHU = FHU;
 	}
 
-	public void setDiseaseIn(DiseaseDTO diseaseIn) {
-		this.diseaseIn = diseaseIn;
-	}
-
 	public void setComplicationDiagnosis(List<DiseaseDTO> complicationDiagnosis) {
 		this.complicationDiagnosis = complicationDiagnosis;
-	}
-
-	public void setDiseaseOut2(DiseaseDTO diseaseOut2) {
-		this.diseaseOut2 = diseaseOut2;
-	}
-
-	public void setDiseaseOut3(DiseaseDTO diseaseOut3) {
-		this.diseaseOut3 = diseaseOut3;
 	}
 
 	public void setOperation(OperationDTO operation) {

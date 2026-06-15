@@ -347,8 +347,8 @@ public class AdmissionController {
 
 		// TODO: Use a appropriate DTO which includes validation and remove following lines
 		Admission adm = admissionMapper.map2Model(currentAdmissionDTO);
-		if (adm.getComplicationDiagnosis() == null || adm.getComplicationDiagnosis().isEmpty()) {
-			throw new OHAPIException(new OHExceptionMessage("at least one disease must be give."));
+		if (adm.getDiagnosisOut() == null || adm.getDiagnosisOut().isEmpty()) {
+			throw new OHAPIException(new OHExceptionMessage("At least one condition must be specified for the discharge diagnosis."));
 		}
 
 		if (adm.getDisDate() == null) {
@@ -440,40 +440,37 @@ public class AdmissionController {
 
 		List<Disease> diseases = diseaseManager.getDiseaseAll();
 
-		if (newAdmissionDTO.getDiseaseIn() != null && newAdmissionDTO.getDiseaseIn().getCode() != null) {
-			List<Disease> dIns = diseases.stream()
-				.filter(d -> d.getCode().equals(newAdmissionDTO.getDiseaseIn().getCode())).toList();
+		if (newAdmissionDTO.getDiagnosisIn() != null && !newAdmissionDTO.getDiagnosisIn().isEmpty()) {
+			List<Disease> dIns = new ArrayList<>();
+			for (DiseaseDTO diagnosisIn: newAdmissionDTO.getDiagnosisIn()) {
+				dIns = diseases.stream().filter(d -> d.getCode().equals(diagnosisIn.getCode())).toList();
+			}
 			if (dIns.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease in not found."));
+				throw new OHAPIException(new OHExceptionMessage("All diseases in not found."));
 			}
-			newAdmission.setDiseaseIn(dIns.get(0));
+			newAdmission.setDiagnosisIn(dIns);
 		}
 
-//		if (newAdmissionDTO.getComplicationDiagnosis() != null && newAdmissionDTO.getComplicationDiagnosis().getCode() != null) {
-//			List<Disease> dOut1 = diseases.stream()
-//				.filter(d -> d.getCode().equals(newAdmissionDTO.getComplicationDiagnosis().getCode())).toList();
-//			if (dOut1.isEmpty()) {
-//				throw new OHAPIException(new OHExceptionMessage("Disease out 1 not found."));
-//			}
-//			newAdmission.setComplicationDiagnosis(dOut1.get(0));
-//		}
-
-		if (newAdmissionDTO.getDiseaseOut2() != null && newAdmissionDTO.getDiseaseOut2().getCode() != null) {
-			List<Disease> dOut2 = diseases.stream()
-				.filter(d -> d.getCode().equals(newAdmissionDTO.getDiseaseOut2().getCode())).toList();
-			if (dOut2.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease out 2 not found."));
+		if (newAdmissionDTO.getDiagnosisOut() != null && !newAdmissionDTO.getDiagnosisOut().isEmpty()) {
+			List<Disease> dIns = new ArrayList<>();
+			for (DiseaseDTO diagnosisOut: newAdmissionDTO.getDiagnosisOut()) {
+				dIns = diseases.stream().filter(d -> d.getCode().equals(diagnosisOut.getCode())).toList();
 			}
-			newAdmission.setDiseaseOut2(dOut2.get(0));
+			if (dIns.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("All diseases out not found."));
+			}
+			newAdmission.setDiagnosisOut(dIns);
 		}
 
-		if (newAdmissionDTO.getDiseaseOut3() != null && newAdmissionDTO.getDiseaseOut3().getCode() != null) {
-			List<Disease> dOut3 = diseases.stream()
-				.filter(d -> d.getCode().equals(newAdmissionDTO.getDiseaseOut3().getCode())).toList();
-			if (dOut3.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease out 3 not found."));
+		if (newAdmissionDTO.getComplicationDiagnosis() != null && !newAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
+			List<Disease> dIns = new ArrayList<>();
+			for (DiseaseDTO complicationDiagnosis: newAdmissionDTO.getComplicationDiagnosis()) {
+				dIns = diseases.stream().filter(d -> d.getCode().equals(complicationDiagnosis.getCode())).toList();
 			}
-			newAdmission.setDiseaseOut3(dOut3.get(0));
+			if (dIns.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("All complication diseases not found."));
+			}
+			newAdmission.setDiagnosisOut(dIns);
 		}
 
 		if (newAdmissionDTO.getDisType() != null && newAdmissionDTO.getDisType().getCode() != null
@@ -602,43 +599,37 @@ public class AdmissionController {
 			throw new OHAPIException(new OHExceptionMessage("Patient field is required."));
 		}
 		List<Disease> diseases = diseaseManager.getDiseaseAll();
-		if (updateAdmissionDTO.getDiseaseIn() != null && updateAdmissionDTO.getDiseaseIn().getCode() != null) {
-			List<Disease> dIns = diseases.stream()
-				.filter(d -> d.getCode().equals(updateAdmissionDTO.getDiseaseIn().getCode())).toList();
+		if (updateAdmissionDTO.getDiagnosisIn() != null && !updateAdmissionDTO.getDiagnosisIn().isEmpty()) {
+			List<Disease> dIns = new ArrayList<>();
+			for (DiseaseDTO diagnosisIn: updateAdmissionDTO.getDiagnosisIn()) {
+				dIns = diseases.stream().filter(d -> d.getCode().equals(diagnosisIn.getCode())).toList();
+			}
 			if (dIns.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease in not found."));
+				throw new OHAPIException(new OHExceptionMessage("All diseases in not found."));
 			}
-			updateAdmission.setDiseaseIn(dIns.get(0));
+			old.setDiagnosisIn(dIns);
 		}
 
-//		if (updateAdmissionDTO.getComplicationDiagnosis() != null && !updateAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
-//			List<Disease> diseaseList = new ArrayList<>();
-//			for (DiseaseDTO complicationDiagnosisCode : updateAdmissionDTO.getComplicationDiagnosis()) {
-//				Disease d = diseaseManager.getDiseaseByCode(complicationDiagnosisCode.getCode());
-//				if (d == null) {
-//					throw new OHAPIException(new OHExceptionMessage("Complication diagnosis not found for code: " + complicationDiagnosisCode));
-//				}
-//				diseaseList.add(d);
-//			}
-//			updateAdmission.setComplicationDiagnosis(diseaseList);
-//		}
-
-		if (updateAdmissionDTO.getDiseaseOut2() != null && updateAdmissionDTO.getDiseaseOut2().getCode() != null) {
-			List<Disease> dOut2s = diseases.stream()
-				.filter(d -> d.getCode().equals(updateAdmissionDTO.getDiseaseOut2().getCode())).toList();
-			if (dOut2s.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease out 2 not found."));
+		if (updateAdmissionDTO.getDiagnosisOut() != null && !updateAdmissionDTO.getDiagnosisOut().isEmpty()) {
+			List<Disease> dIns = new ArrayList<>();
+			for (DiseaseDTO diagnosisOut: updateAdmissionDTO.getDiagnosisOut()) {
+				dIns = diseases.stream().filter(d -> d.getCode().equals(diagnosisOut.getCode())).toList();
 			}
-			updateAdmission.setDiseaseOut2(dOut2s.get(0));
+			if (dIns.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("All diseases out not found."));
+			}
+			old.setDiagnosisOut(dIns);
 		}
 
-		if (updateAdmissionDTO.getDiseaseOut3() != null && updateAdmissionDTO.getDiseaseOut3().getCode() != null) {
-			List<Disease> dOut3s = diseases.stream()
-				.filter(d -> d.getCode().equals(updateAdmissionDTO.getDiseaseOut3().getCode())).toList();
-			if (dOut3s.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("Disease out 3 not found."));
+		if (updateAdmissionDTO.getComplicationDiagnosis() != null && !updateAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
+			List<Disease> dIns = new ArrayList<>();
+			for (DiseaseDTO complicationDiagnosis: updateAdmissionDTO.getComplicationDiagnosis()) {
+				dIns = diseases.stream().filter(d -> d.getCode().equals(complicationDiagnosis.getCode())).toList();
 			}
-			updateAdmission.setDiseaseOut3(dOut3s.get(0));
+			if (dIns.isEmpty()) {
+				throw new OHAPIException(new OHExceptionMessage("All complication diseases not found."));
+			}
+			old.setDiagnosisOut(dIns);
 		}
 
 		if (updateAdmissionDTO.getDisType() != null && updateAdmissionDTO.getDisType().getCode() != null
