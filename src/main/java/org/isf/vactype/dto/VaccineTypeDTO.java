@@ -21,9 +21,8 @@
  */
 package org.isf.vactype.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Class representing a vaccine type")
 public class VaccineTypeDTO {
@@ -40,12 +39,12 @@ public class VaccineTypeDTO {
 		return this.code;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
-
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	public void setDescription(String description) {

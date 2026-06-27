@@ -21,8 +21,8 @@
  */
 package org.isf.dlvrrestype.rest;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.isf.dlvrrestype.dto.DeliveryResultTypeDTO;
 import org.isf.dlvrrestype.manager.DeliveryResultTypeBrowserManager;
 import org.isf.dlvrrestype.mapper.DeliveryResultTypeMapper;
@@ -34,18 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 
 @RestController
 @Tag(name = "Delivery Result Type")
@@ -68,6 +59,7 @@ public class DeliveryResultTypeController {
 
 	/**
 	 * Create a new {@link DeliveryResultType}.
+	 *
 	 * @param deliveryResultTypeDTO Delivery result type payload
 	 * @return {@code true} if the {@link DeliveryResultType} has been stored, {@code false} otherwise.
 	 * @throws OHServiceException When failed to create delivery result type
@@ -84,6 +76,7 @@ public class DeliveryResultTypeController {
 
 	/**
 	 * Update the specified {@link DeliveryResultType}.
+	 *
 	 * @param deliveryResultTypeDTO Delivery result type payload
 	 * @return {@code true} if the {@link DeliveryResultType} has been updated, {@code false} otherwise.
 	 * @throws OHServiceException When failed to update delivery result type
@@ -109,6 +102,7 @@ public class DeliveryResultTypeController {
 
 	/**
 	 * Get all the available {@link DeliveryResultType}s.
+	 *
 	 * @return a {@link List} of {@link DeliveryResultType} or NO_CONTENT if there is no data found.
 	 * @throws OHServiceException When failed to get delivery result types
 	 */
@@ -120,6 +114,7 @@ public class DeliveryResultTypeController {
 
 	/**
 	 * Delete {@link DeliveryResultType} for the specified code.
+	 *
 	 * @param code Delivery result type code
 	 * @return {@code true} if the {@link DeliveryResultType} has been deleted, {@code false} otherwise.
 	 * @throws OHServiceException When failed to delete delivery result type

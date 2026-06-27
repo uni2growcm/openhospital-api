@@ -21,9 +21,8 @@
  */
 package org.isf.exam.dto;
 
-import org.isf.exatype.dto.ExamTypeDTO;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.isf.exatype.dto.ExamTypeDTO;
 
 public class ExamDTO {
 
@@ -45,40 +44,51 @@ public class ExamDTO {
 	@Schema(description = "Lock", example = "0")
 	private int lock;
 
+	public ExamDTO() {
+	}
+
+	public ExamDTO(String code, String description, Integer procedure, String defaultResult, ExamTypeDTO examtype) {
+		this.code = code;
+		this.description = description;
+		this.procedure = procedure;
+		this.defaultResult = defaultResult;
+		this.examtype = examtype;
+	}
+
 	public String getCode() {
 		return this.code;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public Integer getProcedure() {
-		return this.procedure;
-	}
-
-	public String getDefaultResult() {
-		return this.defaultResult;
-	}
-
-	public ExamTypeDTO getExamtype() {
-		return this.examtype;
 	}
 
 	public void setCode(String code) {
 		this.code = code;
 	}
 
+	public String getDescription() {
+		return this.description;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Integer getProcedure() {
+		return this.procedure;
 	}
 
 	public void setProcedure(Integer procedure) {
 		this.procedure = procedure;
 	}
 
+	public String getDefaultResult() {
+		return this.defaultResult;
+	}
+
 	public void setDefaultResult(String defaultResult) {
 		this.defaultResult = defaultResult;
+	}
+
+	public ExamTypeDTO getExamtype() {
+		return this.examtype;
 	}
 
 	public void setExamtype(ExamTypeDTO examtype) {
@@ -93,21 +103,10 @@ public class ExamDTO {
 		this.lock = lock;
 	}
 
-	public ExamDTO() {
-	}
-
-	public ExamDTO(String code, String description, Integer procedure, String defaultResult, ExamTypeDTO examtype) {
-		this.code = code;
-		this.description = description;
-		this.procedure = procedure;
-		this.defaultResult = defaultResult;
-		this.examtype = examtype;
-	}
-
 	@Override
 	public String toString() {
 		return "ExamDTO{" + "code='" + code + '\'' + ", description='" + description + '\'' + ", procedure=" + procedure
-				+ ", defaultResult='" + defaultResult + '\'' + ", examtype=" + examtype + '}';
+			+ ", defaultResult='" + defaultResult + '\'' + ", examtype=" + examtype + '}';
 	}
 
 }

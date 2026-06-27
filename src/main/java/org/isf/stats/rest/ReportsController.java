@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -21,13 +21,11 @@
  */
 package org.isf.stats.rest;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
 import org.apache.poi.util.IOUtils;
 import org.isf.examination.manager.ExaminationBrowserManager;
 import org.isf.examination.model.PatientExamination;
@@ -38,6 +36,9 @@ import org.isf.stat.dto.JasperReportResultDto;
 import org.isf.stat.manager.JasperReportsManager;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -49,8 +50,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @Tag(name = "Reports")
@@ -58,6 +61,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 public class ReportsController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ReportsController.class);
 	private final JasperReportsManager reportsManager;
 	private final ExaminationBrowserManager examinationBrowserManager;
 	private final PatientBrowserManager patientBrowserManager;
@@ -77,7 +81,7 @@ public class ReportsController {
 	public ResponseEntity<Resource> printDiseasesListPdf(HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getDiseasesListPdf(), request);
 	}
-	
+
 	@GetMapping("/reports/patientexamination/{examinationId}")
 	public ResponseEntity<Resource> printPatientExaminationPdf(@PathVariable("examinationId") int examinationId, HttpServletRequest request) throws OHServiceException, IOException {
 		PatientExamination patientExamination = examinationBrowserManager.getByID(examinationId);
@@ -87,7 +91,7 @@ public class ReportsController {
 		int patId = patientExamination.getPatient().getCode();
 	    return getReport(reportsManager.getGenericReportPatientExaminationPdf(patId, examinationId, request.getLocale()), request);
 	}
-	
+
 	@GetMapping("/reports/patientexamrequest/{patientId}")
 	public ResponseEntity<Resource> printPatientExamRequestPdf(@PathVariable("patientId") int patientId, HttpServletRequest request) throws OHServiceException, IOException {
 		Patient patient = patientBrowserManager.getPatientById(patientId);
@@ -110,6 +114,19 @@ public class ReportsController {
 		} catch (MalformedURLException e) {
 			throw new OHAPIException(new OHExceptionMessage("File not found."));
 		}
+
+		String contentType;
+		try {
+			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+		} catch (IOException ex) {
+			throw new OHAPIException(new OHExceptionMessage("Failed to load the file's type."));
+		}
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] out = IOUtils.toByteArray(resource.getInputStream());
 
 		return ResponseEntity.ok()
 			.contentType(MediaType.APPLICATION_OCTET_STREAM)

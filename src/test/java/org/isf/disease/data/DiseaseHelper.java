@@ -21,10 +21,11 @@
  */
 package org.isf.disease.data;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.isf.disease.TestDisease;
 import org.isf.disease.dto.DiseaseDTO;
 import org.isf.disease.model.Disease;
@@ -32,11 +33,9 @@ import org.isf.distype.TestDiseaseType;
 import org.isf.distype.model.DiseaseType;
 import org.isf.utils.exception.OHException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DiseaseHelper {
 
@@ -56,14 +55,14 @@ public class DiseaseHelper {
 
 	public static List<Disease> setupDiseaseList(int size) {
 		return IntStream.range(0, size)
-				.mapToObj(i -> {
-					try {
-						return DiseaseHelper.setup();
-					} catch (OHException e) {
-						e.printStackTrace();
-					}
-					return null;
-				}).collect(Collectors.toList());
+			.mapToObj(i -> {
+				try {
+					return DiseaseHelper.setup();
+				} catch (OHException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}).collect(Collectors.toList());
 	}
 
 	public static String asJsonString(DiseaseDTO diseaseDTO) {
@@ -78,9 +77,9 @@ public class DiseaseHelper {
 	public static ObjectMapper getObjectMapper() {
 		if (objectMapper == null) {
 			objectMapper = new ObjectMapper()
-					.registerModule(new ParameterNamesModule())
-					.registerModule(new Jdk8Module())
-					.registerModule(new JavaTimeModule());
+				.registerModule(new ParameterNamesModule())
+				.registerModule(new Jdk8Module())
+				.registerModule(new JavaTimeModule());
 		}
 		return objectMapper;
 	}

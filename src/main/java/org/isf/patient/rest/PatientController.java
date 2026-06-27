@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -21,6 +21,8 @@
  */
 package org.isf.patient.rest;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,19 +51,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Patients")
@@ -69,11 +59,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class PatientController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PatientController.class);
-
 	// TODO: to centralize
 	protected static final String DEFAULT_PAGE_SIZE = "80";
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(PatientController.class);
 	private final PatientBrowserManager patientManager;
 
 	private final AdmissionBrowserManager admissionManager;
@@ -215,10 +203,6 @@ public class PatientController {
 			params.put("address", address);
 		}
 
-		if (city != null && !city.isEmpty()) {
-			params.put("city", city);
-		}
-
 		PagedResponse<Patient> patientList = new PagedResponse<>();
 		if (age != null && !age.isEmpty()) {
 			PagedResponse<Patient> ageFiltered = patientManager.AgeFromBirthDate(Integer.parseInt(age), page, size);
@@ -320,9 +304,9 @@ public class PatientController {
 
 		return patientManager.getCities();
 	}
-	
+
 	@PostMapping("/patients/by-codes")
-    public List<PatientDTO> getPatientByCodes(@RequestBody List<Integer> codes) throws OHServiceException {
+	public List<PatientDTO> getPatientByCodes(@RequestBody List<Integer> codes) throws OHServiceException {
 		if (codes == null || codes.isEmpty()) {
 			throw new OHAPIException(new OHExceptionMessage("The list of patients' codes cannot be empty."));
 		}
@@ -331,6 +315,6 @@ public class PatientController {
 			throw new OHAPIException(new OHExceptionMessage("Patient not found."), HttpStatus.NOT_FOUND);
 		}
 		List<PatientDTO> patientsDTO = patientMapper.map2DTOList(patients);
-        return patientsDTO;
-    }
+		return patientsDTO;
+	}
 }

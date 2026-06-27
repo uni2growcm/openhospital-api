@@ -21,9 +21,8 @@
  */
 package org.isf.opetype.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 public class OperationTypeDTO {
 
@@ -39,12 +38,12 @@ public class OperationTypeDTO {
 		return this.code;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
-
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	public void setDescription(String description) {

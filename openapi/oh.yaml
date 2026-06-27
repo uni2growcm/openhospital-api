@@ -9,9 +9,12 @@ info:
     url: https://github.com/informatici/openhospital-api?tab=GPL-3.0-1-ov-file#readme
   version: 0.1.0
 servers:
-- url: http://localhost:8080
+- url: http://localhost
 security:
 - bearerAuth: []
+tags:
+- name: Plugins
+  description: Dynamic gateway to registered external plugin services
 paths:
   /wards:
     get:
@@ -3920,7 +3923,7 @@ paths:
         "200":
           description: OK
           content:
-            application/octet-stream:
+            application/json:
               schema:
                 type: string
                 format: binary
@@ -3942,7 +3945,7 @@ paths:
         "200":
           description: OK
           content:
-            application/octet-stream:
+            application/json:
               schema:
                 type: string
                 format: binary
@@ -3957,10 +3960,10 @@ paths:
         "200":
           description: OK
           content:
-            application/octet-stream:
+            application/json:
               schema:
                 type: string
-                format: binary
+                format: byte
       security:
       - bearerAuth: []
   /reports/diseases-list:
@@ -3972,10 +3975,10 @@ paths:
         "200":
           description: OK
           content:
-            application/octet-stream:
+            application/json:
               schema:
                 type: string
-                format: binary
+                format: byte
       security:
       - bearerAuth: []
   /radiology/studies/{id}/series:
@@ -4132,6 +4135,25 @@ paths:
             application/json:
               schema:
                 type: boolean
+      security:
+      - bearerAuth: []
+  /plugins:
+    get:
+      tags:
+      - Plugins
+      summary: List all registered plugins
+      description: Returns all plugins that passed the startup health check and are
+        currently available through the gateway.
+      operationId: listPlugins
+      responses:
+        "200":
+          description: Plugin list returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PluginDefinition"
       security:
       - bearerAuth: []
   /permissions:
@@ -4336,46 +4358,22 @@ paths:
         required: false
         schema:
           type: string
-          format: date
+          format: date-time
       - name: address
         in: query
         required: false
         schema:
           type: string
           default: ""
-      - name: city
-        in: query
-        required: false
-        schema:
-          type: string
-          default: ""
-      - name: age
-        in: query
-        required: false
-        schema:
-          type: string
-          default: ""
-      - name: page
-        in: query
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 0
-      - name: size
-        in: query
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 80
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PagePatientDTO"
+                type: array
+                items:
+                  $ref: "#/components/schemas/PatientDTO"
       security:
       - bearerAuth: []
   /patients/nextcode:
@@ -6490,6 +6488,357 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
+  /plugins/{id}/{path}:
+    get:
+      tags:
+      - Plugins
+      summary: Proxy a request to an external plugin
+      description: "Resolves the plugin by ID, checks authorization, then forwards\
+        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
+        \ is appended to the plugin base URL. All HTTP methods are supported."
+      operationId: proxy
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Upstream response forwarded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Authenticated user lacks required privileges for this plugin
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: Plugin not found or unavailable
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "502":
+          description: Upstream plugin returned an unexpected error
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+    put:
+      tags:
+      - Plugins
+      summary: Proxy a request to an external plugin
+      description: "Resolves the plugin by ID, checks authorization, then forwards\
+        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
+        \ is appended to the plugin base URL. All HTTP methods are supported."
+      operationId: proxy_2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Upstream response forwarded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Authenticated user lacks required privileges for this plugin
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: Plugin not found or unavailable
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "502":
+          description: Upstream plugin returned an unexpected error
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Plugins
+      summary: Proxy a request to an external plugin
+      description: "Resolves the plugin by ID, checks authorization, then forwards\
+        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
+        \ is appended to the plugin base URL. All HTTP methods are supported."
+      operationId: proxy_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Upstream response forwarded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Authenticated user lacks required privileges for this plugin
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: Plugin not found or unavailable
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "502":
+          description: Upstream plugin returned an unexpected error
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Plugins
+      summary: Proxy a request to an external plugin
+      description: "Resolves the plugin by ID, checks authorization, then forwards\
+        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
+        \ is appended to the plugin base URL. All HTTP methods are supported."
+      operationId: proxy_3
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Upstream response forwarded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Authenticated user lacks required privileges for this plugin
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: Plugin not found or unavailable
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "502":
+          description: Upstream plugin returned an unexpected error
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+    options:
+      tags:
+      - Plugins
+      summary: Proxy a request to an external plugin
+      description: "Resolves the plugin by ID, checks authorization, then forwards\
+        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
+        \ is appended to the plugin base URL. All HTTP methods are supported."
+      operationId: proxy_6
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Upstream response forwarded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Authenticated user lacks required privileges for this plugin
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: Plugin not found or unavailable
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "502":
+          description: Upstream plugin returned an unexpected error
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+    head:
+      tags:
+      - Plugins
+      summary: Proxy a request to an external plugin
+      description: "Resolves the plugin by ID, checks authorization, then forwards\
+        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
+        \ is appended to the plugin base URL. All HTTP methods are supported."
+      operationId: proxy_5
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Upstream response forwarded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Authenticated user lacks required privileges for this plugin
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: Plugin not found or unavailable
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "502":
+          description: Upstream plugin returned an unexpected error
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Plugins
+      summary: Proxy a request to an external plugin
+      description: "Resolves the plugin by ID, checks authorization, then forwards\
+        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
+        \ is appended to the plugin base URL. All HTTP methods are supported."
+      operationId: proxy_4
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Upstream response forwarded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Authenticated user lacks required privileges for this plugin
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: Plugin not found or unavailable
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "502":
+          description: Upstream plugin returned an unexpected error
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+      - bearerAuth: []
 components:
   schemas:
     WardDTO:
@@ -6532,13 +6881,13 @@ components:
           format: int32
           description: lock
           example: 0
+        opd:
+          type: boolean
         female:
           type: boolean
         male:
           type: boolean
         pharmacy:
-          type: boolean
-        opd:
           type: boolean
       required:
       - beds
@@ -7342,11 +7691,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
@@ -8787,6 +9136,65 @@ components:
       - item
       - list
       - price
+    PluginBundle:
+      type: object
+      properties:
+        label:
+          type: string
+        manifest:
+          type: string
+        type:
+          type: string
+        location:
+          type: string
+          enum:
+          - main
+          - patient
+        styles:
+          type: string
+      required:
+      - label
+      - location
+      - manifest
+      - type
+    PluginConfiguration:
+      type: object
+      properties:
+        bundle:
+          $ref: "#/components/schemas/PluginBundle"
+        permissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PluginPermission"
+    PluginDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        health:
+          type: string
+        configuration:
+          $ref: "#/components/schemas/PluginConfiguration"
+    PluginPermission:
+      type: object
+      properties:
+        role:
+          type: string
+        routes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PluginRoute"
+    PluginRoute:
+      type: object
+      properties:
+        path:
+          type: string
+        methods:
+          type: array
+          items:
+            type: string
     PageInfoDTO:
       type: object
       properties:

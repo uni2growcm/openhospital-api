@@ -21,12 +21,9 @@
  */
 package org.isf.usersettings.rest;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.menu.manager.UserBrowsingManager;
 import org.isf.menu.manager.UserSettingManager;
 import org.isf.menu.model.UserSetting;
@@ -40,18 +37,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Tag(name = "User Settings")
@@ -79,6 +69,7 @@ public class UserSettingController {
 
 	/**
 	 * Retrieves all userSettings of the current user.
+	 *
 	 * @return list of userSetting {@link UserSettingDTO}.
 	 * @throws OHServiceException When fail to retrieve userSettings
 	 */
@@ -98,6 +89,7 @@ public class UserSettingController {
 
 	/**
 	 * Returns a {@link UserSettingDTO} of userSetting created.
+	 *
 	 * @param userSettingDTO -  the {@link UserSettingDTO} to insert.
 	 * @return {@link UserSettingDTO} if the userSetting has been created, null otherwise.
 	 * @throws OHServiceException When failed to create user setting
@@ -130,8 +122,9 @@ public class UserSettingController {
 
 	/**
 	 * Updates an existing {@link UserSettingDTO}.
+	 *
 	 * @param userSettingDTO - the {@link UserSettingDTO} to update.
-	 * @param id - id of {@link UserSetting} .
+	 * @param id             - id of {@link UserSetting} .
 	 * @return {@link UserSettingDTO} if the UserSetting has been updated.
 	 * @throws OHServiceException If the update operation fails
 	 */
@@ -169,6 +162,7 @@ public class UserSettingController {
 
 	/**
 	 * Retrieves an existing {@link UserSettingDTO} by user.
+	 *
 	 * @param configName - the name of the userSetting {@link UserSetting} .
 	 * @return {@link UserSettingDTO} if the UserSetting exists, null otherwise.
 	 * @throws OHServiceException When failed to get user setting
@@ -189,6 +183,7 @@ public class UserSettingController {
 
 	/**
 	 * Deletes a {@link UserSetting}.
+	 *
 	 * @param id - the id of the userSetting {@link UserSetting} to delete.
 	 * @throws OHServiceException If the deletion fails
 	 */

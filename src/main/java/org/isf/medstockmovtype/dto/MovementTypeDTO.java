@@ -21,9 +21,8 @@
  */
 package org.isf.medstockmovtype.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 public class MovementTypeDTO {
 
@@ -57,20 +56,20 @@ public class MovementTypeDTO {
 		return this.code;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
 	public void setCode(String code) {
 		this.code = code;
 	}
 
+	public String getDescription() {
+		return this.description;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getType() {
+		return this.type;
 	}
 
 	public void setType(String type) {
