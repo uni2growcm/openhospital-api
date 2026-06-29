@@ -9,7 +9,7 @@ info:
     url: https://github.com/informatici/openhospital-api?tab=GPL-3.0-1-ov-file#readme
   version: 0.1.0
 servers:
-- url: http://localhost
+- url: http://localhost:8080
 security:
 - bearerAuth: []
 tags:
@@ -3923,7 +3923,7 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
+            application/octet-stream:
               schema:
                 type: string
                 format: binary
@@ -3945,7 +3945,7 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
+            application/octet-stream:
               schema:
                 type: string
                 format: binary
@@ -3960,10 +3960,10 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
+            application/octet-stream:
               schema:
                 type: string
-                format: byte
+                format: binary
       security:
       - bearerAuth: []
   /reports/diseases-list:
@@ -3975,10 +3975,10 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
+            application/octet-stream:
               schema:
                 type: string
-                format: byte
+                format: binary
       security:
       - bearerAuth: []
   /radiology/studies/{id}/series:
@@ -4358,22 +4358,46 @@ paths:
         required: false
         schema:
           type: string
-          format: date-time
+          format: date
       - name: address
         in: query
         required: false
         schema:
           type: string
           default: ""
+      - name: city
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      - name: age
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 80
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PatientDTO"
+                $ref: "#/components/schemas/PagePatientDTO"
       security:
       - bearerAuth: []
   /patients/nextcode:
@@ -6881,11 +6905,11 @@ components:
           format: int32
           description: lock
           example: 0
-        opd:
-          type: boolean
         female:
           type: boolean
         male:
+          type: boolean
+        opd:
           type: boolean
         pharmacy:
           type: boolean
@@ -7691,11 +7715,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
+        fhu:
+          type: string
         yprog:
           type: integer
           format: int32
-        fhu:
-          type: string
       required:
       - admDate
       - admitted
