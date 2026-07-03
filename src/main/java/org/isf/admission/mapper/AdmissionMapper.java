@@ -21,13 +21,13 @@
  */
 package org.isf.admission.mapper;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.isf.admission.dto.AdmissionDTO;
 import org.isf.admission.model.Admission;
 import org.isf.shared.GenericMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AdmissionMapper extends GenericMapper<Admission, AdmissionDTO> {

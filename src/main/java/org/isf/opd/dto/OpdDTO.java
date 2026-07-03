@@ -21,15 +21,13 @@
  */
 package org.isf.opd.dto;
 
-import java.time.LocalDateTime;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.validation.constraints.NotNull;
-
 import org.isf.disease.dto.DiseaseDTO;
 import org.isf.ward.dto.WardDTO;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import java.time.LocalDateTime;
 
 /**
  * @author gildas
@@ -162,21 +160,33 @@ public class OpdDTO {
 		return lock;
 	}
 
+	public void setLock(int lock) {
+		this.lock = lock;
+	}
+
 	@Schema(accessMode = AccessMode.READ_ONLY)
 	public int getHashCode() {
 		return hashCode;
 	}
 
-	public void setLock(int lock) {
-		this.lock = lock;
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
 	}
 
 	public int getCode() {
 		return this.code;
 	}
 
+	public void setCode(int code) {
+		this.code = code;
+	}
+
 	public LocalDateTime getDate() {
 		return this.date;
+	}
+
+	public void setDate(LocalDateTime date) {
+		this.date = date;
 	}
 
 	public String getPatientName() {
@@ -191,116 +201,104 @@ public class OpdDTO {
 		return this.nextVisitDate;
 	}
 
-	public Integer getPatientCode() {
-		return this.patientCode;
-	}
-
-	public int getAge() {
-		return this.age;
-	}
-
-	public char getSex() {
-		return this.sex;
-	}
-
-	public String getNote() {
-		return this.note;
-	}
-
-	public int getProg_year() {
-		return this.prog_year;
-	}
-
-	public DiseaseDTO getDisease() {
-		return this.disease;
-	}
-
-	public DiseaseDTO getDisease2() {
-		return this.disease2;
-	}
-
-	public DiseaseDTO getDisease3() {
-		return this.disease3;
-	}
-
-	public char getNewPatient() {
-		return this.newPatient;
-	}
-
-	public String getReferralFrom() {
-		return this.referralFrom;
-	}
-
-	public String getReferralTo() {
-		return this.referralTo;
-	}
-
-	public String getUserID() {
-		return this.userID;
-	}
-
-	public void setCode(int code) {
-		this.code = code;
-	}
-
-	public void setDate(LocalDateTime date) {
-		this.date = date;
-	}
-
 	public void setNextVisitDate(LocalDateTime nextVisitDate) {
 		this.nextVisitDate = nextVisitDate;
+	}
+
+	public Integer getPatientCode() {
+		return this.patientCode;
 	}
 
 	public void setPatientCode(Integer patientCode) {
 		this.patientCode = patientCode;
 	}
 
+	public int getAge() {
+		return this.age;
+	}
+
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public char getSex() {
+		return this.sex;
 	}
 
 	public void setSex(char sex) {
 		this.sex = sex;
 	}
 
+	public String getNote() {
+		return this.note;
+	}
+
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public int getProg_year() {
+		return this.prog_year;
 	}
 
 	public void setProg_year(int prog_year) {
 		this.prog_year = prog_year;
 	}
 
+	public DiseaseDTO getDisease() {
+		return this.disease;
+	}
+
 	public void setDisease(DiseaseDTO disease) {
 		this.disease = disease;
+	}
+
+	public DiseaseDTO getDisease2() {
+		return this.disease2;
 	}
 
 	public void setDisease2(DiseaseDTO disease2) {
 		this.disease2 = disease2;
 	}
 
+	public DiseaseDTO getDisease3() {
+		return this.disease3;
+	}
+
 	public void setDisease3(DiseaseDTO disease3) {
 		this.disease3 = disease3;
+	}
+
+	public char getNewPatient() {
+		return this.newPatient;
 	}
 
 	public void setNewPatient(char newPatient) {
 		this.newPatient = newPatient;
 	}
 
+	public String getReferralFrom() {
+		return this.referralFrom;
+	}
+
 	public void setReferralFrom(String referralFrom) {
 		this.referralFrom = referralFrom;
+	}
+
+	public String getReferralTo() {
+		return this.referralTo;
 	}
 
 	public void setReferralTo(String referralTo) {
 		this.referralTo = referralTo;
 	}
 
-	public void setUserID(String userID) {
-		this.userID = userID;
+	public String getUserID() {
+		return this.userID;
 	}
 
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
+	public void setUserID(String userID) {
+		this.userID = userID;
 	}
 
 	public String getAgeType() {

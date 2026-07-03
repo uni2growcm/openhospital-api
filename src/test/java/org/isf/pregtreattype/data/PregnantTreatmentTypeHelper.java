@@ -21,13 +21,13 @@
  */
 package org.isf.pregtreattype.data;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.isf.pregtreattype.TestPregnantTreatmentType;
 import org.isf.pregtreattype.model.PregnantTreatmentType;
 import org.isf.utils.exception.OHException;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PregnantTreatmentTypeHelper {
 
@@ -38,14 +38,14 @@ public class PregnantTreatmentTypeHelper {
 
 	public static List<PregnantTreatmentType> setupPregnantTreatmentTypeList(int size) {
 		return IntStream.range(0, size)
-				.mapToObj(i -> {
-					try {
-						return PregnantTreatmentTypeHelper.setup();
-					} catch (OHException e) {
-						e.printStackTrace();
-					}
-					return null;
-				}).collect(Collectors.toList());
+			.mapToObj(i -> {
+				try {
+					return PregnantTreatmentTypeHelper.setup();
+				} catch (OHException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}).collect(Collectors.toList());
 	}
 
 }

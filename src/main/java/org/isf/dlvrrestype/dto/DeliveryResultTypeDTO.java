@@ -21,9 +21,8 @@
  */
 package org.isf.dlvrrestype.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 public class DeliveryResultTypeDTO {
 
@@ -39,12 +38,12 @@ public class DeliveryResultTypeDTO {
 		return this.code;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
-
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	public void setDescription(String description) {

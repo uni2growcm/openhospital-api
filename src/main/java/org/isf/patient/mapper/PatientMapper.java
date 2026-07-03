@@ -21,16 +21,15 @@
  */
 package org.isf.patient.mapper;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.annotation.PostConstruct;
-
 import org.isf.patient.dto.PatientDTO;
 import org.isf.patient.model.Patient;
 import org.isf.shared.GenericMapper;
 import org.isf.shared.mapper.mappings.PatientMapping;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PatientMapper extends GenericMapper<Patient, PatientDTO> {
@@ -38,6 +37,7 @@ public class PatientMapper extends GenericMapper<Patient, PatientDTO> {
 	public PatientMapper() {
 		super(Patient.class, PatientDTO.class);
 	}
+
 	@PostConstruct
 	private void postConstruct() {
 		PatientMapping.addMapping(modelMapper);

@@ -21,9 +21,8 @@
  */
 package org.isf.menu.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 public class UserMenuItemDTO {
 
@@ -65,7 +64,7 @@ public class UserMenuItemDTO {
 	}
 
 	public UserMenuItemDTO(String code, String buttonLabel, String altLabel, String tooltip, char shortcut,
-			String mySubmenu, String myClass, boolean isASubMenu, int position) {
+						   String mySubmenu, String myClass, boolean isASubMenu, int position) {
 		this.code = code;
 		this.buttonLabel = buttonLabel;
 		this.altLabel = altLabel;
@@ -81,68 +80,68 @@ public class UserMenuItemDTO {
 		return this.code;
 	}
 
-	public String getButtonLabel() {
-		return this.buttonLabel;
-	}
-
-	public String getAltLabel() {
-		return this.altLabel;
-	}
-
-	public String getTooltip() {
-		return this.tooltip;
-	}
-
-	public char getShortcut() {
-		return this.shortcut;
-	}
-
-	public String getMySubmenu() {
-		return this.mySubmenu;
-	}
-
-	public String getMyClass() {
-		return this.myClass;
-	}
-
-	public boolean isASubMenu() {
-		return this.isASubMenu;
-	}
-
-	public int getPosition() {
-		return this.position;
-	}
-
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public String getButtonLabel() {
+		return this.buttonLabel;
 	}
 
 	public void setButtonLabel(String buttonLabel) {
 		this.buttonLabel = buttonLabel;
 	}
 
+	public String getAltLabel() {
+		return this.altLabel;
+	}
+
 	public void setAltLabel(String altLabel) {
 		this.altLabel = altLabel;
+	}
+
+	public String getTooltip() {
+		return this.tooltip;
 	}
 
 	public void setTooltip(String tooltip) {
 		this.tooltip = tooltip;
 	}
 
+	public char getShortcut() {
+		return this.shortcut;
+	}
+
 	public void setShortcut(char shortcut) {
 		this.shortcut = shortcut;
+	}
+
+	public String getMySubmenu() {
+		return this.mySubmenu;
 	}
 
 	public void setMySubmenu(String mySubmenu) {
 		this.mySubmenu = mySubmenu;
 	}
 
+	public String getMyClass() {
+		return this.myClass;
+	}
+
 	public void setMyClass(String myClass) {
 		this.myClass = myClass;
 	}
 
+	public boolean isASubMenu() {
+		return this.isASubMenu;
+	}
+
 	public void setASubMenu(boolean isASubMenu) {
 		this.isASubMenu = isASubMenu;
+	}
+
+	public int getPosition() {
+		return this.position;
 	}
 
 	public void setPosition(int position) {

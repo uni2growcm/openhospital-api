@@ -21,37 +21,8 @@
  */
 package org.isf.accounting.rest;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.isf.accounting.TestBillItems;
-import org.isf.accounting.data.BillDTOHelper;
-import org.isf.accounting.data.BillHelper;
-import org.isf.accounting.data.BillItemsDTOHelper;
-import org.isf.accounting.data.BillPaymentsDTOHelper;
-import org.isf.accounting.data.FullBillDTOHelper;
+import org.isf.accounting.data.*;
 import org.isf.accounting.dto.BillDTO;
 import org.isf.accounting.dto.BillItemsDTO;
 import org.isf.accounting.dto.BillPaymentsDTO;
@@ -93,30 +64,42 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 /**
  * @author Emerson Castaneda
  */
 class BillControllerTest extends ControllerBaseTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BillControllerTest.class);
-
+	private final BillMapper billMapper = new BillMapper();
+	private final BillItemsMapper billItemsMapper = new BillItemsMapper();
+	private final BillPaymentsMapper billPaymentsMapper = new BillPaymentsMapper();
+	private final PatientMapper patientMapper = new PatientMapper();
 	@Mock
 	private BillBrowserManager billManagerMock;
-
 	@Mock
 	private PriceListManager priceListManagerMock;
-
 	@Mock
 	private PatientBrowserManager patientManagerMock;
-
-	private final BillMapper billMapper = new BillMapper();
-
-	private final BillItemsMapper billItemsMapper = new BillItemsMapper();
-
-	private final BillPaymentsMapper billPaymentsMapper = new BillPaymentsMapper();
-
-	private final PatientMapper patientMapper = new PatientMapper();
-
 	private MockMvc mockMvc;
 
 	private AutoCloseable closeable;
@@ -151,7 +134,7 @@ class BillControllerTest extends ControllerBaseTest {
 		String request = "/bills";
 
 		MvcResult result = this.mockMvc
-			.perform(post(request).content(new byte[] { 'a', 'b', 'c' }))
+			.perform(post(request).content(new byte[]{'a', 'b', 'c'}))
 			.andDo(log())
 			.andExpect(status().is4xxClientError())
 			.andExpect(status().isUnsupportedMediaType())

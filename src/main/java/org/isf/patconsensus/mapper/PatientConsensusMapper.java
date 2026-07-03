@@ -22,7 +22,6 @@
 package org.isf.patconsensus.mapper;
 
 import jakarta.annotation.PostConstruct;
-
 import org.isf.patconsensus.dto.PatientConsensusDTO;
 import org.isf.patconsensus.model.PatientConsensus;
 import org.isf.patient.model.Patient;

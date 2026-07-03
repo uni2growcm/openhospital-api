@@ -21,11 +21,11 @@
  */
 package org.isf.login.rest;
 
-import java.time.LocalDateTime;
-
+import io.jsonwebtoken.JwtException;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-
 import org.isf.login.dto.LoginRequest;
 import org.isf.login.dto.LoginResponse;
 import org.isf.login.dto.TokenRefreshRequest;
@@ -51,9 +51,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.jsonwebtoken.JwtException;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDateTime;
 
 @RestController
 @Tag(name = "Login")
@@ -61,17 +59,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class LoginController {
 
-	private final HttpSession httpSession;
-
-	private final SessionAuditManager sessionAuditManager;
-
-	private final TokenProvider tokenProvider;
-
-	private final CustomAuthenticationManager authenticationManager;
-
-	private final UserBrowsingManager userManager;
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
+	private final HttpSession httpSession;
+	private final SessionAuditManager sessionAuditManager;
+	private final TokenProvider tokenProvider;
+	private final CustomAuthenticationManager authenticationManager;
+	private final UserBrowsingManager userManager;
 
 	public LoginController(
 		HttpSession httpSession,

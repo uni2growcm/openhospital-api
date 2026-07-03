@@ -21,19 +21,6 @@
  */
 package org.isf.disease.rest;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-import java.util.Objects;
-
 import org.isf.disease.data.DiseaseHelper;
 import org.isf.disease.dto.DiseaseDTO;
 import org.isf.disease.manager.DiseaseBrowserManager;
@@ -56,15 +43,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
+import java.util.Objects;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 class DiseaseControllerTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DiseaseControllerTest.class);
-
+	private final DiseaseMapper diseaseMapper = new DiseaseMapper();
 	@Mock
 	private DiseaseBrowserManager diseaseBrowserManagerMock;
-
-	private final DiseaseMapper diseaseMapper = new DiseaseMapper();
-
 	private MockMvc mockMvc;
 
 	private AutoCloseable closeable;

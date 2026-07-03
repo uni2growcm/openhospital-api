@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LaboratoryMapper extends GenericMapper<Laboratory, LaboratoryDTO> {
 
-    public LaboratoryMapper() {
-        super(Laboratory.class, LaboratoryDTO.class);
-    }
+	public LaboratoryMapper() {
+		super(Laboratory.class, LaboratoryDTO.class);
+	}
 }

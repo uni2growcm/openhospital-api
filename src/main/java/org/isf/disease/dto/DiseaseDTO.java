@@ -21,12 +21,10 @@
  */
 package org.isf.disease.dto;
 
-import jakarta.validation.constraints.NotNull;
-
-import org.isf.distype.dto.DiseaseTypeDTO;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import jakarta.validation.constraints.NotNull;
+import org.isf.distype.dto.DiseaseTypeDTO;
 
 @Schema(description = "Class representing a disease")
 public class DiseaseDTO {
@@ -73,56 +71,56 @@ public class DiseaseDTO {
 		return hashCode;
 	}
 
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
+	}
+
 	public String getCode() {
 		return this.code;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public DiseaseTypeDTO getDiseaseType() {
-		return this.diseaseType;
-	}
-
-	public boolean isOpdInclude() {
-		return this.opdInclude;
-	}
-
-	public boolean isIpdInInclude() {
-		return this.ipdInInclude;
-	}
-
-	public boolean isIpdOutInclude() {
-		return this.ipdOutInclude;
 	}
 
 	public void setCode(String code) {
 		this.code = code;
 	}
 
+	public String getDescription() {
+		return this.description;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public DiseaseTypeDTO getDiseaseType() {
+		return this.diseaseType;
 	}
 
 	public void setDiseaseType(DiseaseTypeDTO diseaseType) {
 		this.diseaseType = diseaseType;
 	}
 
+	public boolean isOpdInclude() {
+		return this.opdInclude;
+	}
+
 	public void setOpdInclude(boolean opdInclude) {
 		this.opdInclude = opdInclude;
+	}
+
+	public boolean isIpdInInclude() {
+		return this.ipdInInclude;
 	}
 
 	public void setIpdInInclude(boolean ipdInInclude) {
 		this.ipdInInclude = ipdInInclude;
 	}
 
-	public void setIpdOutInclude(boolean ipdOutInclude) {
-		this.ipdOutInclude = ipdOutInclude;
+	public boolean isIpdOutInclude() {
+		return this.ipdOutInclude;
 	}
 
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
+	public void setIpdOutInclude(boolean ipdOutInclude) {
+		this.ipdOutInclude = ipdOutInclude;
 	}
 
 }

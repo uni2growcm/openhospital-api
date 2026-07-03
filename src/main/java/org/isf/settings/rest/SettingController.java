@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2024 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -43,6 +43,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -69,11 +71,13 @@ public class SettingController {
 
 	/**
 	 * Get a setting by its ID
+	 *
 	 * @param id Setting ID
 	 * @return {@link SettingDTO}
 	 * @throws OHServiceException When failed to get the setting
 	 */
 	@GetMapping("/settings/{id}")
+	@PreAuthorize("hasAuthority('settings.read')")
 	public SettingDTO getSettingById(@PathVariable("id") int id) throws OHServiceException {
 		Setting setting = manager.getById(id);
 
@@ -88,11 +92,13 @@ public class SettingController {
 
 	/**
 	 * Get a setting by its code
+	 *
 	 * @param code Setting code
 	 * @return {@link SettingDTO}
 	 * @throws OHServiceException When failed to get the setting
 	 */
 	@GetMapping("/settings/code/{code}")
+	@PreAuthorize("hasAuthority('settings.read')")
 	public SettingDTO getSettingByCode(@PathVariable("code") String code) throws OHServiceException {
 		Setting setting = manager.getByCode(code);
 
@@ -107,10 +113,12 @@ public class SettingController {
 
 	/**
 	 * Get all settings
+	 *
 	 * @return {@link List} of {@link SettingDTO}
 	 * @throws OHServiceException When failed to get settings
 	 */
 	@GetMapping("/settings")
+	@PreAuthorize("hasAuthority('settings.read')")
 	public List<SettingDTO> getAllSettings() throws OHServiceException {
 		logger.info("Retrieved all settings");
 		return mapper.map2DTOList(manager.findAll());
@@ -120,7 +128,7 @@ public class SettingController {
 	 * Update setting
 	 *
 	 * @param code Setting code
-	 * @param dto Setting Update payload
+	 * @param dto  Setting Update payload
 	 * @return {@link SettingDTO} the updated setting
 	 * @throws OHServiceException When failed to update setting
 	 */
@@ -142,6 +150,7 @@ public class SettingController {
 
 	/**
 	 * Reset all settings to default
+	 *
 	 * @return <code>true</code> when settings have been reset, <code>false</code> otherwise
 	 * @throws OHServiceException When failed to reset settings
 	 */

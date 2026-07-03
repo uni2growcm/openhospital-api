@@ -21,15 +21,13 @@
  */
 package org.isf.patvac.dto;
 
-import java.time.LocalDateTime;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.validation.constraints.NotNull;
-
 import org.isf.patient.dto.PatientDTO;
 import org.isf.vaccine.dto.VaccineDTO;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import java.time.LocalDateTime;
 
 public class PatientVaccineDTO {
 	private int code;
@@ -68,47 +66,47 @@ public class PatientVaccineDTO {
 		return hashCode;
 	}
 
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
+	}
+
 	public int getCode() {
 		return this.code;
-	}
-
-	public int getProgr() {
-		return this.progr;
-	}
-
-	public LocalDateTime getVaccineDate() {
-		return this.vaccineDate;
-	}
-
-	public PatientDTO getPatient() {
-		return this.patient;
-	}
-
-	public VaccineDTO getVaccine() {
-		return this.vaccine;
 	}
 
 	public void setCode(int code) {
 		this.code = code;
 	}
 
+	public int getProgr() {
+		return this.progr;
+	}
+
 	public void setProgr(int progr) {
 		this.progr = progr;
+	}
+
+	public LocalDateTime getVaccineDate() {
+		return this.vaccineDate;
 	}
 
 	public void setVaccineDate(LocalDateTime vaccineDate) {
 		this.vaccineDate = vaccineDate;
 	}
 
+	public PatientDTO getPatient() {
+		return this.patient;
+	}
+
 	public void setPatient(PatientDTO patient) {
 		this.patient = patient;
 	}
 
-	public void setVaccine(VaccineDTO vaccine) {
-		this.vaccine = vaccine;
+	public VaccineDTO getVaccine() {
+		return this.vaccine;
 	}
 
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
+	public void setVaccine(VaccineDTO vaccine) {
+		this.vaccine = vaccine;
 	}
 }

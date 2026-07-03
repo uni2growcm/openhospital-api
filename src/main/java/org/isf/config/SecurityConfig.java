@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -20,8 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.isf.config;
-
-import java.util.Arrays;
 
 import org.isf.permissions.manager.PermissionManager;
 import org.isf.security.ApiAuditorAwareImpl;
@@ -50,33 +48,32 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
 	private final TokenProvider tokenProvider;
-
-	@Autowired
-	private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
 	@Autowired
 	protected PermissionManager permissionManager;
+	@Autowired
+	private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+	@Autowired
+	private CustomLogoutHandler customLogoutHandler;
+	@Value("${cors.allowed.origins}")
+	private String allowedOrigins;
 
 	public SecurityConfig(TokenProvider tokenProvider, PermissionManager permissionManager) {
 		this.tokenProvider = tokenProvider;
 		this.permissionManager = permissionManager;
 	}
 
-	@Autowired
-	private CustomLogoutHandler customLogoutHandler;
-
 	@Bean
 	public PasswordEncoder encoder() {
 		return new BCryptPasswordEncoder();
 	}
-
-	@Value("${cors.allowed.origins}")
-	private String allowedOrigins;
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -85,7 +82,7 @@ public class SecurityConfig {
 		for (String origin : allowedOrigins.split(",")) {
 			configuration.addAllowedOriginPattern(origin.trim());
 		}
-		configuration.setAllowedMethods(Arrays.asList("*")); // Allows all HTTP methods
+		configuration.setAllowedMethods(List.of("*")); // Allows all HTTP methods
 		configuration.addAllowedHeader("*"); // Allows all headers
 		configuration.setAllowCredentials(true); // Allows credentials (e.g., cookies)
 		configuration.setMaxAge(3600L); // Cache preflight responses for 1 hour
@@ -334,6 +331,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/wards/**").hasAnyAuthority("wards.read")
 				.requestMatchers(HttpMethod.PUT, "/wards/**").hasAuthority("wards.update")
 				.requestMatchers(HttpMethod.DELETE, "/wards/**").hasAuthority("wards.delete")
+
+				// Assets
+				.requestMatchers("/assets/**").permitAll()
+				// Plugins
+				.requestMatchers(HttpMethod.GET, "/plugins").permitAll()
 
 				.anyRequest().authenticated()
 			)

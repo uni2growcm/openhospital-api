@@ -21,9 +21,8 @@
  */
 package org.isf.patvac.rest;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.isf.patvac.dto.PatientVaccineDTO;
 import org.isf.patvac.manager.PatVacManager;
 import org.isf.patvac.mapper.PatVacMapper;
@@ -35,19 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @Tag(name = "Patient Vaccines")
@@ -68,6 +58,7 @@ public class PatVacController {
 
 	/**
 	 * Create a new {@link PatientVaccine}.
+	 *
 	 * @param patientVaccineDTO Patient Vaccine DTO
 	 * @return {@code true} if the operation type has been stored, {@code false} otherwise.
 	 * @throws OHServiceException When failed to create patient vaccine
@@ -87,6 +78,7 @@ public class PatVacController {
 
 	/**
 	 * Updates the specified {@link PatientVaccine}.
+	 *
 	 * @param patientVaccineDTO Patient Vaccine payload
 	 * @return {@code true} if the operation type has been updated, {@code false} otherwise.
 	 * @throws OHServiceException When failed to update patient vaccine
@@ -108,12 +100,13 @@ public class PatVacController {
 
 	/**
 	 * Get all the {@link PatientVaccine}s for today or in the last week.
+	 *
 	 * @return the list of {@link PatientVaccine}s
 	 * @throws OHServiceException When failed to get patient vaccines
 	 */
 	@GetMapping("/patientvaccines/week")
 	public List<PatientVaccineDTO> getPatientVaccines(
-		@RequestParam(required=false) Boolean oneWeek
+		@RequestParam(required = false) Boolean oneWeek
 	) throws OHServiceException {
 		LOGGER.info("Get the all patient vaccine of to day or one week");
 		if (oneWeek == null) {
@@ -125,6 +118,7 @@ public class PatVacController {
 
 	/**
 	 * Get all {@link PatientVaccine}s within {@code dateFrom} and {@code dateTo}.
+	 *
 	 * @return the list of {@link PatientVaccine}s
 	 * @throws OHServiceException When failed to get patient vaccines
 	 */
@@ -147,6 +141,7 @@ public class PatVacController {
 
 	/**
 	 * Get the maximum progressive number within specified year or within current year if {@code 0}.
+	 *
 	 * @return {@code int} - the progressive number in the year
 	 * @throws OHServiceException When failed to get the progressive number
 	 */
@@ -159,6 +154,7 @@ public class PatVacController {
 
 	/**
 	 * Delete {@link PatientVaccine} for specified code.
+	 *
 	 * @param code Patient vaccine code
 	 * @return {@code true} if the {@link PatientVaccine} has been deleted, {@code false} otherwise.
 	 * @throws OHServiceException When failed to delete patient vaccine

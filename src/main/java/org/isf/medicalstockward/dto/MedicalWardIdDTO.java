@@ -21,12 +21,10 @@
  */
 package org.isf.medicalstockward.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-
 import org.isf.medical.dto.MedicalDTO;
 import org.isf.ward.dto.WardDTO;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 
 public class MedicalWardIdDTO {
 
@@ -50,12 +48,12 @@ public class MedicalWardIdDTO {
 		return this.ward;
 	}
 
-	public MedicalDTO getMedical() {
-		return this.medical;
-	}
-
 	public void setWard(WardDTO ward) {
 		this.ward = ward;
+	}
+
+	public MedicalDTO getMedical() {
+		return this.medical;
 	}
 
 	public void setMedical(MedicalDTO medical) {

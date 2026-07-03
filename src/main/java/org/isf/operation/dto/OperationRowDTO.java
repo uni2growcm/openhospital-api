@@ -26,16 +26,14 @@
  */
 package org.isf.operation.dto;
 
-import java.time.LocalDateTime;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.validation.constraints.NotNull;
-
 import org.isf.accounting.dto.BillDTO;
 import org.isf.admission.dto.AdmissionDTO;
 import org.isf.opd.dto.OpdDTO;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import java.time.LocalDateTime;
 
 public class OperationRowDTO {
 
@@ -79,6 +77,10 @@ public class OperationRowDTO {
 		return hashCode;
 	}
 
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
+	}
+
 	@Override
 	public String toString() {
 		return this.operation.getDescription() + ' ' + this.admission.getUserID();
@@ -88,83 +90,79 @@ public class OperationRowDTO {
 		return this.id;
 	}
 
-	public OperationDTO getOperation() {
-		return this.operation;
-	}
-
-	public String getPrescriber() {
-		return this.prescriber;
-	}
-
-	public String getOpResult() {
-		return this.opResult;
-	}
-
-	public LocalDateTime getOpDate() {
-		return this.opDate;
-	}
-
-	public String getRemarks() {
-		return this.remarks;
-	}
-
-	public AdmissionDTO getAdmission() {
-		return this.admission;
-	}
-
-	public OpdDTO getOpd() {
-		return this.opd;
-	}
-
-	public BillDTO getBill() {
-		return this.bill;
-	}
-
-	public Float getTransUnit() {
-		return this.transUnit;
-	}
-
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public OperationDTO getOperation() {
+		return this.operation;
 	}
 
 	public void setOperation(OperationDTO operation) {
 		this.operation = operation;
 	}
 
+	public String getPrescriber() {
+		return this.prescriber;
+	}
+
 	public void setPrescriber(String prescriber) {
 		this.prescriber = prescriber;
+	}
+
+	public String getOpResult() {
+		return this.opResult;
 	}
 
 	public void setOpResult(String opResult) {
 		this.opResult = opResult;
 	}
 
+	public LocalDateTime getOpDate() {
+		return this.opDate;
+	}
+
 	public void setOpDate(LocalDateTime opDate) {
 		this.opDate = opDate;
+	}
+
+	public String getRemarks() {
+		return this.remarks;
 	}
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
 
+	public AdmissionDTO getAdmission() {
+		return this.admission;
+	}
+
 	public void setAdmission(AdmissionDTO admission) {
 		this.admission = admission;
+	}
+
+	public OpdDTO getOpd() {
+		return this.opd;
 	}
 
 	public void setOpd(OpdDTO opd) {
 		this.opd = opd;
 	}
 
+	public BillDTO getBill() {
+		return this.bill;
+	}
+
 	public void setBill(BillDTO bill) {
 		this.bill = bill;
 	}
 
-	public void setTransUnit(Float transUnit) {
-		this.transUnit = transUnit;
+	public Float getTransUnit() {
+		return this.transUnit;
 	}
 
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
+	public void setTransUnit(Float transUnit) {
+		this.transUnit = transUnit;
 	}
 }

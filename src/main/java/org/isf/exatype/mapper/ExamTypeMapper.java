@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExamTypeMapper extends GenericMapper<ExamType, ExamTypeDTO> {
 
-    public ExamTypeMapper() {
-        super(ExamType.class, ExamTypeDTO.class);
-    }
+	public ExamTypeMapper() {
+		super(ExamType.class, ExamTypeDTO.class);
+	}
 }
