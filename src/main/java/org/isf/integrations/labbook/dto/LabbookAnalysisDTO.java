@@ -1,5 +1,7 @@
 package org.isf.integrations.labbook.dto;
 
+import java.util.List;
+
 public class LabbookAnalysisDTO {
 
 	private Integer id;
@@ -12,20 +14,17 @@ public class LabbookAnalysisDTO {
 
 	private String recordNumber;
 
-	private String variable;
-
-	private String result;
+	private List<LabbookAnalysisVariableDTO> variables;
 
 	public LabbookAnalysisDTO() {}
 
-	public LabbookAnalysisDTO(Integer id, String recordType, String prescriptionDate, String analysis, String recordNumber, String variable, String result) {
+	public LabbookAnalysisDTO(Integer id, String recordType, String prescriptionDate, String analysis, String recordNumber, List<LabbookAnalysisVariableDTO> variables) {
 		this.id = id;
 		this.recordType = recordType;
 		this.prescriptionDate = prescriptionDate;
 		this.analysis = analysis;
 		this.recordNumber = recordNumber;
-		this.variable = variable;
-		this.result = result;
+		this.variables = variables;
 	}
 
 	public Integer getId() {
@@ -68,19 +67,11 @@ public class LabbookAnalysisDTO {
 		this.recordNumber = recordNumber;
 	}
 
-	public String getVariable() {
-		return variable;
+	public List<LabbookAnalysisVariableDTO> getVariables() {
+		return variables;
 	}
 
-	public void setVariable(String variable) {
-		this.variable = variable;
-	}
-
-	public String getResult() {
-		return result;
-	}
-
-	public void setResult(String result) {
-		this.result = result;
+	public void setVariables(List<LabbookAnalysisVariableDTO> variables) {
+		this.variables = variables;
 	}
 }
