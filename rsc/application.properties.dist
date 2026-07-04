@@ -48,3 +48,6 @@ spring.jpa.hibernate.ddl-auto=none
 # See PluginsConfig for how this file is parsed at startup.
 
 spring.config.import=classpath:plugins.yaml
+# Extra config import
+
+spring.config.import=classpath:labbook.properties

@@ -1,0 +1,4 @@
+labbook-enabled=${LABBOOK_ENABLED:false}
+labbook-base-url=${LABBOOK_BASE_URL:http://localhost:5000/sigl}
+labbook-oauth-client-id=${LABBOOK_OAUTH_CLIENT_ID:OH2-API}
+labbook-oauth-client-secret=${LABBOOK_OAUTH_CLIENT_SECRET:OH2-API-SECRET}

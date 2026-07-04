@@ -6,6 +6,7 @@ HELP.md
 !.mvn/wrapper/maven-wrapper.jar
 /oh-rest-api.log.*.gz
 logs/
+LOG_DEST
 bin
 *.log
 /static
@@ -50,3 +51,7 @@ OH_API_PID
 *.log
 logs/
 LOG_DEST
+### Git ###
+/**/.gitkeep
+
+rsc/plugins

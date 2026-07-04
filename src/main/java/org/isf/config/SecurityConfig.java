@@ -331,6 +331,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/wards/**").hasAnyAuthority("wards.read")
 				.requestMatchers(HttpMethod.PUT, "/wards/**").hasAuthority("wards.update")
 				.requestMatchers(HttpMethod.DELETE, "/wards/**").hasAuthority("wards.delete")
+				// Labbook patient
+				.requestMatchers(HttpMethod.GET, "/labbook/patients/{id}/analysis/**").hasAuthority("exams.read")
 
 				// Assets
 				.requestMatchers("/assets/**").permitAll()
