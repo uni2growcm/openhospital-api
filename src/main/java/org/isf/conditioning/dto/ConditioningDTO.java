@@ -38,8 +38,8 @@ public class ConditioningDTO {
 	@Schema(description = "Aspiration conditioning", example = "true")
 	private Boolean aspiration;
 
-	@Schema(description = "Conditioning mce duration", example = "4")
-	private Integer mce;
+	@Schema(description = "Conditioning mce", example = "4")
+	private Boolean mce;
 
 	@Schema(description = "Conditioning ventilation duration", example = "true")
 	private Boolean ventilation;
@@ -81,6 +81,12 @@ public class ConditioningDTO {
 	@Schema(description = "Conditioning blood glucose level ", example = "5.6")
 	private Double bloodGlucoseLevel;
 
+	@Schema(description = "Conditioning others rapid screening test ", example = "5.6")
+	private String othersRapidScreeningTest;
+
+	@Schema(description = "Conditioning cpap details ", example = "5.6")
+	private String cpapDetails;
+
 	@NotNull
 	@Schema(description = "patient", example = "22")
 	private PatientDTO patient;
@@ -107,11 +113,11 @@ public class ConditioningDTO {
 		this.aspiration = aspiration;
 	}
 
-	public Integer getMce() {
+	public Boolean getMce() {
 		return mce;
 	}
 
-	public void setMce(Integer mce) {
+	public void setMce(Boolean mce) {
 		this.mce = mce;
 	}
 
@@ -199,6 +205,22 @@ public class ConditioningDTO {
 
 	public LocalDateTime getPerformedAt() {
 		return performedAt;
+	}
+
+	public String getOthersRapidScreeningTest() {
+		return othersRapidScreeningTest;
+	}
+
+	public void setOthersRapidScreeningTest(String othersRapidScreeningTest) {
+		this.othersRapidScreeningTest = othersRapidScreeningTest;
+	}
+
+	public String getCpapDetails() {
+		return cpapDetails;
+	}
+
+	public  void setCpapDetails(String cpapDetails) {
+		this.cpapDetails = cpapDetails;
 	}
 
 	public void setPerformedAt(LocalDateTime performedAt) {

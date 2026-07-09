@@ -24,6 +24,7 @@ package org.isf.medicalhistory.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import org.isf.patient.dto.PatientDTO;
 import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -165,6 +166,18 @@ public class MedicalHistoryDTO {
 
 	@Schema(description = "Medical history performed date", example = "2025-08-26T16:15:58")
 	private LocalDateTime performedAt;
+
+	@Schema(description = "Medical history other pregnancy section", example = "None")
+	private String otherPregnancySection;
+
+	@Schema(description = "Medical history other vaccination state section", example = "None")
+	private String otherVaccinationStateSection;
+
+	@Schema(description = "Medical history combined breastfeeding", example = "None")
+	private String combinedBreastfeeding;
+
+	@Schema(description = "Medical history no applicable deparasitation", example = "")
+	private Boolean noApplicableDeparasitation;
 
 	@Schema(description = "Optimistic lock value", example = "0")
 	private int lock;
@@ -499,6 +512,38 @@ public class MedicalHistoryDTO {
 
 	public void setPerformedAt(LocalDateTime performedAt) {
 		this.performedAt = performedAt;
+	}
+
+	public String getOtherPregnancySection() {
+		return otherPregnancySection;
+	}
+
+	public void setOtherPregnancySection(String otherPregnancySection) {
+		this.otherPregnancySection = otherPregnancySection;
+	}
+
+	public String getOtherVaccinationStateSection() {
+		return otherVaccinationStateSection;
+	}
+
+	public void setOtherVaccinationStateSection(String otherVaccinationStateSection) {
+		this.otherVaccinationStateSection = otherVaccinationStateSection;
+	}
+
+	public String getCombinedBreastfeeding() {
+		return combinedBreastfeeding;
+	}
+
+	public void setCombinedBreastfeeding(String combinedBreastfeeding) {
+		this.combinedBreastfeeding = combinedBreastfeeding;
+	}
+
+	public Boolean getNoApplicableDeparasitation() {
+		return noApplicableDeparasitation;
+	}
+
+	public void setNoApplicableDeparasitation(Boolean noApplicableDeparasitation) {
+		this.noApplicableDeparasitation = noApplicableDeparasitation;
 	}
 
 	public int getLock() {

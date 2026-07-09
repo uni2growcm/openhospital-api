@@ -23,6 +23,7 @@ package org.isf.examination.dto;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 
 import org.isf.examination.model.Ausculation;
@@ -110,6 +111,18 @@ public class PatientExaminationDTO {
 	
 	@Schema(description = "Head circumference", example = "23")
 	private Double pex_pc;
+
+	@Schema(description = "Head circumference per age", example = "23")
+	private Double pex_head_circ_age;
+
+	@Schema(description = "Weight per age", example = "22")
+	private Double pex_weight_age;
+
+	@Schema(description = "Height per age", example = "25")
+	private Double pex_height_age;
+
+	@Schema(description = "Body mass index par age", example = "26")
+	private Double pex_body_mass_index_age;
 
 	public int getPex_ID() {
 		return this.pex_ID;
@@ -288,6 +301,36 @@ public class PatientExaminationDTO {
 	public void setPex_pc(Double pex_pc) {
 		this.pex_pc = pex_pc;
 	}
-	
-	
+
+	public Double getPex_head_circ_age() {
+		return pex_head_circ_age;
+	}
+
+	public void setPex_head_circ_age(Double pex_head_circ_age) {
+		this.pex_head_circ_age = pex_head_circ_age;
+	}
+
+	public Double getPex_weight_age() {
+		return pex_weight_age;
+	}
+
+	public void setPex_weight_age(Double pex_weight_age) {
+		this.pex_weight_age = pex_weight_age;
+	}
+
+	public Double getPex_height_age() {
+		return pex_height_age;
+	}
+
+	public void setPex_height_age(Double pex_height_age) {
+		this.pex_height_age = pex_height_age;
+	}
+
+	public Double getPex_body_mass_index_age() {
+		return pex_body_mass_index_age;
+	}
+
+	public void setPex_body_mass_index_age(Double pex_body_mass_index_age) {
+		this.pex_body_mass_index_age = pex_body_mass_index_age;
+	}
 }

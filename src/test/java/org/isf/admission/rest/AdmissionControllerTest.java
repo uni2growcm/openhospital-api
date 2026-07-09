@@ -344,14 +344,10 @@ class AdmissionControllerTest {
 
 		Admission admission = AdmissionHelper.setup();
 		when(admissionManagerMock.getCurrentAdmission(patient)).thenReturn(admission);
-		Disease disease1 = DiseaseHelper.setup();
-		Disease disease2 = DiseaseHelper.setup();
-		Disease disease3 = DiseaseHelper.setup();
 		String dischargeTypeCode = "B";
 		DischargeType dischargeType = DischargeTypeHelper.setup(dischargeTypeCode);
 		admission.setAdmitted(0);
 		admission.setDisDate(LocalDateTime.now());
-		admission.setComplicationDiagnosis(List.of(disease1, disease2, disease3));
 		admission.setDisType(dischargeType);
 
 		when(admissionManagerMock.updateAdmission(admission)).thenReturn(admission);
