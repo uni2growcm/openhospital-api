@@ -25,13 +25,22 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,18 +90,13 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 class PatientControllerTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PatientControllerTest.class);
-
+	private final PatientMapper patientMapper = new PatientMapper();
 	@Mock
 	private PatientBrowserManager patientBrowserManagerMock;
-
 	@Mock
 	private AdmissionBrowserManager admissionBrowserManagerMock;
-
 	@Mock
 	private PatientConsensusBrowserManager patientConsensusManagerMock;
-
-	private final PatientMapper patientMapper = new PatientMapper();
-
 	private MockMvc mockMvc;
 
 	private AutoCloseable closeable;
@@ -127,7 +131,7 @@ class PatientControllerTest {
 		String request = "/patients";
 
 		MvcResult result = this.mockMvc
-			.perform(post(request).content(new byte[] { 'a', 'b', 'c' }))
+			.perform(post(request).content(new byte[]{'a', 'b', 'c'}))
 			.andDo(log())
 			.andExpect(status().is4xxClientError())
 			.andExpect(status().isUnsupportedMediaType())
@@ -570,7 +574,7 @@ class PatientControllerTest {
 		oHAPIException.ifPresent(se -> assertThat(se, notNullValue()));
 		oHAPIException.ifPresent(se -> assertThat(se, instanceOf(OHAPIException.class)));
 	}
-	
+
 	/**
 	 * Test method for
 	 * {@link PatientController#getPatientByCodes(List<Integer>)}.
@@ -578,25 +582,25 @@ class PatientControllerTest {
 	 * @throws Exception
 	 */
 	@Test
-    void when_get_patients_with_the_list_of_existing_code_then_return_list_of_PatientDTO() throws Exception {
-        String request = "/patients/by-codes";
-        List<Patient> patientList = PatientHelper.setupPatientList(5);
-        
-        List<Integer> codes = new ArrayList<Integer>();
-        
-        for (Patient patient: patientList) {
-        	codes.add(patient.getCode());
-        }
+	void when_get_patients_with_the_list_of_existing_code_then_return_list_of_PatientDTO() throws Exception {
+		String request = "/patients/by-codes";
+		List<Patient> patientList = PatientHelper.setupPatientList(5);
 
-        when(patientBrowserManagerMock.getPatientByCodes(anyList())).thenReturn(patientList);
+		List<Integer> codes = new ArrayList<Integer>();
 
-        this.mockMvc
-            .perform(post(request)
-                .content(codes.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-            .andDo(log())
-            .andExpect(status().isOk())
-            .andExpect(content().string(containsString(PatientHelper.asJsonString(patientMapper.map2DTOList(patientList)))));
+		for (Patient patient : patientList) {
+			codes.add(patient.getCode());
+		}
+
+		when(patientBrowserManagerMock.getPatientByCodes(anyList())).thenReturn(patientList);
+
+		this.mockMvc
+			.perform(post(request)
+				.content(codes.toString())
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(log())
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString(PatientHelper.asJsonString(patientMapper.map2DTOList(patientList)))));
     }
 
 	@Test

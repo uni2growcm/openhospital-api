@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2026 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -21,20 +21,21 @@
  */
 package org.isf.patient.dto;
 
-import java.time.LocalDate;
-
-import jakarta.validation.constraints.NotNull;
-
-import com.drew.lang.annotations.Nullable;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 
 @Schema(description = "Class representing a patient")
 public class PatientDTO {
 
 	@Schema(description = "Code of the Patient", example = "1")
 	private Integer code;
+
+	@Schema(description = "Code of the Patient in labBook software", example = "1")
+	private Integer labBookId;
 
 	@NotNull
 	@Schema(description = "First name of the patient", example = "Mario", maxLength = 50)
@@ -91,8 +92,8 @@ public class PatientDTO {
 	private Character father;
 
 	@NotNull
-	@Schema(description = "Blood type (0-/+, A-/+ , B-/+, AB-/+)", allowableValues = { "0-", "0+", "A-", "A+", "B-",
-			"B+", "AB-", "AB+" }, example = "A+")
+	@Schema(description = "Blood type (0-/+, A-/+ , B-/+, AB-/+)", allowableValues = {"0-", "0+", "A-", "A+", "B-",
+		"B+", "AB-", "AB+"}, example = "A+")
 	private String bloodType;
 
 	@Schema(description = "HasInsurance (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
@@ -152,6 +153,10 @@ public class PatientDTO {
 		return lock;
 	}
 
+	public void setLock(int lock) {
+		this.lock = lock;
+	}
+
 	public String getAllergies() {
 		return allergies;
 	}
@@ -173,9 +178,17 @@ public class PatientDTO {
 		return code;
 	}
 
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
 	@Schema(accessMode = AccessMode.READ_ONLY)
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Schema(accessMode = AccessMode.READ_ONLY)
@@ -183,13 +196,25 @@ public class PatientDTO {
 		return nextKin;
 	}
 
+	public void setNextKin(String nextKin) {
+		this.nextKin = nextKin;
+	}
+
 	@Schema(accessMode = AccessMode.READ_ONLY)
 	public int getHashCode() {
 		return hashCode;
 	}
 
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
+	}
+
 	public String getFirstName() {
 		return this.firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	public String getSecondName() {
@@ -208,136 +233,100 @@ public class PatientDTO {
 		return this.agetype;
 	}
 
-	public Character getSex() {
-		return this.sex;
-	}
-
-	public String getAddress() {
-		return this.address;
-	}
-
-	public String getCity() {
-		return this.city;
-	}
-
-	public String getTelephone() {
-		return this.telephone;
-	}
-
-	public String getNote() {
-		return this.note;
-	}
-
-	public Character getMother() {
-		return this.mother;
-	}
-
-	public Character getFather() {
-		return this.father;
-	}
-
-	public String getBloodType() {
-		return this.bloodType;
-	}
-
-	public Character getHasInsurance() {
-		return this.hasInsurance;
-	}
-
-	public Character getParentTogether() {
-		return this.parentTogether;
-	}
-
-	public String getTaxCode() {
-		return this.taxCode;
-	}
-
 	public String getUpdatedFrom() {
 		return this.updatedFrom;
-	}
-
-	public void setCode(Integer code) {
-		this.code = code;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public void setSecondName(String secondName) {
-		this.secondName = secondName;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setBirthDate(LocalDate birthDate) {
-		this.birthDate = birthDate;
-	}
-
-	public void setAge(Integer age) {
-		this.age = age;
 	}
 
 	public void setAgetype(String agetype) {
 		this.agetype = agetype;
 	}
 
+	public Character getSex() {
+		return this.sex;
+	}
+
 	public void setSex(Character sex) {
 		this.sex = sex;
+	}
+
+	public String getAddress() {
+		return this.address;
 	}
 
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
+	public String getCity() {
+		return this.city;
+	}
+
 	public void setCity(String city) {
 		this.city = city;
 	}
 
-	public void setNextKin(String nextKin) {
-		this.nextKin = nextKin;
+	public String getTelephone() {
+		return this.telephone;
 	}
 
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
 	}
 
+	public String getNote() {
+		return this.note;
+	}
+
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public Character getMother() {
+		return this.mother;
 	}
 
 	public void setMother(Character mother) {
 		this.mother = mother;
 	}
 
+	public Character getFather() {
+		return this.father;
+	}
+
 	public void setFather(Character father) {
 		this.father = father;
+	}
+
+	public String getBloodType() {
+		return this.bloodType;
 	}
 
 	public void setBloodType(String bloodType) {
 		this.bloodType = bloodType;
 	}
 
+	public Character getHasInsurance() {
+		return this.hasInsurance;
+	}
+
 	public void setHasInsurance(Character hasInsurance) {
 		this.hasInsurance = hasInsurance;
+	}
+
+	public Character getParentTogether() {
+		return this.parentTogether;
 	}
 
 	public void setParentTogether(Character parentTogether) {
 		this.parentTogether = parentTogether;
 	}
 
+	public String getTaxCode() {
+		return this.taxCode;
+	}
+
 	public void setTaxCode(String taxCode) {
 		this.taxCode = taxCode;
-	}
-
-	public void setLock(int lock) {
-		this.lock = lock;
-	}
-
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
 	}
 
 	public PatientSTATUS getStatus() {
@@ -362,6 +351,26 @@ public class PatientDTO {
 
 	public void setFatherName(String fatherName) {
 		this.fatherName = fatherName;
+	}
+
+	public void setSecondName(String secondName) {
+		this.secondName = secondName;
+	}
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+
+	public Integer getLabBookId() {
+		return labBookId;
+	}
+
+	public void setLabBookId(Integer labBookId) {
+		this.labBookId = labBookId;
 	}
 
 	public byte[] getBlobPhoto() {

@@ -21,11 +21,9 @@
  */
 package org.isf.therapy.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.medical.dto.MedicalDTO;
 import org.isf.medical.mapper.MedicalMapper;
 import org.isf.shared.exceptions.OHAPIException;
@@ -39,17 +37,10 @@ import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @Tag(name = "Therapies")
@@ -79,6 +70,7 @@ public class TherapyController {
 
 	/**
 	 * Creates a new therapy for related Patient.
+	 *
 	 * @param thRowDTO - the therapy
 	 * @return the created therapy
 	 * @throws OHServiceException When failed to create therapy
@@ -95,6 +87,7 @@ public class TherapyController {
 
 	/**
 	 * Replaces all therapies for related Patient.
+	 *
 	 * @param thRowDTOs - the list of therapies
 	 * @return {@code true} if the rows has been inserted, {@code false} otherwise
 	 * @throws OHServiceException When failed to replace patient therapies
@@ -104,13 +97,14 @@ public class TherapyController {
 	public TherapyRowDTO replaceTherapies(
 		@RequestBody @Valid List<TherapyRowDTO> thRowDTOs
 	) throws OHServiceException {
-		ArrayList<TherapyRow> therapies = (ArrayList<TherapyRow>)therapyRowMapper.map2ModelList(thRowDTOs);
+		ArrayList<TherapyRow> therapies = (ArrayList<TherapyRow>) therapyRowMapper.map2ModelList(thRowDTOs);
 
 		return therapyRowMapper.map2DTO(manager.newTherapy(therapies.get(0)));
 	}
 
 	/**
 	 * Deletes all therapies for specified Patient Code.
+	 *
 	 * @param code - the Patient Code
 	 * @return {@code true} if the therapies have been deleted, throws an exception otherwise
 	 * @throws OHServiceException When failed to delete patient therapies
@@ -127,6 +121,7 @@ public class TherapyController {
 
 	/**
 	 * Gets the medicals that are not available for the specified list of therapies.
+	 *
 	 * @param therapyDTOs - the list of therapies
 	 * @return the list of medicals out of stock
 	 * @throws OHServiceException When failed to get not available medicals
@@ -140,6 +135,7 @@ public class TherapyController {
 
 	/**
 	 * Gets the list of therapies for specified Patient ID.
+	 *
 	 * @param patientID - the Patient ID
 	 * @return the list of therapies of the patient or all the therapies if {@code 0} is passed
 	 * @throws OHServiceException When failed to get patient therapies
@@ -153,6 +149,7 @@ public class TherapyController {
 
 	/**
 	 * Gets a list of therapies from a list of therapyRows (DB records).
+	 *
 	 * @param thRowDTOs - the list of therapyRows
 	 * @return the list of therapies
 	 * @throws OHServiceException When failed to get therapies
@@ -166,6 +163,7 @@ public class TherapyController {
 
 	/**
 	 * Gets therapy from a therapyRow (DB record).
+	 *
 	 * @param thRowDTO - the therapyRow
 	 * @return the therapy
 	 * @throws OHServiceException When failed to get therapy

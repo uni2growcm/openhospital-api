@@ -21,8 +21,8 @@
  */
 package org.isf.pricesothers.rest;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.isf.pricesothers.dto.PricesOthersDTO;
 import org.isf.pricesothers.manager.PricesOthersManager;
 import org.isf.pricesothers.mapper.PricesOthersMapper;
@@ -34,18 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 
 @RestController
 @Tag(name = "Others Price")
@@ -66,6 +57,7 @@ public class PricesOthersController {
 
 	/**
 	 * Create a new {@link PricesOthers}.
+	 *
 	 * @param pricesOthersDTO PriceOther payload
 	 * @return {@code true} if the prices others has been stored, {@code false} otherwise.
 	 * @throws OHServiceException When failed to create price other
@@ -83,6 +75,7 @@ public class PricesOthersController {
 
 	/**
 	 * Updates the specified {@link PricesOthers}.
+	 *
 	 * @param pricesOthersDTO PriceOther payload
 	 * @return {@code true} if the prices others has been updated, {@code false} otherwise.
 	 * @throws OHServiceException When failed to update price other
@@ -112,6 +105,7 @@ public class PricesOthersController {
 
 	/**
 	 * Get all the available {@link PricesOthers}s.
+	 *
 	 * @return a {@link List} of {@link PricesOthers} or NO_CONTENT if there is no data found.
 	 * @throws OHServiceException When failed to get other prices
 	 */
@@ -124,6 +118,7 @@ public class PricesOthersController {
 
 	/**
 	 * Delete {@link PricesOthers} for specified code.
+	 *
 	 * @param id Other price ID
 	 * @return {@code true} if the {@link PricesOthers} has been deleted, {@code false} otherwise.
 	 * @throws OHServiceException When failed to delete the other price

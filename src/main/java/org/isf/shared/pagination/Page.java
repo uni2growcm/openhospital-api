@@ -25,19 +25,22 @@ package org.isf.shared.pagination;
 import java.util.List;
 
 public class Page<T> {
-	
+
 	List<T> data;
 	PageInfoDTO pageInfoDTO;
 
 	public List<T> getData() {
 		return data;
 	}
+
 	public void setData(List<T> data) {
 		this.data = data;
 	}
+
 	public PageInfoDTO getPageInfo() {
 		return pageInfoDTO;
 	}
+
 	public void setPageInfo(PageInfoDTO pageInfoDTO) {
 		this.pageInfoDTO = pageInfoDTO;
 	}

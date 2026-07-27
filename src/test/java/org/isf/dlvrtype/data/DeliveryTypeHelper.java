@@ -21,20 +21,19 @@
  */
 package org.isf.dlvrtype.data;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.isf.dlvrtype.TestDeliveryType;
-import org.isf.dlvrtype.dto.DeliveryTypeDTO;
-import org.isf.dlvrtype.model.DeliveryType;
-import org.isf.utils.exception.OHException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.isf.dlvrtype.TestDeliveryType;
+import org.isf.dlvrtype.dto.DeliveryTypeDTO;
+import org.isf.dlvrtype.model.DeliveryType;
+import org.isf.utils.exception.OHException;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DeliveryTypeHelper {
 
@@ -49,14 +48,14 @@ public class DeliveryTypeHelper {
 
 	public static List<DeliveryType> setupDeliveryTypeList(int size) {
 		return IntStream.range(0, size)
-				.mapToObj(i -> {
-					try {
-						return DeliveryTypeHelper.setup(i);
-					} catch (OHException e) {
-						e.printStackTrace();
-					}
-					return null;
-				}).collect(Collectors.toList());
+			.mapToObj(i -> {
+				try {
+					return DeliveryTypeHelper.setup(i);
+				} catch (OHException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}).collect(Collectors.toList());
 	}
 
 	public static String asJsonString(DeliveryTypeDTO body) {
@@ -71,9 +70,9 @@ public class DeliveryTypeHelper {
 	public static ObjectMapper getObjectMapper() {
 		if (objectMapper == null) {
 			objectMapper = new ObjectMapper()
-					.registerModule(new ParameterNamesModule())
-					.registerModule(new Jdk8Module())
-					.registerModule(new JavaTimeModule());
+				.registerModule(new ParameterNamesModule())
+				.registerModule(new Jdk8Module())
+				.registerModule(new JavaTimeModule());
 		}
 		return objectMapper;
 	}

@@ -21,17 +21,14 @@
  */
 package org.isf.examination.dto;
 
-import java.time.LocalDateTime;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-
 import org.isf.examination.model.Ausculation;
 import org.isf.examination.model.Bowel;
 import org.isf.examination.model.Diurese;
 
-import com.drew.lang.annotations.Nullable;
-
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 
 public class PatientExaminationDTO {
 
@@ -98,8 +95,16 @@ public class PatientExaminationDTO {
 		return this.pex_ID;
 	}
 
+	public void setPex_ID(int pex_ID) {
+		this.pex_ID = pex_ID;
+	}
+
 	public LocalDateTime getPex_date() {
 		return this.pex_date;
+	}
+
+	public void setPex_date(LocalDateTime pex_date) {
+		this.pex_date = pex_date;
 	}
 
 	public Integer getPex_ap_min() {
@@ -178,52 +183,44 @@ public class PatientExaminationDTO {
 		return this.patientCode;
 	}
 
-	public Integer getPex_height() {
-		return this.pex_height;
-	}
-
-	public Double getPex_weight() {
-		return this.pex_weight;
-	}
-
-	public Double getPex_temp() {
-		return this.pex_temp;
-	}
-
-	public Double getPex_sat() {
-		return this.pex_sat;
-	}
-
-	public String getPex_note() {
-		return this.pex_note;
-	}
-
-	public void setPex_ID(int pex_ID) {
-		this.pex_ID = pex_ID;
-	}
-
-	public void setPex_date(LocalDateTime pex_date) {
-		this.pex_date = pex_date;
-	}
-
 	public void setPatientCode(Integer patientCode) {
 		this.patientCode = patientCode;
+	}
+
+	public Integer getPex_height() {
+		return this.pex_height;
 	}
 
 	public void setPex_height(Integer pex_height) {
 		this.pex_height = pex_height;
 	}
 
+	public Double getPex_weight() {
+		return this.pex_weight;
+	}
+
 	public void setPex_weight(Double pex_weight) {
 		this.pex_weight = pex_weight;
+	}
+
+	public Double getPex_temp() {
+		return this.pex_temp;
 	}
 
 	public void setPex_temp(Double pex_temp) {
 		this.pex_temp = pex_temp;
 	}
 
+	public Double getPex_sat() {
+		return this.pex_sat;
+	}
+
 	public void setPex_sat(Double pex_sat) {
 		this.pex_sat = pex_sat;
+	}
+
+	public String getPex_note() {
+		return this.pex_note;
 	}
 
 	public void setPex_note(String pex_note) {

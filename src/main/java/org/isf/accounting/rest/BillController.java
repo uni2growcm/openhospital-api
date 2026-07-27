@@ -21,9 +21,9 @@
  */
 package org.isf.accounting.rest;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.isf.accounting.dto.BillDTO;
 import org.isf.accounting.dto.BillItemsDTO;
 import org.isf.accounting.dto.BillPaymentsDTO;
@@ -47,20 +47,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @Tag(name = "Bills")
@@ -100,6 +90,7 @@ public class BillController {
 
 	/**
 	 * Create new bill with the list of billItems and the list of billPayments
+	 *
 	 * @param newBillDto Bill payload
 	 * @return {@link FullBillDTO}
 	 * @throws OHServiceException When failed to create bill
@@ -198,9 +189,10 @@ public class BillController {
 
 	/**
 	 * Retrieves all the {@link Bill}s for the specified parameters
+	 *
 	 * @param dateFrom the low date range endpoint, inclusive.
-	 * @param dateTo the high date range endpoint, inclusive.
-	 * @param code the patient code, which can be set or not.
+	 * @param dateTo   the high date range endpoint, inclusive.
+	 * @param code     the patient code, which can be set or not.
 	 * @return a list of retrieved {@link Bill}s or {@code null} if an error occurred.
 	 * @throws OHServiceException When failed to get bills
 	 */
@@ -227,9 +219,10 @@ public class BillController {
 
 	/**
 	 * Retrieves all the billPayments for a given parameters
+	 *
 	 * @param dateFrom Start date
-	 * @param dateTo End date
-	 * @param code the patient code, which can be set or not.
+	 * @param dateTo   End date
+	 * @param code     the patient code, which can be set or not.
 	 * @return the list of payments
 	 * @throws OHServiceException When failed to get bill payments
 	 */
@@ -255,6 +248,7 @@ public class BillController {
 
 	/**
 	 * Gets all the {@link BillPayments} for the specified {@link Bill}.
+	 *
 	 * @param id the bill id.
 	 * @return a list of {@link BillPayments} or {@code null} if an error occurred.
 	 * @throws OHServiceException When failed to get bill payments
@@ -268,6 +262,7 @@ public class BillController {
 
 	/**
 	 * Retrieves all the {@link BillItems} associated to the passed {@link Bill} id.
+	 *
 	 * @param id the bill id.
 	 * @return a list of {@link BillItems} or {@code null} if an error occurred.
 	 * @throws OHServiceException When failed to get bill items
@@ -281,6 +276,7 @@ public class BillController {
 
 	/**
 	 * Get the {@link Bill} with specified billID
+	 *
 	 * @param id the bill ID
 	 * @return the {@link Bill} or {@code null} if an error occurred.
 	 * @throws OHServiceException When failed to get the bill
@@ -302,6 +298,7 @@ public class BillController {
 
 	/**
 	 * Retrieves all the {@link Bill}s associated to the specified {@link Patient}.
+	 *
 	 * @param code - the Patient's code
 	 * @return the list of {@link Bill}s
 	 * @throws OHServiceException When failed to get associated bills
@@ -315,6 +312,7 @@ public class BillController {
 
 	/**
 	 * Returns all the pending {@link Bill}s for the specified patient.
+	 *
 	 * @param code the patient code.
 	 * @return the list of pending bills or {@code null} if an error occurred.
 	 * @throws OHServiceException When failed to get patient pending bills
@@ -328,8 +326,9 @@ public class BillController {
 
 	/**
 	 * Search all the {@link Bill}s for the specified parameters
-	 * @param dateFrom the low date range endpoint, inclusive.
-	 * @param dateTo the high date range endpoint, inclusive.
+	 *
+	 * @param dateFrom    the low date range endpoint, inclusive.
+	 * @param dateTo      the high date range endpoint, inclusive.
 	 * @param billItemDTO the bill item object.
 	 * @return a list of retrieved {@link Bill}s or {@code null} if an error occurred.
 	 * @throws OHServiceException When error occurs
@@ -361,6 +360,7 @@ public class BillController {
 
 	/**
 	 * Delete a bill using ID
+	 *
 	 * @param id Bill ID
 	 * @return <code>true</code> if the bill has been successfully deleted,
 	 * throws exception otherwise
@@ -386,6 +386,7 @@ public class BillController {
 
 	/**
 	 * Search all the {@link Bill}s associated to the passed {@link BillPayments}.
+	 *
 	 * @param paymentsDTO the {@link BillPaymentsDTO} associated to the bill to retrieve.
 	 * @return a list of {@link Bill} associated to the passed {@link BillPayments} or {@code null} if an error occurred.
 	 * @throws OHServiceException When failed to get bills

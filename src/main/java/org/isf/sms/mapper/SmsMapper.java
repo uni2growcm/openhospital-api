@@ -27,7 +27,7 @@ import org.isf.sms.model.Sms;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SmsMapper extends GenericMapper<Sms, SmsDTO>{
+public class SmsMapper extends GenericMapper<Sms, SmsDTO> {
 	public SmsMapper() {
 		super(Sms.class, SmsDTO.class);
 	}

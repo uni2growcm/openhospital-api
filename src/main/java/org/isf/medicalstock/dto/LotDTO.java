@@ -21,12 +21,11 @@
  */
 package org.isf.medicalstock.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class LotDTO {
 
@@ -59,28 +58,28 @@ public class LotDTO {
 		return this.code;
 	}
 
-	public LocalDate getPreparationDate() {
-		return this.preparationDate;
-	}
-
-	public LocalDate getDueDate() {
-		return this.dueDate;
-	}
-
-	public BigDecimal getCost() {
-		return this.cost;
-	}
-
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public LocalDate getPreparationDate() {
+		return this.preparationDate;
 	}
 
 	public void setPreparationDate(LocalDate preparationDate) {
 		this.preparationDate = preparationDate;
 	}
 
+	public LocalDate getDueDate() {
+		return this.dueDate;
+	}
+
 	public void setDueDate(LocalDate dueDate) {
 		this.dueDate = dueDate;
+	}
+
+	public BigDecimal getCost() {
+		return this.cost;
 	}
 
 	public void setCost(BigDecimal cost) {

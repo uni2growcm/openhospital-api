@@ -21,14 +21,13 @@
  */
 package org.isf.lab.data;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.isf.lab.TestLaboratoryRow;
 import org.isf.lab.dto.LaboratoryRowDTO;
 import org.isf.lab.model.Laboratory;
 import org.isf.lab.model.LaboratoryRow;
 import org.isf.utils.exception.OHException;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class LaboratoryRowHelper {
 	public static LaboratoryRow setup() throws OHException {
@@ -39,7 +38,7 @@ public class LaboratoryRowHelper {
 
 
 	public static String asJsonString(LaboratoryRowDTO body) {
-		
+
 		try {
 			return new ObjectMapper().writeValueAsString(body);
 		} catch (JsonProcessingException e) {

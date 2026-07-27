@@ -21,12 +21,9 @@
  */
 package org.isf.agetype.rest;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import org.isf.agetype.dto.AgeTypeDTO;
 import org.isf.agetype.manager.AgeTypeBrowserManager;
 import org.isf.agetype.mapper.AgeTypeMapper;
@@ -38,16 +35,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "AgeTypes")
@@ -81,6 +73,7 @@ public class AgeTypeController {
 
 	/**
 	 * Update an age type
+	 *
 	 * @param ageTypeDTOs - the list of age types to be updated
 	 * @return {@link AgeTypeDTO} the updated age type
 	 * @throws OHServiceException When failed to update age type
@@ -92,7 +85,7 @@ public class AgeTypeController {
 			try {
 				if (ageTypeDTO.getCode() == null || ageTypeDTO.getCode().trim().isEmpty() || ageTypeManager.getTypeByCode(ageTypeDTO.getCode()) == null) {
 					try {
-						throw new OHAPIException(new OHExceptionMessage("The age type with code "+ageTypeDTO.getCode()+" is not valid."));
+						throw new OHAPIException(new OHExceptionMessage("The age type with code " + ageTypeDTO.getCode() + " is not valid."));
 					} catch (OHAPIException e) {
 						throw new RuntimeException(e);
 					}
@@ -117,6 +110,7 @@ public class AgeTypeController {
 
 	/**
 	 * Get the code of an age type whose ages range includes a given age
+	 *
 	 * @param age - the given age
 	 * @return the code of the age type matching the given age
 	 * @throws OHServiceException When failed to get age type
@@ -128,7 +122,7 @@ public class AgeTypeController {
 		String result = ageTypeManager.getTypeByAge(age);
 		Map<String, String> responseBody = new HashMap<>();
 
-		if (result != null){
+		if (result != null) {
 			responseBody.put("code", result);
 		} else {
 			LOGGER.info("No corresponding age code for the given age");
@@ -139,6 +133,7 @@ public class AgeTypeController {
 
 	/**
 	 * Gets the {@link AgeType} from the code index.
+	 *
 	 * @param index the code index.
 	 * @return the retrieved element.
 	 * @throws OHServiceException When failed to get age type
@@ -148,7 +143,7 @@ public class AgeTypeController {
 		LOGGER.info("Get age type by index: {}", index);
 		AgeType result = ageTypeManager.getTypeByCode(index);
 
-		if (result == null){
+		if (result == null) {
 			LOGGER.info("No corresponding age code for the given index");
 			throw new OHAPIException(new OHExceptionMessage("Age type not found with index :" + index), HttpStatus.NOT_FOUND);
 		}

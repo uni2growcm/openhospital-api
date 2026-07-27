@@ -32,5 +32,5 @@ public class LotMapper extends GenericMapper<Lot, LotDTO> {
 	public LotMapper() {
 		super(Lot.class, LotDTO.class);
 	}
-	
+
 }

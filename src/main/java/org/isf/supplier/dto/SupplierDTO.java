@@ -21,9 +21,8 @@
  */
 package org.isf.supplier.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 public class SupplierDTO {
 
@@ -59,7 +58,7 @@ public class SupplierDTO {
 	}
 
 	public SupplierDTO(Integer supId, String supName, String supAddress, String supTaxcode, String supPhone,
-					String supFax, String supEmail, String supNote) {
+					   String supFax, String supEmail, String supNote) {
 		this.supId = supId;
 		this.supName = supName;
 		this.supAddress = supAddress;
@@ -74,60 +73,60 @@ public class SupplierDTO {
 		return this.supId;
 	}
 
-	public String getSupName() {
-		return this.supName;
-	}
-
-	public String getSupAddress() {
-		return this.supAddress;
-	}
-
-	public String getSupTaxcode() {
-		return this.supTaxcode;
-	}
-
-	public String getSupPhone() {
-		return this.supPhone;
-	}
-
-	public String getSupFax() {
-		return this.supFax;
-	}
-
-	public String getSupEmail() {
-		return this.supEmail;
-	}
-
-	public String getSupNote() {
-		return this.supNote;
-	}
-
 	public void setSupId(Integer supId) {
 		this.supId = supId;
+	}
+
+	public String getSupName() {
+		return this.supName;
 	}
 
 	public void setSupName(String supName) {
 		this.supName = supName;
 	}
 
+	public String getSupAddress() {
+		return this.supAddress;
+	}
+
 	public void setSupAddress(String supAddress) {
 		this.supAddress = supAddress;
+	}
+
+	public String getSupTaxcode() {
+		return this.supTaxcode;
 	}
 
 	public void setSupTaxcode(String supTaxcode) {
 		this.supTaxcode = supTaxcode;
 	}
 
+	public String getSupPhone() {
+		return this.supPhone;
+	}
+
 	public void setSupPhone(String supPhone) {
 		this.supPhone = supPhone;
+	}
+
+	public String getSupFax() {
+		return this.supFax;
 	}
 
 	public void setSupFax(String supFax) {
 		this.supFax = supFax;
 	}
 
+	public String getSupEmail() {
+		return this.supEmail;
+	}
+
 	public void setSupEmail(String supEmail) {
 		this.supEmail = supEmail;
+	}
+
+	public String getSupNote() {
+		return this.supNote;
 	}
 
 	public void setSupNote(String supNote) {
