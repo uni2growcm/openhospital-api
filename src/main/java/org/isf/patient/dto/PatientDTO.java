@@ -58,8 +58,8 @@ public class PatientDTO {
 	private String agetype;
 
 	@NotNull
-	@Schema(description = "Sex", allowableValues = {"M", "F"}, example = "M")
-	private char sex;
+	@Schema(description = "Sex", allowableValues = { "M", "F" }, example = "M")
+	private Character sex;
 
 	@Schema(description = "Address", example = "Via Roma, 12", maxLength = 50)
 	private String address;
@@ -81,26 +81,26 @@ public class PatientDTO {
 	@Schema(description = "Mother's name", example = "Roberta", maxLength = 50)
 	private String motherName;
 
-	@Schema(description = "Mother's status (D=dead, A=alive)", allowableValues = {"D", "A"}, example = "A")
-	private char mother;
+	@Schema(description = "Mother's status (D=dead, A=alive)", allowableValues = { "D", "A" }, example = "A")
+	private Character mother;
 
 	@NotNull
 	@Schema(description = "Father's name", example = "Giuseppe", maxLength = 50)
 	private String fatherName;
 
-	@Schema(description = "Father's status (D=dead, A=alive)", allowableValues = {"D", "A"}, example = "D")
-	private char father;
+	@Schema(description = "Father's status (D=dead, A=alive)", allowableValues = { "D", "A" }, example = "D")
+	private Character father;
 
 	@NotNull
 	@Schema(description = "Blood type (0-/+, A-/+ , B-/+, AB-/+)", allowableValues = {"0-", "0+", "A-", "A+", "B-",
 		"B+", "AB-", "AB+"}, example = "A+")
 	private String bloodType;
 
-	@Schema(description = "HasInsurance (Y=Yes, N=no)", allowableValues = {"Y", "N"}, example = "N")
-	private char hasInsurance;
+	@Schema(description = "HasInsurance (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
+	private Character hasInsurance;
 
-	@Schema(description = "Parent together (Y=Yes, N=no)", allowableValues = {"Y", "N"}, example = "N")
-	private char parentTogether;
+	@Schema(description = "Parent together (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
+	private Character parentTogether;
 
 	@Schema(description = "Tax code", example = "RSSMRA79E01L781N", maxLength = 30)
 	private String taxCode;
@@ -129,6 +129,9 @@ public class PatientDTO {
 
 	@Schema(description = "Consensus service flag", example = "true")
 	private boolean consensusServiceFlag;
+
+	@Schema(description = "the source from which the patient was updated", example = "OH")
+	private String updatedFrom;
 
 	public boolean isConsensusFlag() {
 		return consensusFlag;
@@ -222,7 +225,7 @@ public class PatientDTO {
 		return this.birthDate;
 	}
 
-	public int getAge() {
+	public Integer getAge() {
 		return this.age;
 	}
 
@@ -230,15 +233,19 @@ public class PatientDTO {
 		return this.agetype;
 	}
 
+	public String getUpdatedFrom() {
+		return this.updatedFrom;
+	}
+
 	public void setAgetype(String agetype) {
 		this.agetype = agetype;
 	}
 
-	public char getSex() {
+	public Character getSex() {
 		return this.sex;
 	}
 
-	public void setSex(char sex) {
+	public void setSex(Character sex) {
 		this.sex = sex;
 	}
 
@@ -274,19 +281,19 @@ public class PatientDTO {
 		this.note = note;
 	}
 
-	public char getMother() {
+	public Character getMother() {
 		return this.mother;
 	}
 
-	public void setMother(char mother) {
+	public void setMother(Character mother) {
 		this.mother = mother;
 	}
 
-	public char getFather() {
+	public Character getFather() {
 		return this.father;
 	}
 
-	public void setFather(char father) {
+	public void setFather(Character father) {
 		this.father = father;
 	}
 
@@ -298,19 +305,19 @@ public class PatientDTO {
 		this.bloodType = bloodType;
 	}
 
-	public char getHasInsurance() {
+	public Character getHasInsurance() {
 		return this.hasInsurance;
 	}
 
-	public void setHasInsurance(char hasInsurance) {
+	public void setHasInsurance(Character hasInsurance) {
 		this.hasInsurance = hasInsurance;
 	}
 
-	public char getParentTogether() {
+	public Character getParentTogether() {
 		return this.parentTogether;
 	}
 
-	public void setParentTogether(char parentTogether) {
+	public void setParentTogether(Character parentTogether) {
 		this.parentTogether = parentTogether;
 	}
 
@@ -372,5 +379,9 @@ public class PatientDTO {
 
 	public void setBlobPhoto(byte[] blobPhoto) {
 		this.blobPhoto = blobPhoto;
+	}
+
+	public void setUpdatedFrom(String updatedFrom) {
+		this.updatedFrom = updatedFrom;
 	}
 }

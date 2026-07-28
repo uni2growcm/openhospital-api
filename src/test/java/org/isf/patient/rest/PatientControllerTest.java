@@ -25,16 +25,22 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,24 +82,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 /**
@@ -613,5 +601,76 @@ class PatientControllerTest {
 			.andDo(log())
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString(PatientHelper.asJsonString(patientMapper.map2DTOList(patientList)))));
+    }
+
+	@Test
+	void when_patch_patient_not_found_then_NotFound() throws Exception {
+		int code = 123;
+
+		when(patientBrowserManagerMock.getPatientById(code)).thenReturn(null);
+
+		this.mockMvc
+			.perform(
+				patch("/patients/{code}", code)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{\"firstName\":\"Anna\"}")
+			)
+			.andExpect(status().isNotFound())
+			.andExpect(content().string(containsString("Patient not found.")));
+	}
+
+	@Test
+	void when_patch_patient_with_partial_body_then_only_fields_are_updated() throws Exception {
+		int code = 123;
+
+		Patient existingPatient = PatientHelper.setup();
+		existingPatient.setCode(code);
+		existingPatient.setFirstName("OldName");
+		existingPatient.setSecondName("OldSurname");
+
+		when(patientBrowserManagerMock.getPatientById(code)).thenReturn(existingPatient);
+		when(patientBrowserManagerMock.savePatient(any(Patient.class)))
+			.thenAnswer(invocation -> invocation.getArgument(0));
+
+		String patchBody = """
+        {
+            "firstName": "NewName"
+        }
+        """;
+
+		this.mockMvc
+			.perform(
+				patch("/patients/{code}", code)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(patchBody)
+			)
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString("NewName")))
+			.andExpect(content().string(containsString("OldSurname")));
+	}
+
+	@Test
+	void when_patch_patient_with_empty_blob_then_BadRequest() throws Exception {
+		int code = 123;
+
+		Patient patient = PatientHelper.setup();
+		patient.setCode(code);
+
+		when(patientBrowserManagerMock.getPatientById(code)).thenReturn(patient);
+
+		String patchBody = """
+        {
+            "blobPhoto": ""
+        }
+        """;
+
+		this.mockMvc
+			.perform(
+				patch("/patients/{code}", code)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(patchBody)
+			)
+			.andExpect(status().isBadRequest())
+			.andExpect(content().string(containsString("Malformed picture.")));
 	}
 }
