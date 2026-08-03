@@ -356,10 +356,10 @@ public class AdmissionController {
 		}
 
 		if (adm.getDisDate().isBefore(adm.getAdmDate())) {
-			throw new OHAPIException(new OHExceptionMessage("the exit date must be after the entry date."));
+			throw new OHAPIException(new OHExceptionMessage("The exit date must be after the entry date."));
 		}
 		if (adm.getDisType() == null || !dischargeTypeManager.isCodePresent(adm.getDisType().getCode())) {
-			throw new OHAPIException(new OHExceptionMessage("the type of output is mandatory or does not exist."));
+			throw new OHAPIException(new OHExceptionMessage("The type of output is mandatory or does not exist."));
 		}
 
 		adm.setAdmitted(0);

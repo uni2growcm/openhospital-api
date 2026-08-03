@@ -102,6 +102,9 @@ public class AdmissionDTO {
 	@Schema(description = "Anamnesis", maxLength = 65535)
 	private String anamnesis;
 
+	@Schema(description = "Note", maxLength = 65535)
+	private String note;
+
 	@Schema(description = "Transfusional unit")
 	private Float transUnit;
 
@@ -259,6 +262,14 @@ public class AdmissionDTO {
 
 	public String getAnamnesis() {
 		return this.anamnesis;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	public Float getTransUnit() {

@@ -134,6 +134,7 @@ public class ReportsController {
 	public ResponseEntity<Resource> printDischargeAgainstMedicalAdvicePdf(@RequestBody DischargeAgainstMedicalAdviceDTO dischargeAgainstMedicalAdviceDTO, HttpServletRequest request) throws OHServiceException, IOException {
 		return getReport(reportsManager.getGenericReportDischargeAgainstAdvicePdf(
 			dischargeAgainstMedicalAdviceDTO.getPatID(),
+			dischargeAgainstMedicalAdviceDTO.getAdmID(),
 			dischargeAgainstMedicalAdviceDTO.getLocalisation(),
 			dischargeAgainstMedicalAdviceDTO.getReference(),
 			dischargeAgainstMedicalAdviceDTO.getDistrict(),

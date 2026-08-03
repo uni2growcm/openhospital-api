@@ -201,7 +201,9 @@ public class ConditioningDTO {
 
 	public Double getBloodGlucoseLevel() {return bloodGlucoseLevel;}
 
-	public void setBloodGlucoseLevel(Double tdr) {this.bloodGlucoseLevel = bloodGlucoseLevel;}
+	public void setBloodGlucoseLevel(Double tdr) {
+		this.bloodGlucoseLevel = tdr;
+	}
 
 	public LocalDateTime getPerformedAt() {
 		return performedAt;

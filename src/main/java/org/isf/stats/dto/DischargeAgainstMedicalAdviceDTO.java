@@ -12,6 +12,10 @@ public class DischargeAgainstMedicalAdviceDTO {
 	private Integer patID;
 
 	@NotNull
+	@Schema(description = "ID of patient admission", example = "513")
+	private Integer admID;
+
+	@NotNull
 	@Schema(description = "Localisation of the person who want to remove patient", example = "Cotonou")
 	private String localisation;
 
@@ -56,6 +60,14 @@ public class DischargeAgainstMedicalAdviceDTO {
 
 	public void setPatID(Integer patID) {
 		this.patID = patID;
+	}
+
+	public Integer getAdmID() {
+		return admID;
+	}
+
+	public void setAdmID(Integer admID) {
+		this.admID = admID;
 	}
 
 	public String getLocalisation() {
