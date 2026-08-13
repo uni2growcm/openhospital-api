@@ -356,10 +356,10 @@ public class AdmissionController {
 		}
 
 		if (adm.getDisDate().isBefore(adm.getAdmDate())) {
-			throw new OHAPIException(new OHExceptionMessage("the exit date must be after the entry date."));
+			throw new OHAPIException(new OHExceptionMessage("The exit date must be after the entry date."));
 		}
 		if (adm.getDisType() == null || !dischargeTypeManager.isCodePresent(adm.getDisType().getCode())) {
-			throw new OHAPIException(new OHExceptionMessage("the type of output is mandatory or does not exist."));
+			throw new OHAPIException(new OHExceptionMessage("The type of output is mandatory or does not exist."));
 		}
 
 		adm.setAdmitted(0);
@@ -388,17 +388,6 @@ public class AdmissionController {
 		@Valid @RequestBody AdmissionDTO newAdmissionDTO
 	) throws OHServiceException {
 		Admission newAdmission = admissionMapper.map2Model(newAdmissionDTO);
-		if (newAdmissionDTO.getComplicationDiagnosis() != null && !newAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
-			List<Disease> diseaseList = new ArrayList<>();
-			for (DiseaseDTO diseaseOutCode : newAdmissionDTO.getComplicationDiagnosis()) {
-				Disease dOut1 = diseaseManager.getDiseaseByCode(diseaseOutCode.getCode());
-				if (dOut1 == null) {
-					throw new OHAPIException(new OHExceptionMessage("Disease out not found for code: " + diseaseOutCode));
-				}
-				diseaseList.add(dOut1);
-			}
-			newAdmission.setComplicationDiagnosis(diseaseList);
-		}
 
 		if (newAdmissionDTO.getWard() != null && newAdmissionDTO.getWard().getCode() != null
 			&& !newAdmissionDTO.getWard().getCode().trim().isEmpty()) {
@@ -458,17 +447,6 @@ public class AdmissionController {
 			}
 			if (dIns.isEmpty()) {
 				throw new OHAPIException(new OHExceptionMessage("All diseases out not found."));
-			}
-			newAdmission.setDiagnosisOut(dIns);
-		}
-
-		if (newAdmissionDTO.getComplicationDiagnosis() != null && !newAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
-			List<Disease> dIns = new ArrayList<>();
-			for (DiseaseDTO complicationDiagnosis: newAdmissionDTO.getComplicationDiagnosis()) {
-				dIns = diseases.stream().filter(d -> d.getCode().equals(complicationDiagnosis.getCode())).toList();
-			}
-			if (dIns.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("All complication diseases not found."));
 			}
 			newAdmission.setDiagnosisOut(dIns);
 		}
@@ -617,17 +595,6 @@ public class AdmissionController {
 			}
 			if (dIns.isEmpty()) {
 				throw new OHAPIException(new OHExceptionMessage("All diseases out not found."));
-			}
-			old.setDiagnosisOut(dIns);
-		}
-
-		if (updateAdmissionDTO.getComplicationDiagnosis() != null && !updateAdmissionDTO.getComplicationDiagnosis().isEmpty()) {
-			List<Disease> dIns = new ArrayList<>();
-			for (DiseaseDTO complicationDiagnosis: updateAdmissionDTO.getComplicationDiagnosis()) {
-				dIns = diseases.stream().filter(d -> d.getCode().equals(complicationDiagnosis.getCode())).toList();
-			}
-			if (dIns.isEmpty()) {
-				throw new OHAPIException(new OHExceptionMessage("All complication diseases not found."));
 			}
 			old.setDiagnosisOut(dIns);
 		}

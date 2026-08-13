@@ -108,7 +108,7 @@ public class PatientDTO {
 	private char hasInsurance;
 
 	@Schema(description = "Parent together (Y=Yes, N=no)", allowableValues = { "Y", "N" }, example = "N")
-	private char parentTogether;
+	private String parentTogether;
 
 	@Schema(description = "Tax code", example = "RSSMRA79E01L781N", maxLength = 30)
 	private String taxCode;
@@ -286,7 +286,7 @@ public class PatientDTO {
 		return this.hasInsurance;
 	}
 
-	public char getParentTogether() {
+	public String getParentTogether() {
 		return this.parentTogether;
 	}
 
@@ -386,7 +386,7 @@ public class PatientDTO {
 		this.hasInsurance = hasInsurance;
 	}
 
-	public void setParentTogether(char parentTogether) {
+	public void setParentTogether(String parentTogether) {
 		this.parentTogether = parentTogether;
 	}
 

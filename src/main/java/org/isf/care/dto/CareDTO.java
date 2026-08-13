@@ -38,7 +38,7 @@ public class CareDTO {
 	private List<String> team;
 
 	@Schema(description = "Observation of the commune", example = "Good observation")
-	private String observation;
+	private Boolean observation;
 
 	@Schema(description = "Planned care", example = "Take one perfusion")
 	private String plannedCare;
@@ -69,11 +69,11 @@ public class CareDTO {
 		this.team = team;
 	}
 
-	public String getObservation() {
+	public Boolean getObservation() {
 		return observation;
 	}
 
-	public void setObservation(String observation) {
+	public void setObservation(Boolean observation) {
 		this.observation = observation;
 	}
 

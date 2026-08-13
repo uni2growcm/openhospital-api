@@ -76,7 +76,7 @@ public class AdmissionDTO {
 	private String FHU;
 
 	@Schema(description = "Complication Diagnosis")
-	private List<DiseaseDTO> complicationDiagnosis;
+	private String complication;
 
 	@Schema(description = "Diagnosis out")
 	private List<DiseaseDTO> diagnosisOut;
@@ -101,6 +101,9 @@ public class AdmissionDTO {
 
 	@Schema(description = "Anamnesis", maxLength = 65535)
 	private String anamnesis;
+
+	@Schema(description = "Note", maxLength = 65535)
+	private String note;
 
 	@Schema(description = "Transfusional unit")
 	private Float transUnit;
@@ -233,8 +236,8 @@ public class AdmissionDTO {
 		return this.FHU;
 	}
 
-	public List<DiseaseDTO> getComplicationDiagnosis() {
-		return this.complicationDiagnosis;
+	public String getComplication() {
+		return this.complication;
 	}
 
 	public OperationDTO getOperation() {
@@ -259,6 +262,14 @@ public class AdmissionDTO {
 
 	public String getAnamnesis() {
 		return this.anamnesis;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	public Float getTransUnit() {
@@ -352,8 +363,8 @@ public class AdmissionDTO {
 		this.FHU = FHU;
 	}
 
-	public void setComplicationDiagnosis(List<DiseaseDTO> complicationDiagnosis) {
-		this.complicationDiagnosis = complicationDiagnosis;
+	public void setComplication(String complication) {
+		this.complication = complication;
 	}
 
 	public void setOperation(OperationDTO operation) {
