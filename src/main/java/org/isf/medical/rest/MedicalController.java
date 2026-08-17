@@ -269,7 +269,7 @@ public class MedicalController {
 
 	/**
 	 * Returns the next available product code, to be used as a suggestion
-	 * when creating a new {@link Medical}. for the medical
+	 * when creating a new {@link Medical}.
 	 * @return the next available product code.
 	 * @throws OHServiceException When failed to compute the next code
 	 */
