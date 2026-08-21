@@ -44,6 +44,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -124,6 +125,18 @@ public class StockMovementController {
 		movInsertingManager.newMultipleDischargingMovements(movements, referenceNumber);
 
 		return true;
+	}
+
+	/**
+	 * Updates (adjusts) the quantity of an existing {@link Movement}.
+	 *
+	 * @param movementDTO the {@link Movement} with the new quantity (the code identifies the movement to update).
+	 * @return the updated movement.
+	 * @throws OHServiceException When failed to update the movement
+	 */
+	@PutMapping("/stockmovements")
+	public MovementDTO updateMovement(@RequestBody MovementDTO movementDTO) throws OHServiceException {
+		return movMapper.map2DTO(movInsertingManager.updateMovement(movMapper.map2Model(movementDTO)));
 	}
 
 	/**
