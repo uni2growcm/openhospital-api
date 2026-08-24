@@ -31,6 +31,7 @@ import org.isf.medical.mapper.MedicalMapper;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
 import org.isf.shared.exceptions.OHAPIException;
+import org.isf.utils.exception.OHDataValidationException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.slf4j.Logger;
@@ -167,11 +168,36 @@ public class MedicalController {
 	) throws OHServiceException {
 		LOGGER.info("Creating a new medical ...");
 		try {
+			Medical medical = mapper.map2Model(medicalDTO);
+			Medical created = medicalManager.newMedical(medical, ignoreSimilar);
 			LOGGER.info("Medical successfully created.");
-			return mapper.map2DTO(medicalManager.newMedical(mapper.map2Model(medicalDTO), ignoreSimilar));
+			return mapper.map2DTO(created);
 		} catch (OHServiceException serviceException) {
-			LOGGER.info("Medical is not created.");
-			throw new OHAPIException(new OHExceptionMessage("Medical not created."));
+			LOGGER.error("Medical creation failed: {}", serviceException.getMessage());
+
+			List<OHExceptionMessage> messages = serviceException.getMessages();
+
+			if (messages != null && !messages.isEmpty()) {
+				String message = messages.get(0).getMessage();
+				if (message != null && !message.isEmpty()) {
+					throw new OHAPIException(
+						new OHExceptionMessage(message),
+						HttpStatus.BAD_REQUEST
+					);
+				}
+			}
+
+			if (serviceException instanceof OHDataValidationException) {
+				throw new OHAPIException(
+					new OHExceptionMessage("Invalid data provided. Please check all required fields."),
+					HttpStatus.BAD_REQUEST
+				);
+			}
+
+			throw new OHAPIException(
+				new OHExceptionMessage("Failed to create medical. Please try again."),
+				HttpStatus.BAD_REQUEST
+			);
 		}
 	}
 
@@ -189,14 +215,38 @@ public class MedicalController {
 	) throws OHServiceException {
 		LOGGER.info("Updating a medical ...");
 		try {
+			Medical medical = mapper.map2Model(medicalDTO);
+			Medical updated = medicalManager.updateMedical(medical, ignoreSimilar);
 			LOGGER.info("Medical successfully updated.");
-			return mapper.map2DTO(medicalManager.updateMedical(mapper.map2Model(medicalDTO), ignoreSimilar));
+			return mapper.map2DTO(updated);
 		} catch (OHServiceException serviceException) {
-			LOGGER.info("Medical is not updated.");
-			throw new OHAPIException(new OHExceptionMessage("Medical not updated."));
+			LOGGER.error("Medical update failed: {}", serviceException.getMessage());
+
+			List<OHExceptionMessage> messages = serviceException.getMessages();
+
+			if (messages != null && !messages.isEmpty()) {
+				String message = messages.get(0).getMessage();
+				if (message != null && !message.isEmpty()) {
+					throw new OHAPIException(
+						new OHExceptionMessage(message),
+						HttpStatus.BAD_REQUEST
+					);
+				}
+			}
+
+			if (serviceException instanceof OHDataValidationException) {
+				throw new OHAPIException(
+					new OHExceptionMessage("Invalid data provided. Please check all required fields."),
+					HttpStatus.BAD_REQUEST
+				);
+			}
+
+			throw new OHAPIException(
+				new OHExceptionMessage("Failed to update medical. Please try again."),
+				HttpStatus.BAD_REQUEST
+			);
 		}
 	}
-
 	/**
 	 * Deletes the specified {@link Medical}.
 	 * @param code the medical to delete.
@@ -215,5 +265,17 @@ public class MedicalController {
 		} catch (OHServiceException serviceException) {
 			throw new OHAPIException(new OHExceptionMessage("Medical not deleted"));
 		}
+	}
+
+	/**
+	 * Returns the next available product code, to be used as a suggestion
+	 * when creating a new {@link Medical}.
+	 * @return the next available product code.
+	 * @throws OHServiceException When failed to compute the next code
+	 */
+	@GetMapping(value = "/medicals/next-code")
+	public Integer getNextMedicalCode() throws OHServiceException {
+		LOGGER.info("Retrieving next available medical code...");
+		return medicalManager.getNextMedicalCode();
 	}
 }

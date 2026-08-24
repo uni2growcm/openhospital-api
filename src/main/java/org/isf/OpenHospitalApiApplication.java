@@ -24,6 +24,7 @@ package org.isf;
 import jakarta.annotation.PostConstruct;
 
 import org.isf.generaldata.GeneralData;
+import org.isf.generaldata.MessageBundle;
 import org.isf.menu.manager.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -56,6 +57,7 @@ public class OpenHospitalApiApplication extends SpringBootServletInitializer {
 	public void setUp() {
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		GeneralData.getGeneralData(); // initialize core settings
+		MessageBundle.initialize();
 	}
 
 	@Override
