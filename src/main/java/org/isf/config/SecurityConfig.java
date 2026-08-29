@@ -108,6 +108,11 @@ public class SecurityConfig {
 				.requestMatchers("/", "/healthcheck").permitAll()
 				.requestMatchers("/auth/login", "/auth/refresh-token").permitAll()
 				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
+				//accounting
+				.requestMatchers(HttpMethod.POST, "/bills/**").hasAuthority("bills.create")
+				.requestMatchers(HttpMethod.GET, "/bills/**").hasAnyAuthority("bills.read")
+				.requestMatchers(HttpMethod.PUT, "/bills/**").hasAuthority("bills.update")
+				.requestMatchers(HttpMethod.DELETE, "/bills/**").hasAuthority("bills.delete")
 				// admissions
 				.requestMatchers(HttpMethod.POST, "/admissions/**").hasAuthority("admissions.create")
 				.requestMatchers(HttpMethod.GET, "/admissions/**").hasAnyAuthority("admissions.read")
@@ -121,6 +126,11 @@ public class SecurityConfig {
 				// age types
 				.requestMatchers(HttpMethod.GET, "/agetypes/**").hasAnyAuthority("agetypes.read")
 				.requestMatchers(HttpMethod.PUT, "/agetypes/**").hasAuthority("agetypes.update")
+				//conditionings
+				.requestMatchers(HttpMethod.POST, "/conditionings/**").hasAuthority("conditionings.create")
+				.requestMatchers(HttpMethod.GET, "/conditionings/**").hasAnyAuthority("conditionings.read")
+				.requestMatchers(HttpMethod.PUT, "/conditionings/**").hasAuthority("conditionings.update")
+				.requestMatchers(HttpMethod.DELETE, "/conditionings/**").hasAuthority("conditionings.delete")
 				// dischargetypes
 				.requestMatchers(HttpMethod.POST, "/dischargetypes/**").hasAuthority("dischargetypes.create")
 				.requestMatchers(HttpMethod.GET, "/dischargetypes/**").hasAnyAuthority("dischargetypes.read")
@@ -146,6 +156,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/deliverytypes/**").hasAnyAuthority("deliverytypes.read")
 				.requestMatchers(HttpMethod.PUT, "/deliverytypes/**").hasAuthority("deliverytypes.update")
 				.requestMatchers(HttpMethod.DELETE, "/deliverytypes/**").hasAuthority("deliverytypes.delete")
+				// encounters
+				.requestMatchers(HttpMethod.POST, "/encounters/**").hasAuthority("encounters.create")
+				.requestMatchers(HttpMethod.GET, "/encounters/**").hasAnyAuthority("encounters.read")
+				.requestMatchers(HttpMethod.PATCH, "/encounters/**").hasAuthority("encounters.update")
+				.requestMatchers(HttpMethod.DELETE, "/encounters/**").hasAuthority("encounters.delete")
 				// exams
 				.requestMatchers(HttpMethod.POST, "/exams/**").hasAuthority("exams.create")
 				.requestMatchers(HttpMethod.GET, "/exams/**").hasAnyAuthority("exams.read")
@@ -195,6 +210,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/medicals/**").hasAuthority("medicals.read")
 				.requestMatchers(HttpMethod.PUT, "/medicals/**").hasAuthority("medicals.update")
 				.requestMatchers(HttpMethod.DELETE, "/medicals/**").hasAuthority("medicals.delete")
+				// medicalhistories
+				.requestMatchers(HttpMethod.POST, "/medicalhistories/**").hasAuthority("medicalhistories.create")
+				.requestMatchers(HttpMethod.GET, "/medicalhistories/**").hasAuthority("medicalhistories.read")
+				.requestMatchers(HttpMethod.PUT, "/medicalhistories/**").hasAuthority("medicalhistories.update")
+				.requestMatchers(HttpMethod.DELETE, "/medicalhistories/**").hasAuthority("medicalhistories.delete")
 				// medicalstock
 				.requestMatchers(HttpMethod.POST, "/medicalstockmovements/**").hasAuthority("medicalstockmovements.create")
 				.requestMatchers(HttpMethod.GET, "/medicalstockmovements/**").hasAuthority("medicalstockmovements.read")
@@ -250,6 +270,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/permissions/**").hasAuthority("permissions.read")
 				.requestMatchers(HttpMethod.PUT, "/permissions/**").hasAuthority("permissions.update")
 				.requestMatchers(HttpMethod.DELETE, "/permissions/**").hasAuthority("permissions.delete")
+				//pregtreattype
+				.requestMatchers(HttpMethod.POST, "/pregnanttreatmenttypes/**").hasAuthority("pregnanttreatmenttypes.create")
+				.requestMatchers(HttpMethod.GET, "/pregnanttreatmenttypes/**").hasAuthority("pregnanttreatmenttypes.read")
+				.requestMatchers(HttpMethod.PUT, "/pregnanttreatmenttypes/**").hasAuthority("pregnanttreatmenttypes.update")
+				.requestMatchers(HttpMethod.DELETE, "/pregnanttreatmenttypes/**").hasAuthority("pregnanttreatmenttypes.delete")
 				// radiology
 				.requestMatchers(HttpMethod.GET, "/radiology/**").hasAuthority("radiology.read")
 				// grouppermission
@@ -308,6 +333,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/sms/**").hasAnyAuthority("sms.read")
 				.requestMatchers(HttpMethod.PUT, "/sms/**").hasAuthority("sms.update")
 				.requestMatchers(HttpMethod.DELETE, "/sms/**").hasAuthority("sms.delete")
+				//stats.rest
+				.requestMatchers(HttpMethod.GET, "/reports/**").hasAnyAuthority("reports.read")
 				// suppliers
 				.requestMatchers(HttpMethod.POST, "/suppliers/**").hasAuthority("suppliers.create")
 				.requestMatchers(HttpMethod.GET, "/suppliers/**").hasAnyAuthority("suppliers.read")
