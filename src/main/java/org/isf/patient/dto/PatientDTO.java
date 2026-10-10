@@ -105,6 +105,12 @@ public class PatientDTO {
 	@Schema(description = "Country of the patient")
 	private CountryDTO country;
 
+	@Schema(description = "Code of the affiliated patient", example = "2")
+	private Integer affiliatedPatientCode;
+
+	@Schema(description = "Name of the affiliated patient", example = "Mario Rossi", accessMode = AccessMode.READ_ONLY)
+	private String affiliatedPatientName;
+
 	@NotNull
 	@Schema(description = "Father's name", example = "Giuseppe", maxLength = 50)
 	private String fatherName;
@@ -381,6 +387,22 @@ public class PatientDTO {
 
 	public void setCountry(CountryDTO country) {
 		this.country = country;
+	}
+
+	public Integer getAffiliatedPatientCode() {
+		return this.affiliatedPatientCode;
+	}
+
+	public void setAffiliatedPatientCode(Integer affiliatedPatientCode) {
+		this.affiliatedPatientCode = affiliatedPatientCode;
+	}
+
+	public String getAffiliatedPatientName() {
+		return this.affiliatedPatientName;
+	}
+
+	public void setAffiliatedPatientName(String affiliatedPatientName) {
+		this.affiliatedPatientName = affiliatedPatientName;
 	}
 
 	public char getFather() {

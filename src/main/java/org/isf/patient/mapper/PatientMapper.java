@@ -44,6 +44,27 @@ public class PatientMapper extends GenericMapper<Patient, PatientDTO> {
 	}
 
 	@Override
+	public PatientDTO map2DTO(Patient fromObj) {
+		PatientDTO patientDTO = super.map2DTO(fromObj);
+		if (fromObj.getAffiliatedPatient() != null) {
+			patientDTO.setAffiliatedPatientCode(fromObj.getAffiliatedPatient().getCode());
+			patientDTO.setAffiliatedPatientName(fromObj.getAffiliatedPatient().getName());
+		}
+		return patientDTO;
+	}
+
+	@Override
+	public Patient map2Model(PatientDTO fromObj) {
+		Patient patient = super.map2Model(fromObj);
+		if (fromObj.getAffiliatedPatientCode() != null) {
+			Patient affiliatedPatient = new Patient();
+			affiliatedPatient.setCode(fromObj.getAffiliatedPatientCode());
+			patient.setAffiliatedPatient(affiliatedPatient);
+		}
+		return patient;
+	}
+
+	@Override
 	public List<PatientDTO> map2DTOList(List<Patient> list) {
 		return list.stream().map(it -> map2DTO(it)).collect(Collectors.toList());
 	}

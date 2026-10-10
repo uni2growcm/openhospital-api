@@ -22,6 +22,7 @@
 package org.isf.country.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Class representing a country")
 public class CountryDTO {
@@ -29,12 +30,15 @@ public class CountryDTO {
 	@Schema(description = "Country id", example = "1")
 	private int id;
 
+	@NotNull
 	@Schema(description = "ISO code of the country", example = "IT", maxLength = 2)
 	private String isoCode;
 
+	@NotNull
 	@Schema(description = "Phone code of the country", example = "+39", maxLength = 10)
 	private String phoneCode;
 
+	@NotNull
 	@Schema(description = "Name of the country", example = "Italy", maxLength = 100)
 	private String name;
 

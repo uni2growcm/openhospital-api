@@ -23,15 +23,23 @@ package org.isf.country.rest;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.isf.country.dto.CountryDTO;
 import org.isf.country.manager.CountryBrowserManager;
 import org.isf.country.mapper.CountryMapper;
+import org.isf.country.model.Country;
+import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHServiceException;
+import org.isf.utils.exception.model.OHExceptionMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -64,5 +72,31 @@ public class CountryController {
 		LOGGER.info("Get countries");
 
 		return mapper.map2DTOList(countryManager.getCountries());
+	}
+
+	/**
+	 * Create a new {@link Country}
+	 *
+	 * @param countryDTO Country payload
+	 * @return the created {@link Country}
+	 * @throws OHServiceException When failed to create the country
+	 */
+	@PostMapping(value = "/countries")
+	@ResponseStatus(HttpStatus.CREATED)
+	public CountryDTO newCountry(@Valid @RequestBody CountryDTO countryDTO) throws OHServiceException {
+		LOGGER.info("Create country {}", countryDTO.getName());
+
+		if (countryManager.getCountryByIsoCode(countryDTO.getIsoCode()).isPresent()) {
+			throw new OHAPIException(new OHExceptionMessage("A country with this ISO code already exists."));
+		}
+		if (countryManager.getCountryByPhoneCode(countryDTO.getPhoneCode()).isPresent()) {
+			throw new OHAPIException(new OHExceptionMessage("A country with this phone code already exists."));
+		}
+		if (countryManager.getCountryByName(countryDTO.getName()).isPresent()) {
+			throw new OHAPIException(new OHExceptionMessage("A country with this name already exists."));
+		}
+
+		Country newCountry = countryManager.saveCountry(mapper.map2Model(countryDTO));
+		return mapper.map2DTO(newCountry);
 	}
 }
