@@ -118,7 +118,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/dischargetypes/**").hasAuthority("dischargetypes.create")
 				.requestMatchers(HttpMethod.GET, "/dischargetypes/**").hasAnyAuthority("dischargetypes.read")
 				.requestMatchers(HttpMethod.PUT, "/dischargetypes/**").hasAuthority("dischargetypes.update")
-				.requestMatchers(HttpMethod.DELETE, "/dischargetypes/**").hasAuthority("dischargetypes.delete")
+				// countries
+				.requestMatchers("/countries/**", "/countries").authenticated()
 				// diseases
 				.requestMatchers(HttpMethod.POST, "/diseases/**").hasAuthority("diseases.create")
 				.requestMatchers(HttpMethod.GET, "/diseases/**").hasAnyAuthority("diseases.read")
