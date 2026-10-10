@@ -47,4 +47,4 @@ spring.jpa.hibernate.ddl-auto=none
 # Plugin gateway definitions are loaded from rsc/plugins.yaml.
 # See PluginsConfig for how this file is parsed at startup.
 
-spring.config.import=classpath:plugins.yaml
+spring.config.import=optional:classpath:plugins.yaml
