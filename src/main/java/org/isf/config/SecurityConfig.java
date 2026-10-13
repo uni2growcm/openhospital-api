@@ -319,6 +319,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/vaccinetypes/**").hasAnyAuthority("vaccinetypes.read")
 				.requestMatchers(HttpMethod.PUT, "/vaccinetypes/**").hasAuthority("vaccinetypes.update")
 				.requestMatchers(HttpMethod.DELETE, "/vaccinetypes/**").hasAuthority("vaccinetypes.delete")
+				// typologies
+				.requestMatchers("/typologies/**").authenticated()
 				// visit
 				.requestMatchers(HttpMethod.POST, "/visits/**").hasAuthority("visits.create")
 				.requestMatchers(HttpMethod.GET, "/visits/**").hasAnyAuthority("visits.read")
