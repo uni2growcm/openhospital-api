@@ -29,7 +29,6 @@ import org.isf.homevisit.model.Staff;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.shared.pagination.Page;
 import org.isf.staff.dto.StaffDTO;
-import org.isf.staff.manager.StaffPagedManager;
 import org.isf.staff.mapper.StaffMapper;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
@@ -56,12 +55,9 @@ public class StaffController {
 
 	private final StaffMapper mapper;
 
-	private final StaffPagedManager staffPagedManager;
-
-	public StaffController(StaffBrowserManager staffManager, StaffMapper staffMapper, StaffPagedManager staffPagedManager) {
+	public StaffController(StaffBrowserManager staffManager, StaffMapper staffMapper) {
 		this.staffManager = staffManager;
 		this.mapper = staffMapper;
-		this.staffPagedManager = staffPagedManager;
 	}
 
 	/**
@@ -108,9 +104,9 @@ public class StaffController {
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 		@RequestParam(value = "size", required = false, defaultValue = DEFAULT_PAGE_SIZE) int size,
 		@RequestParam(value = "keyword", required = false) String keyword
-	) {
+	) throws OHServiceException {
 		LOGGER.info("Get staff page: {} size: {} keyword: {}", page, size, keyword);
-		PagedResponse<Staff> staffPaged = staffPagedManager.getStaffPageable(page, size, keyword);
+		PagedResponse<Staff> staffPaged = staffManager.getStaffPageable(page, size, keyword);
 
 		Page<StaffDTO> result = new Page<>();
 		result.setData(mapper.map2DTOList(staffPaged.getData()));
