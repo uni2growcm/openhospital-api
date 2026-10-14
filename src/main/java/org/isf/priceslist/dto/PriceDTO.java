@@ -53,6 +53,9 @@ public class PriceDTO {
 	@Schema(description = "Lock", example = "0")
 	private int lock;
 
+	@Schema(description = "Whether the price is variable")
+	private boolean isVariable;
+
 	private boolean editable;
 
 	private int hashCode;
@@ -134,5 +137,13 @@ public class PriceDTO {
 
 	public void setLock(int lock) {
 		this.lock = lock;
+	}
+
+	public boolean isVariable() {
+		return isVariable;
+	}
+
+	public void setVariable(boolean variable) {
+		isVariable = variable;
 	}
 }

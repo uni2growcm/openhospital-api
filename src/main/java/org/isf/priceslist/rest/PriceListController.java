@@ -154,6 +154,30 @@ public class PriceListController {
 	}
 
 	/**
+	 * Update the {@link Price}s of the specified {@link PriceList}.
+	 * @param id Price list ID
+	 * @param pricesDTO the full set of prices for the list
+	 * @return {@code true} if the prices have been updated.
+	 * @throws OHServiceException When failed to update the prices
+	 */
+	@PutMapping("/pricelists/{id}/prices")
+	public boolean updatePrices(@PathVariable Integer id, @RequestBody List<PriceDTO> pricesDTO) throws OHServiceException {
+		LOGGER.info("Update prices for price list id: {}.", id);
+		List<PriceList> priceLists = priceListManager.getLists();
+		List<PriceList> priceListFounds = priceLists.stream().filter(pl -> pl.getId() == id).toList();
+		if (priceListFounds.isEmpty()) {
+			throw new OHAPIException(new OHExceptionMessage("Price list not found."), HttpStatus.NOT_FOUND);
+		}
+
+		try {
+			priceListManager.updatePrices(priceListFounds.get(0), priceMapper.map2ModelList(pricesDTO));
+			return true;
+		} catch (OHServiceException serviceException) {
+			throw new OHAPIException(new OHExceptionMessage("Prices not updated."));
+		}
+	}
+
+	/**
 	 * Duplicate specified {@link PriceList}.
 	 * @return {@code true} if the list has been duplicated.
 	 * @throws OHServiceException When failed to duplicate the price list
