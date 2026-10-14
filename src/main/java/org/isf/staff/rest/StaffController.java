@@ -106,7 +106,7 @@ public class StaffController {
 		@RequestParam(value = "keyword", required = false) String keyword
 	) throws OHServiceException {
 		LOGGER.info("Get staff page: {} size: {} keyword: {}", page, size, keyword);
-		PagedResponse<Staff> staffPaged = staffManager.getStaffPageable(page, size, keyword);
+		PagedResponse<Staff> staffPaged = staffManager.getStaff(keyword, page, size);
 
 		Page<StaffDTO> result = new Page<>();
 		result.setData(mapper.map2DTOList(staffPaged.getData()));
