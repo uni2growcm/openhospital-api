@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import jakarta.validation.Valid;
 
+import org.isf.articlefamily.manager.ArticleFamilyBrowserManager;
 import org.isf.exa.manager.ExamBrowsingManager;
 import org.isf.exa.model.Exam;
 import org.isf.exam.dto.ExamDTO;
@@ -37,6 +38,8 @@ import org.isf.exatype.model.ExamType;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -58,19 +61,25 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ExamController {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExamController.class);
+
 	private final ExamBrowsingManager examManager;
 
 	private final ExamTypeBrowserManager examTypeBrowserManager;
+
+	private final ArticleFamilyBrowserManager articleFamilyBrowserManager;
 
 	private final ExamMapper examMapper;
 
 	public ExamController(
 		ExamBrowsingManager examManager,
 		ExamTypeBrowserManager examTypeBrowserManager,
+		ArticleFamilyBrowserManager articleFamilyBrowserManager,
 		ExamMapper examMapper
 	) {
 		this.examManager = examManager;
 		this.examTypeBrowserManager = examTypeBrowserManager;
+		this.articleFamilyBrowserManager = articleFamilyBrowserManager;
 		this.examMapper = examMapper;
 	}
 
@@ -93,11 +102,24 @@ public class ExamController {
 			}
 		}
 
+		String code = examDTO.getCode();
+		LOGGER.info("Create exam {}.", code);
+		if (examManager.findByCode(code) != null) {
+			throw new OHAPIException(new OHExceptionMessage("Another exam already exist with provided code."));
+		}
+
 		Exam exam = examMapper.map2Model(examDTO);
+		exam.setLock(null);
 		exam.setExamtype(examType);
+		if (examDTO.getArticleFamily() != null && examDTO.getArticleFamily().getId() != null && examDTO.getArticleFamily().getId() > 0) {
+			exam.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(examDTO.getArticleFamily().getId()));
+		} else {
+			exam.setArticleFamily(null);
+		}
 		try {
 			exam = examManager.create(exam, examRows);
 		} catch (OHServiceException serviceException) {
+			LOGGER.error("Error creating exam {}", code, serviceException);
 			throw new OHAPIException(new OHExceptionMessage("Exam not created."));
 		}
 		return examMapper.map2DTO(exam);
@@ -131,6 +153,11 @@ public class ExamController {
 
 		Exam exam = examMapper.map2Model(examDTO);
 		exam.setExamtype(examType);
+		if (examDTO.getArticleFamily() != null && examDTO.getArticleFamily().getId() != null && examDTO.getArticleFamily().getId() > 0) {
+			exam.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(examDTO.getArticleFamily().getId()));
+		} else {
+			exam.setArticleFamily(null);
+		}
 		Exam examUpdated = examManager.update(exam, examRows);
 		if (examUpdated == null) {
 			throw new OHAPIException(new OHExceptionMessage("Exam not updated."));

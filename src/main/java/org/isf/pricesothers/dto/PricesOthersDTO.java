@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
+import org.isf.articlefamily.dto.ArticleFamilyDTO;
 
 @Schema(description = "Class representing a price others")
 public class PricesOthersDTO {
@@ -38,6 +39,9 @@ public class PricesOthersDTO {
 	@NotNull
 	@Schema(description = "The description", maxLength = 100)
 	private String description;
+
+	@Schema(description = "The article family")
+	private ArticleFamilyDTO articleFamily;
 
 	@Schema(description = "Lock", example = "0")
 	private int lock;
@@ -136,5 +140,13 @@ public class PricesOthersDTO {
 
 	public void setLock(int lock) {
 		this.lock = lock;
+	}
+
+	public ArticleFamilyDTO getArticleFamily() {
+		return this.articleFamily;
+	}
+
+	public void setArticleFamily(ArticleFamilyDTO articleFamily) {
+		this.articleFamily = articleFamily;
 	}
 }
