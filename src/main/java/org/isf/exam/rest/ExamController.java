@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import jakarta.validation.Valid;
 
+import org.isf.articlefamily.manager.ArticleFamilyBrowserManager;
 import org.isf.exa.manager.ExamBrowsingManager;
 import org.isf.exa.model.Exam;
 import org.isf.exam.dto.ExamDTO;
@@ -62,15 +63,19 @@ public class ExamController {
 
 	private final ExamTypeBrowserManager examTypeBrowserManager;
 
+	private final ArticleFamilyBrowserManager articleFamilyBrowserManager;
+
 	private final ExamMapper examMapper;
 
 	public ExamController(
 		ExamBrowsingManager examManager,
 		ExamTypeBrowserManager examTypeBrowserManager,
+		ArticleFamilyBrowserManager articleFamilyBrowserManager,
 		ExamMapper examMapper
 	) {
 		this.examManager = examManager;
 		this.examTypeBrowserManager = examTypeBrowserManager;
+		this.articleFamilyBrowserManager = articleFamilyBrowserManager;
 		this.examMapper = examMapper;
 	}
 
@@ -95,6 +100,11 @@ public class ExamController {
 
 		Exam exam = examMapper.map2Model(examDTO);
 		exam.setExamtype(examType);
+		if (examDTO.getArticleFamily() != null && examDTO.getArticleFamily().getId() != null && examDTO.getArticleFamily().getId() > 0) {
+			exam.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(examDTO.getArticleFamily().getId()));
+		} else {
+			exam.setArticleFamily(null);
+		}
 		try {
 			exam = examManager.create(exam, examRows);
 		} catch (OHServiceException serviceException) {
@@ -131,6 +141,11 @@ public class ExamController {
 
 		Exam exam = examMapper.map2Model(examDTO);
 		exam.setExamtype(examType);
+		if (examDTO.getArticleFamily() != null && examDTO.getArticleFamily().getId() != null && examDTO.getArticleFamily().getId() > 0) {
+			exam.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(examDTO.getArticleFamily().getId()));
+		} else {
+			exam.setArticleFamily(null);
+		}
 		Exam examUpdated = examManager.update(exam, examRows);
 		if (examUpdated == null) {
 			throw new OHAPIException(new OHExceptionMessage("Exam not updated."));
