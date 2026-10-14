@@ -46,7 +46,7 @@ public class ExamDTO {
 	private ArticleFamilyDTO articleFamily;
 
 	@Schema(description = "Lock", example = "0")
-	private int lock;
+	private Integer lock;
 
 	public ExamDTO() {
 	}
@@ -116,11 +116,11 @@ public class ExamDTO {
 		this.articleFamily = articleFamily;
 	}
 
-	public int getLock() {
+	public Integer getLock() {
 		return lock;
 	}
 
-	public void setLock(int lock) {
+	public void setLock(Integer lock) {
 		this.lock = lock;
 	}
 

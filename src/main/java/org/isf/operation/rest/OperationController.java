@@ -127,6 +127,7 @@ public class OperationController {
 		}
 
 		Operation operation = mapper.map2Model(operationDTO);
+		operation.setLock(null);
 		if (operationDTO.getArticleFamily() != null && operationDTO.getArticleFamily().getId() != null && operationDTO.getArticleFamily().getId() > 0) {
 			operation.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(operationDTO.getArticleFamily().getId()));
 		} else {

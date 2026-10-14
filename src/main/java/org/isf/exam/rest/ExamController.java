@@ -38,6 +38,8 @@ import org.isf.exatype.model.ExamType;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -58,6 +60,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ExamController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExamController.class);
 
 	private final ExamBrowsingManager examManager;
 
@@ -98,7 +102,14 @@ public class ExamController {
 			}
 		}
 
+		String code = examDTO.getCode();
+		LOGGER.info("Create exam {}.", code);
+		if (examManager.findByCode(code) != null) {
+			throw new OHAPIException(new OHExceptionMessage("Another exam already exist with provided code."));
+		}
+
 		Exam exam = examMapper.map2Model(examDTO);
+		exam.setLock(null);
 		exam.setExamtype(examType);
 		if (examDTO.getArticleFamily() != null && examDTO.getArticleFamily().getId() != null && examDTO.getArticleFamily().getId() > 0) {
 			exam.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(examDTO.getArticleFamily().getId()));
@@ -108,6 +119,7 @@ public class ExamController {
 		try {
 			exam = examManager.create(exam, examRows);
 		} catch (OHServiceException serviceException) {
+			LOGGER.error("Error creating exam {}", code, serviceException);
 			throw new OHAPIException(new OHExceptionMessage("Exam not created."));
 		}
 		return examMapper.map2DTO(exam);
