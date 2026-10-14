@@ -320,7 +320,10 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.PUT, "/vaccinetypes/**").hasAuthority("vaccinetypes.update")
 				.requestMatchers(HttpMethod.DELETE, "/vaccinetypes/**").hasAuthority("vaccinetypes.delete")
 				// typologies
-				.requestMatchers("/typologies/**").authenticated()
+				.requestMatchers(HttpMethod.POST, "/typologies/**").hasAuthority("typologies.create")
+				.requestMatchers(HttpMethod.GET, "/typologies/**").hasAnyAuthority("typologies.read")
+				.requestMatchers(HttpMethod.PUT, "/typologies/**").hasAuthority("typologies.update")
+				.requestMatchers(HttpMethod.DELETE, "/typologies/**").hasAuthority("typologies.delete")
 				// visit
 				.requestMatchers(HttpMethod.POST, "/visits/**").hasAuthority("visits.create")
 				.requestMatchers(HttpMethod.GET, "/visits/**").hasAnyAuthority("visits.read")

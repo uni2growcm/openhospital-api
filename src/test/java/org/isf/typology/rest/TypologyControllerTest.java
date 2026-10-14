@@ -83,6 +83,10 @@ class TypologyControllerTest {
 		mockMvc.perform(get("/typologies?family=VISITTYPE"))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString("ANC")));
+
+		mockMvc.perform(get("/typologies?family=angal.typology.visittype"))
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString("ANC")));
 	}
 
 	@Test

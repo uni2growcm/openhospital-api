@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -76,12 +77,13 @@ public class TypologyController {
 	 * @throws OHServiceException When failed to get typologies
 	 */
 	@GetMapping
-	public List<TypologyDTO> getTypologies(@RequestParam(value = "family", required = false) Family family) throws OHServiceException {
+	public List<TypologyDTO> getTypologies(@RequestParam(value = "family", required = false) String family) throws OHServiceException {
 		LOGGER.info("Get typologies for family: {}", family);
-		if (family != null) {
-			return typologyMapper.map2DTOList(typologyManager.getTypologies(family));
+		Family familyEnum = Family.fromString(family);
+		if (familyEnum != null) {
+			return typologyMapper.map2DTOList(typologyManager.getTypologies(familyEnum));
 		}
-		List<Typology> allTypologies = new java.util.ArrayList<>();
+		List<Typology> allTypologies = new ArrayList<>();
 		for (Family f : Family.values()) {
 			if (typologyManager.isFamilyEnabled(f)) {
 				allTypologies.addAll(typologyManager.getTypologies(f));
@@ -103,12 +105,13 @@ public class TypologyController {
 	@GetMapping("/search")
 	public Page<TypologyDTO> searchTypologies(
 		@RequestParam(value = "search", required = false) String search,
-		@RequestParam(value = "family", required = false) Family family,
+		@RequestParam(value = "family", required = false) String family,
 		@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "10") int size
 	) throws OHServiceException {
 		LOGGER.info("Search typologies - search: {}, family: {}, page: {}, size: {}", search, family, page, size);
-		Page<Typology> typologies = typologyManager.searchTypologies(search, family, page, size);
+		Family familyEnum = Family.fromString(family);
+		Page<Typology> typologies = typologyManager.searchTypologies(search, familyEnum, page, size);
 		return typologies.map(typologyMapper::map2DTO);
 	}
 
