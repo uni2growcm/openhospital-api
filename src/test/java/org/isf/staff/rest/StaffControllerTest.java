@@ -96,8 +96,7 @@ class StaffControllerTest {
 
 		List<Staff> staffList = StaffHelper.setupStaffList(4);
 
-		when(staffBrowserManagerMock.getStaff())
-				.thenReturn(staffList);
+		when(staffBrowserManagerMock.getStaff()).thenReturn(staffList);
 
 		List<StaffDTO> expectedStaffDTOs = staffMapper.map2DTOList(staffList);
 
@@ -119,8 +118,7 @@ class StaffControllerTest {
 
 		Staff staff = StaffHelper.setup(code);
 
-		when(staffBrowserManagerMock.getStaff(code))
-				.thenReturn(staff);
+		when(staffBrowserManagerMock.getStaff(code)).thenReturn(staff);
 
 		StaffDTO expectedStaffDTO = staffMapper.map2DTO(staff);
 
