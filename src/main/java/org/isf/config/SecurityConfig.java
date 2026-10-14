@@ -118,6 +118,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/dischargetypes/**").hasAuthority("dischargetypes.create")
 				.requestMatchers(HttpMethod.GET, "/dischargetypes/**").hasAnyAuthority("dischargetypes.read")
 				.requestMatchers(HttpMethod.PUT, "/dischargetypes/**").hasAuthority("dischargetypes.update")
+				.requestMatchers(HttpMethod.DELETE, "/dischargetypes/**").hasAuthority("dischargetypes.delete")
 				// countries
 				.requestMatchers(HttpMethod.POST, "/countries/**", "/countries").hasAuthority("countries.create")
 				.requestMatchers(HttpMethod.GET, "/countries/**", "/countries").hasAnyAuthority("countries.read")
