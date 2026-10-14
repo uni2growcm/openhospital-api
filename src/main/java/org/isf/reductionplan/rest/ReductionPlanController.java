@@ -29,9 +29,20 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import org.isf.reductionplan.dto.ExamReductionDTO;
+import org.isf.reductionplan.dto.MedicalReductionDTO;
+import org.isf.reductionplan.dto.OperationReductionDTO;
+import org.isf.reductionplan.dto.PriceOtherReductionDTO;
 import org.isf.reductionplan.dto.ReductionPlanDTO;
 import org.isf.reductionplan.manager.ReductionPlanManager;
 import org.isf.reductionplan.mapper.ReductionPlanMapper;
+import org.isf.reductionplan.model.ExamReduction;
+import org.isf.reductionplan.model.MedicalReduction;
+import org.isf.reductionplan.model.OperationReduction;
+import org.isf.reductionplan.model.PriceOtherReduction;
 import org.isf.reductionplan.model.ReductionPlan;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.utils.exception.OHDataIntegrityViolationException;
@@ -178,6 +189,8 @@ public class ReductionPlanController {
 			reductionPlanDTO.setLock(existingPlan.getLock());
 		}
 
+		synchronizeChildReductions(reductionPlanDTO, existingPlan);
+
 		try {
 			ReductionPlan model = mapper.map2Model(reductionPlanDTO);
 			ReductionPlan updated = reductionPlanManager.update(model);
@@ -186,6 +199,112 @@ public class ReductionPlanController {
 		} catch (OHDataIntegrityViolationException | DataIntegrityViolationException e) {
 			LOGGER.error("Data integrity violation while updating reduction plan: {}", e.getMessage());
 			throw new OHAPIException(new OHExceptionMessage("errors.reductionplan.integrity_violation"), HttpStatus.CONFLICT);
+		}
+	}
+
+	/**
+	 * Synchronizes the IDs and lock versions of child reductions with existing persistent entities
+	 * to prevent optimistic locking failures on updates.
+	 */
+	private void synchronizeChildReductions(ReductionPlanDTO reductionPlanDTO, ReductionPlan existingPlan) {
+		if (reductionPlanDTO.getMedicalReductions() != null && existingPlan.getMedicalReductions() != null) {
+			Map<String, MedicalReduction> existingMedicals = existingPlan.getMedicalReductions().stream()
+				.filter(mr -> mr.getMedical() != null && mr.getMedical().getCode() != null)
+				.collect(Collectors.toMap(mr -> String.valueOf(mr.getMedical().getCode()), mr -> mr, (a, b) -> a));
+
+			for (MedicalReductionDTO mrDTO : reductionPlanDTO.getMedicalReductions()) {
+				if (mrDTO.getMedical() != null && mrDTO.getMedical().getCode() != null) {
+					MedicalReduction existingMr = existingMedicals.get(String.valueOf(mrDTO.getMedical().getCode()));
+					if (existingMr == null && mrDTO.getId() != null) {
+						existingMr = existingPlan.getMedicalReductions().stream()
+							.filter(mr -> Objects.equals(mr.getId(), mrDTO.getId()))
+							.findFirst()
+							.orElse(null);
+					}
+					if (existingMr != null) {
+						mrDTO.setId(existingMr.getId());
+						mrDTO.setLock(existingMr.getLock());
+					} else {
+						mrDTO.setId(null);
+						mrDTO.setLock(0);
+					}
+				}
+			}
+		}
+
+		if (reductionPlanDTO.getExamReductions() != null && existingPlan.getExamReductions() != null) {
+			Map<String, ExamReduction> existingExams = existingPlan.getExamReductions().stream()
+				.filter(er -> er.getExam() != null && er.getExam().getCode() != null)
+				.collect(Collectors.toMap(er -> String.valueOf(er.getExam().getCode()), er -> er, (a, b) -> a));
+
+			for (ExamReductionDTO erDTO : reductionPlanDTO.getExamReductions()) {
+				if (erDTO.getExam() != null && erDTO.getExam().getCode() != null) {
+					ExamReduction existingEr = existingExams.get(String.valueOf(erDTO.getExam().getCode()));
+					if (existingEr == null && erDTO.getId() != null) {
+						existingEr = existingPlan.getExamReductions().stream()
+							.filter(er -> Objects.equals(er.getId(), erDTO.getId()))
+							.findFirst()
+							.orElse(null);
+					}
+					if (existingEr != null) {
+						erDTO.setId(existingEr.getId());
+						erDTO.setLock(existingEr.getLock());
+					} else {
+						erDTO.setId(null);
+						erDTO.setLock(0);
+					}
+				}
+			}
+		}
+
+		if (reductionPlanDTO.getOperationReductions() != null && existingPlan.getOperationReductions() != null) {
+			Map<String, OperationReduction> existingOps = existingPlan.getOperationReductions().stream()
+				.filter(or -> or.getOperation() != null && or.getOperation().getCode() != null)
+				.collect(Collectors.toMap(or -> String.valueOf(or.getOperation().getCode()), or -> or, (a, b) -> a));
+
+			for (OperationReductionDTO orDTO : reductionPlanDTO.getOperationReductions()) {
+				if (orDTO.getOperation() != null && orDTO.getOperation().getCode() != null) {
+					OperationReduction existingOr = existingOps.get(String.valueOf(orDTO.getOperation().getCode()));
+					if (existingOr == null && orDTO.getId() != null) {
+						existingOr = existingPlan.getOperationReductions().stream()
+							.filter(or -> Objects.equals(or.getId(), orDTO.getId()))
+							.findFirst()
+							.orElse(null);
+					}
+					if (existingOr != null) {
+						orDTO.setId(existingOr.getId());
+						orDTO.setLock(existingOr.getLock());
+					} else {
+						orDTO.setId(null);
+						orDTO.setLock(0);
+					}
+				}
+			}
+		}
+
+		if (reductionPlanDTO.getPriceOtherReductions() != null && existingPlan.getPriceOtherReductions() != null) {
+			Map<Integer, PriceOtherReduction> existingOthers = existingPlan.getPriceOtherReductions().stream()
+				.filter(por -> por.getPricesOthers() != null)
+				.collect(Collectors.toMap(por -> por.getPricesOthers().getId(), por -> por, (a, b) -> a));
+
+			for (PriceOtherReductionDTO porDTO : reductionPlanDTO.getPriceOtherReductions()) {
+				if (porDTO.getPricesOthers() != null) {
+					PriceOtherReduction existingPor = existingOthers.get(porDTO.getPricesOthers().getId());
+					if (existingPor == null && porDTO.getId() != null) {
+						existingPor = existingPlan.getPriceOtherReductions().stream()
+							.filter(por -> Objects.equals(por.getId(), porDTO.getId()))
+							.findFirst()
+							.orElse(null);
+					}
+					if (existingPor != null) {
+						porDTO.setId(existingPor.getId());
+						porDTO.setLock(existingPor.getLock());
+					} else {
+						porDTO.setId(null);
+						porDTO.setLock(0);
+					}
+				}
+			}
 		}
 	}
 

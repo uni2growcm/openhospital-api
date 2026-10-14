@@ -32,10 +32,15 @@ import org.isf.reductionplan.mapper.ReductionPlanMapper;
 import org.isf.reductionplan.model.ReductionPlan;
 import org.isf.shared.exceptions.OHResponseEntityExceptionHandler;
 import org.isf.utils.exception.OHDataValidationException;
+import org.isf.medical.dto.MedicalDTO;
+import org.isf.medicals.model.Medical;
+import org.isf.reductionplan.dto.MedicalReductionDTO;
+import org.isf.reductionplan.model.MedicalReduction;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
@@ -43,6 +48,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -198,6 +205,38 @@ class ReductionPlanControllerTest {
 			.andExpect(jsonPath("$.description", is("Staff Plan Updated")));
 
 		verify(reductionPlanManagerMock, times(1)).update(any(ReductionPlan.class));
+	}
+
+	@Test
+	void testUpdateReductionPlan_SynchronizesChildReductionsLockAndId() throws Exception {
+		ReductionPlan existing = createReductionPlan(1, "Staff Plan", BigDecimal.valueOf(10));
+		Medical med = new Medical();
+		med.setCode(101);
+		MedicalReduction existingMr = new MedicalReduction(6, existing, med, BigDecimal.valueOf(20));
+		existingMr.setLock(2);
+		existing.getMedicalReductions().add(existingMr);
+
+		ReductionPlanDTO updateDto = new ReductionPlanDTO(1, "Staff Plan", BigDecimal.valueOf(10), BigDecimal.valueOf(10), BigDecimal.valueOf(10), BigDecimal.valueOf(10), 0);
+		MedicalDTO medDto = new MedicalDTO();
+		medDto.setCode(101);
+		MedicalReductionDTO childDto = new MedicalReductionDTO(null, medDto, BigDecimal.valueOf(30), 0);
+		updateDto.setMedicalReductions(List.of(childDto));
+
+		when(reductionPlanManagerMock.getById(1)).thenReturn(existing);
+		when(reductionPlanManagerMock.update(any(ReductionPlan.class))).thenReturn(existing);
+
+		mockMvc.perform(put("/reduction-plans/1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(updateDto)))
+			.andExpect(status().isOk());
+
+		ArgumentCaptor<ReductionPlan> captor = ArgumentCaptor.forClass(ReductionPlan.class);
+		verify(reductionPlanManagerMock).update(captor.capture());
+		ReductionPlan captured = captor.getValue();
+		assertEquals(1, captured.getMedicalReductions().size());
+		assertEquals(6, captured.getMedicalReductions().get(0).getId());
+		assertEquals(2, captured.getMedicalReductions().get(0).getLock());
+		assertEquals(BigDecimal.valueOf(30), captured.getMedicalReductions().get(0).getReductionRate());
 	}
 
 	@Test
