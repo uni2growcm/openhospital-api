@@ -28,6 +28,8 @@ import org.isf.country.manager.CountryBrowserManager;
 import org.isf.country.mapper.CountryMapper;
 import org.isf.country.model.Country;
 import org.isf.shared.exceptions.OHResponseEntityExceptionHandler;
+import org.isf.utils.pagination.PageInfo;
+import org.isf.utils.pagination.PagedResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,6 +125,58 @@ class CountryControllerTest {
 
 		verify(countryBrowserManagerMock, times(1)).searchCountries("came");
 		verify(countryBrowserManagerMock, never()).getCountries();
+	}
+
+	@Test
+	void testGetCountriesPaged_200() throws Exception {
+		List<Country> countries = List.of(
+			createCountry(1, "CM", "Cameroon", "+237"),
+			createCountry(2, "MG", "Madagascar", "+261")
+		);
+		PagedResponse<Country> pagedResponse = new PagedResponse<>();
+		pagedResponse.setData(countries);
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.setPage(0);
+		pageInfo.setSize(10);
+		pageInfo.setTotalPages(1);
+		pageInfo.setTotalNbOfElements(2L);
+		pagedResponse.setPageInfo(pageInfo);
+
+		when(countryBrowserManagerMock.getCountries(null, 0, 10)).thenReturn(pagedResponse);
+
+		mockMvc.perform(get("/countries/paged").param("page", "0").param("size", "10"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data", hasSize(2)))
+			.andExpect(jsonPath("$.data[0].isoCode", is("CM")))
+			.andExpect(jsonPath("$.pageInfo.totalNbOfElements", is(2)))
+			.andExpect(jsonPath("$.pageInfo.totalPages", is(1)));
+
+		verify(countryBrowserManagerMock, times(1)).getCountries(null, 0, 10);
+	}
+
+	@Test
+	void testGetCountriesPaged_WithSearch_200() throws Exception {
+		List<Country> countries = List.of(
+			createCountry(1, "CM", "Cameroon", "+237")
+		);
+		PagedResponse<Country> pagedResponse = new PagedResponse<>();
+		pagedResponse.setData(countries);
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.setPage(0);
+		pageInfo.setSize(10);
+		pageInfo.setTotalPages(1);
+		pageInfo.setTotalNbOfElements(1L);
+		pagedResponse.setPageInfo(pageInfo);
+
+		when(countryBrowserManagerMock.getCountries("came", 0, 10)).thenReturn(pagedResponse);
+
+		mockMvc.perform(get("/countries/paged").param("page", "0").param("size", "10").param("search", "came"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data", hasSize(1)))
+			.andExpect(jsonPath("$.data[0].isoCode", is("CM")))
+			.andExpect(jsonPath("$.pageInfo.totalNbOfElements", is(1)));
+
+		verify(countryBrowserManagerMock, times(1)).getCountries("came", 0, 10);
 	}
 
 	@Test

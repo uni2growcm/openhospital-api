@@ -33,9 +33,11 @@ import org.isf.country.manager.CountryBrowserManager;
 import org.isf.country.mapper.CountryMapper;
 import org.isf.country.model.Country;
 import org.isf.shared.exceptions.OHAPIException;
+import org.isf.shared.pagination.Page;
 import org.isf.utils.exception.OHDataIntegrityViolationException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.isf.utils.pagination.PagedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -81,6 +83,31 @@ public class CountryController {
 		}
 		LOGGER.info("Found {} countries.", countries.size());
 		return mapper.map2DTOList(countries);
+	}
+
+	/**
+	 * Returns the list of active countries page by page, optionally filtered by keyword.
+	 *
+	 * @param page Zero-based page index
+	 * @param size Page size
+	 * @param search Search keyword (matches name, ISO code or phone code)
+	 * @return The requested page of {@link CountryDTO}
+	 * @throws OHServiceException When failing to fetch countries
+	 */
+	@GetMapping("/paged")
+	@Operation(summary = "Get active countries page by page, optionally filtered by keyword")
+	public Page<CountryDTO> getCountriesPaged(
+		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
+		@RequestParam(value = "search", required = false) String search
+	) throws OHServiceException {
+		LOGGER.info("Retrieving countries page: {} size: {} search: {}", page, size, search);
+		PagedResponse<Country> countriesPaged = countryManager.getCountries(search, page, size);
+
+		Page<CountryDTO> result = new Page<>();
+		result.setData(mapper.map2DTOList(countriesPaged.getData()));
+		result.setPageInfo(mapper.setParameterPageInfo(countriesPaged.getPageInfo()));
+		return result;
 	}
 
 	/**
