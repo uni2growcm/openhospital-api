@@ -304,6 +304,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/sms/**").hasAnyAuthority("sms.read")
 				.requestMatchers(HttpMethod.PUT, "/sms/**").hasAuthority("sms.update")
 				.requestMatchers(HttpMethod.DELETE, "/sms/**").hasAuthority("sms.delete")
+				// staff
+				.requestMatchers(HttpMethod.POST, "/staff/**").hasAuthority("staff.create")
+				.requestMatchers(HttpMethod.GET, "/staff/**").hasAnyAuthority("staff.read")
+				.requestMatchers(HttpMethod.PUT, "/staff/**").hasAuthority("staff.update")
+				.requestMatchers(HttpMethod.DELETE, "/staff/**").hasAuthority("staff.delete")
 				// suppliers
 				.requestMatchers(HttpMethod.POST, "/suppliers/**").hasAuthority("suppliers.create")
 				.requestMatchers(HttpMethod.GET, "/suppliers/**").hasAnyAuthority("suppliers.read")
