@@ -39,7 +39,6 @@ jobs:
 
           # Set default FORK_REPO and BRANCH_NAME values.
           BRANCH_NAME="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-
           # Extract repository owner (e.g. "uni2growcm", "informatici")
           REPO_OWNER="${GITHUB_REPOSITORY_OWNER:-${GITHUB_REPOSITORY%%/*}}"
 
@@ -48,15 +47,18 @@ jobs:
           CHECK_ORG_URL="https://github.com/${ORG_CORE_REPO}/tree/${BRANCH_NAME}"
           echo "Checking branch existence in organization ($CHECK_ORG_URL)"
 
-          if curl -s -o /dev/null -w "%{http_code}" "$CHECK_ORG_URL" | grep -q "200"; then
+          if curl -s -L -o /dev/null -w "%{http_code}" "$CHECK_ORG_URL" | grep -q "200"; then
             FORK_REPO="$ORG_CORE_REPO"
             echo "Branch $BRANCH_NAME found in organization repository: $FORK_REPO"
-          elif [[ -n "$GITHUB_ACTOR" ]] && curl -s -o /dev/null -w "%{http_code}" "https://github.com/${GITHUB_ACTOR}/openhospital-core/tree/${BRANCH_NAME}" | grep -q "200"; then
+          elif [[ -n "$GITHUB_ACTOR" ]] && curl -s -L -o /dev/null -w "%{http_code}" "https://github.com/${GITHUB_ACTOR}/openhospital-core/tree/${BRANCH_NAME}" | grep -q "200"; then
             FORK_REPO="${GITHUB_ACTOR}/openhospital-core"
             echo "Branch $BRANCH_NAME found in actor repository: $FORK_REPO"
+          elif curl -s -L -o /dev/null -w "%{http_code}" "https://github.com/${ORG_CORE_REPO}" | grep -q "200"; then
+            FORK_REPO="$ORG_CORE_REPO"
+            echo "Branch $BRANCH_NAME not found in forks. Fallback to organization repository develop: $FORK_REPO"
           else
             FORK_REPO="informatici/openhospital-core"
-            echo "Branch $BRANCH_NAME not found in forks. Fallback to: $FORK_REPO"
+            echo "Organization repository not found. Fallback to upstream: $FORK_REPO"
           fi
           
           # Export FORK_REPO and BRANCH_NAME to GITHUB_ENV for the next step
@@ -79,7 +81,7 @@ jobs:
         run: |
           git clone --depth=1 --no-single-branch https://github.com/${{ env.FORK_REPO }}.git openhospital-core
           pushd openhospital-core
-          git checkout -B ${{ env.BRANCH_NAME }} origin/${{ env.BRANCH_NAME }} || git checkout develop
+          git checkout -B ${{ env.BRANCH_NAME }} origin/${{ env.BRANCH_NAME }} || git checkout develop || git checkout -b develop origin/develop || true
           popd
         
       - name: Install core
