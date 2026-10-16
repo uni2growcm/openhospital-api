@@ -280,6 +280,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/pricelists/**").hasAnyAuthority("pricelists.read")
 				.requestMatchers(HttpMethod.PUT, "/pricelists/**").hasAuthority("pricelists.update")
 				.requestMatchers(HttpMethod.DELETE, "/pricelists/**").hasAuthority("pricelists.delete")
+				// reduction-plans
+				.requestMatchers(HttpMethod.POST, "/reduction-plans/**", "/reduction-plans").hasAuthority("reductionplans.create")
+				.requestMatchers(HttpMethod.GET, "/reduction-plans/**", "/reduction-plans").hasAnyAuthority("reductionplans.read")
+				.requestMatchers(HttpMethod.PUT, "/reduction-plans/**", "/reduction-plans").hasAuthority("reductionplans.update")
+				.requestMatchers(HttpMethod.DELETE, "/reduction-plans/**", "/reduction-plans").hasAuthority("reductionplans.delete")
 				// pricesothers
 				.requestMatchers(HttpMethod.POST, "/pricesothers/**").hasAuthority("pricesothers.create")
 				.requestMatchers(HttpMethod.GET, "/pricesothers/**").hasAnyAuthority("pricesothers.read")
