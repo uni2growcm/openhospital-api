@@ -142,7 +142,7 @@ class CountryControllerTest {
 		pageInfo.setTotalNbOfElements(2L);
 		pagedResponse.setPageInfo(pageInfo);
 
-		when(countryBrowserManagerMock.getCountries(null, 0, 10)).thenReturn(pagedResponse);
+		when(countryBrowserManagerMock.getCountries(0, 10)).thenReturn(pagedResponse);
 
 		mockMvc.perform(get("/countries/paged").param("page", "0").param("size", "10"))
 			.andExpect(status().isOk())
@@ -151,32 +151,7 @@ class CountryControllerTest {
 			.andExpect(jsonPath("$.pageInfo.totalNbOfElements", is(2)))
 			.andExpect(jsonPath("$.pageInfo.totalPages", is(1)));
 
-		verify(countryBrowserManagerMock, times(1)).getCountries(null, 0, 10);
-	}
-
-	@Test
-	void testGetCountriesPaged_WithSearch_200() throws Exception {
-		List<Country> countries = List.of(
-			createCountry(1, "CM", "Cameroon", "+237")
-		);
-		PagedResponse<Country> pagedResponse = new PagedResponse<>();
-		pagedResponse.setData(countries);
-		PageInfo pageInfo = new PageInfo();
-		pageInfo.setPage(0);
-		pageInfo.setSize(10);
-		pageInfo.setTotalPages(1);
-		pageInfo.setTotalNbOfElements(1L);
-		pagedResponse.setPageInfo(pageInfo);
-
-		when(countryBrowserManagerMock.getCountries("came", 0, 10)).thenReturn(pagedResponse);
-
-		mockMvc.perform(get("/countries/paged").param("page", "0").param("size", "10").param("search", "came"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.data", hasSize(1)))
-			.andExpect(jsonPath("$.data[0].isoCode", is("CM")))
-			.andExpect(jsonPath("$.pageInfo.totalNbOfElements", is(1)));
-
-		verify(countryBrowserManagerMock, times(1)).getCountries("came", 0, 10);
+		verify(countryBrowserManagerMock, times(1)).getCountries(0, 10);
 	}
 
 	@Test

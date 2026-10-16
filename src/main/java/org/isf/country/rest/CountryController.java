@@ -86,23 +86,21 @@ public class CountryController {
 	}
 
 	/**
-	 * Returns the list of active countries page by page, optionally filtered by keyword.
+	 * Returns the list of active countries page by page.
 	 *
 	 * @param page Zero-based page index
 	 * @param size Page size
-	 * @param search Search keyword (matches name, ISO code or phone code)
 	 * @return The requested page of {@link CountryDTO}
 	 * @throws OHServiceException When failing to fetch countries
 	 */
 	@GetMapping("/paged")
-	@Operation(summary = "Get active countries page by page, optionally filtered by keyword")
+	@Operation(summary = "Get active countries page by page")
 	public Page<CountryDTO> getCountriesPaged(
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
-		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
-		@RequestParam(value = "search", required = false) String search
+		@RequestParam(value = "size", required = false, defaultValue = "10") int size
 	) throws OHServiceException {
-		LOGGER.info("Retrieving countries page: {} size: {} search: {}", page, size, search);
-		PagedResponse<Country> countriesPaged = countryManager.getCountries(search, page, size);
+		LOGGER.info("Retrieving countries page: {} size: {}", page, size);
+		PagedResponse<Country> countriesPaged = countryManager.getCountries(page, size);
 
 		Page<CountryDTO> result = new Page<>();
 		result.setData(mapper.map2DTOList(countriesPaged.getData()));
