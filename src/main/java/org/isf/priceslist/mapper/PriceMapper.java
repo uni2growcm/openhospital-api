@@ -21,14 +21,22 @@
  */
 package org.isf.priceslist.mapper;
 
+import jakarta.annotation.PostConstruct;
+
 import org.isf.priceslist.dto.PriceDTO;
 import org.isf.priceslist.model.Price;
 import org.isf.shared.GenericMapper;
+import org.isf.shared.mapper.mappings.PriceMapping;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PriceMapper extends GenericMapper<Price, PriceDTO> {
 	public PriceMapper() {
 		super(Price.class, PriceDTO.class);
+	}
+
+	@PostConstruct
+	private void postConstruct() {
+		PriceMapping.addMapping(modelMapper);
 	}
 }

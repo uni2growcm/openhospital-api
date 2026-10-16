@@ -23,6 +23,7 @@ package org.isf.priceslist.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Class representing a prices")
@@ -47,6 +48,7 @@ public class PriceDTO {
 	private String description;
 
 	@NotNull
+	@DecimalMin(value = "0.0", message = "Price must not be negative")
 	@Schema(description = "Price", example = "1500")
 	private Double price;
 

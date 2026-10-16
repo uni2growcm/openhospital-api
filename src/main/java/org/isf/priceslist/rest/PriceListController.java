@@ -23,6 +23,8 @@ package org.isf.priceslist.rest;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.isf.priceslist.dto.PriceDTO;
 import org.isf.priceslist.dto.PriceListDTO;
 import org.isf.priceslist.manager.PriceListManager;
@@ -161,7 +163,7 @@ public class PriceListController {
 	 * @throws OHServiceException When failed to update the prices
 	 */
 	@PutMapping("/pricelists/{id}/prices")
-	public boolean updatePrices(@PathVariable Integer id, @RequestBody List<PriceDTO> pricesDTO) throws OHServiceException {
+	public boolean updatePrices(@PathVariable Integer id, @Valid @RequestBody List<PriceDTO> pricesDTO) throws OHServiceException {
 		LOGGER.info("Update prices for price list id: {}.", id);
 		List<PriceList> priceLists = priceListManager.getLists();
 		List<PriceList> priceListFounds = priceLists.stream().filter(pl -> pl.getId() == id).toList();
