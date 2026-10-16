@@ -204,14 +204,18 @@ public class BillController {
 
 		List<Bill> bills;
 
-		if (code == null) {
+		if (code == null || code <= 0) {
 			LOGGER.info("Get payments datefrom: {}  dateTo: {}", dateFrom, dateTo);
 			bills = billManager.getBills(dateFrom, dateTo);
 		} else {
 			Patient pat = patientManager.getPatientById(code);
-
-			LOGGER.info("Get Bills datefrom: {}  dateTo: {} patient: {}", dateFrom, dateTo, pat);
-			bills = billManager.getBills(dateFrom, dateTo, pat);
+			if (pat == null) {
+				LOGGER.warn("Patient with code {} not found", code);
+				bills = List.of();
+			} else {
+				LOGGER.info("Get Bills datefrom: {}  dateTo: {} patient: {}", dateFrom, dateTo, pat);
+				bills = billManager.getBills(dateFrom, dateTo, pat);
+			}
 		}
 
 		return billMapper.map2DTOList(bills);
@@ -236,11 +240,16 @@ public class BillController {
 		LOGGER.info("Get getPayments datefrom: {}  dateTo: {}", dateFrom, dateTo);
 
 		List<BillPayments> payments;
-		if (code == null) {
+		if (code == null || code <= 0) {
 			payments = billManager.getPayments(dateFrom, dateTo);
 		} else {
 			Patient pat = patientManager.getPatientById(code);
-			payments = billManager.getPayments(dateFrom, dateTo, pat);
+			if (pat == null) {
+				LOGGER.warn("Patient with code {} not found", code);
+				payments = List.of();
+			} else {
+				payments = billManager.getPayments(dateFrom, dateTo, pat);
+			}
 		}
 
 		return billPaymentsMapper.map2DTOList(payments);
