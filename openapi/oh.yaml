@@ -7523,11 +7523,11 @@ components:
           example: 0
         opd:
           type: boolean
-        pharmacy:
+        female:
           type: boolean
         male:
           type: boolean
-        female:
+        pharmacy:
           type: boolean
       required:
       - beds
@@ -8086,6 +8086,10 @@ components:
           type: integer
           format: int32
           description: Optimistic locking version indicator
+          example: 0
+      required:
+      - code
+      - description
     ExamDTO:
       type: object
       properties:
@@ -8112,6 +8116,9 @@ components:
         examtype:
           $ref: "#/components/schemas/ExamTypeDTO"
           description: Exam Type
+        articleFamily:
+          $ref: "#/components/schemas/ArticleFamilyDTO"
+          description: Article Family
         lock:
           type: integer
           format: int32
@@ -8262,6 +8269,9 @@ components:
         type:
           $ref: "#/components/schemas/OperationTypeDTO"
           description: The operation type
+        articleFamily:
+          $ref: "#/components/schemas/ArticleFamilyDTO"
+          description: The article family
         opeFor:
           type: string
           description: The operation context
@@ -8569,60 +8579,6 @@ components:
           description: Patient id
       required:
       - patientId
-    OperationTypeDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: The operation code
-          maxLength: 2
-        description:
-          type: string
-          description: The operation type
-          maxLength: 50
-      required:
-      - code
-      - description
-    OperationDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: The code of operation
-          maxLength: 10
-        description:
-          type: string
-          description: The operation description
-          maxLength: 50
-        type:
-          $ref: "#/components/schemas/OperationTypeDTO"
-          description: The operation type
-        articleFamily:
-          $ref: "#/components/schemas/ArticleFamilyDTO"
-          description: The article family
-        opeFor:
-          type: string
-          description: The operation context
-          enum:
-          - opd_admission
-          - admission
-          - opd
-          example: opd_admission
-        major:
-          type: integer
-          format: int32
-          description: The operation major
-        lock:
-          type: integer
-          format: int32
-          description: Lock
-          example: 0
-      required:
-      - code
-      - description
-      - major
-      - opeFor
-      - type
     AdmissionDTO:
       type: object
       properties:
@@ -8732,11 +8688,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
-        fhu:
-          type: string
         yprog:
           type: integer
           format: int32
+        fhu:
+          type: string
       required:
       - admDate
       - admitted
@@ -9147,52 +9103,6 @@ components:
       - dateSupp
       - height
       - weight
-    ExamDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Exam Code
-          example: "01.01"
-          maxLength: 10
-        description:
-          type: string
-          description: Exam Description
-          example: 1.1
-          maxLength: 100
-        procedure:
-          type: integer
-          format: int32
-          description: Exam Procedure
-          example: 1
-        defaultResult:
-          type: string
-          description: Exam Default Result
-          example: '>=12 (NORMAL)'
-          maxLength: 50
-        examtype:
-          $ref: "#/components/schemas/ExamTypeDTO"
-          description: Exam Type
-        articleFamily:
-          $ref: "#/components/schemas/ArticleFamilyDTO"
-          description: Article Family
-        lock:
-          type: integer
-          format: int32
-          description: Lock
-          example: 0
-    ExamTypeDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Exam Type Code
-          example: HB
-        description:
-          type: string
-          description: Exam Type Description
-          example: 1.Haematology
-          maxLength: 50
     LabWithRowsDTO:
       type: object
       properties:
