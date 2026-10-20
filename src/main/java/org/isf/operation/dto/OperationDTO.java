@@ -23,6 +23,7 @@ package org.isf.operation.dto;
 
 import jakarta.validation.constraints.NotNull;
 
+import org.isf.articlefamily.dto.ArticleFamilyDTO;
 import org.isf.operation.enums.OperationTarget;
 import org.isf.opetype.dto.OperationTypeDTO;
 
@@ -42,6 +43,9 @@ public class OperationDTO {
 	@Schema(description = "The operation type")
 	private OperationTypeDTO type;
 
+	@Schema(description = "The article family")
+	private ArticleFamilyDTO articleFamily;
+
 	@NotNull
 	@Schema(description = "The operation context", example = "opd_admission")
 	private OperationTarget opeFor;
@@ -51,13 +55,13 @@ public class OperationDTO {
 	private Integer major;
 
 	@Schema(description = "Lock", example = "0")
-	private int lock;
+	private Integer lock;
 
-	public int getLock() {
+	public Integer getLock() {
 		return lock;
 	}
 
-	public void setLock(int lock) {
+	public void setLock(Integer lock) {
 		this.lock = lock;
 	}
 
@@ -91,6 +95,14 @@ public class OperationDTO {
 	}
 	public void setOpeFor(OperationTarget opeFor) {
 		this.opeFor = opeFor;
+	}
+
+	public ArticleFamilyDTO getArticleFamily() {
+		return this.articleFamily;
+	}
+
+	public void setArticleFamily(ArticleFamilyDTO articleFamily) {
+		this.articleFamily = articleFamily;
 	}
 
 }
