@@ -31,8 +31,6 @@ public class PriceMapping {
 
 		modelMapper.typeMap(Price.class, PriceDTO.class).addMappings(mapper -> {
 			mapper.map(Price::getDesc, PriceDTO::setDescription);
-			// Price#isPrice() is a boolean getter unrelated to the price amount; it collides with
-			// getPrice()/setPrice() under JavaBean property-name matching, so map "price" explicitly.
 			mapper.map(Price::getPrice, PriceDTO::setPrice);
 		});
 
