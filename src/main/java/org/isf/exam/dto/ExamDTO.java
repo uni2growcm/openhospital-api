@@ -22,6 +22,7 @@
 package org.isf.exam.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.isf.articlefamily.dto.ArticleFamilyDTO;
 import org.isf.exatype.dto.ExamTypeDTO;
 
 public class ExamDTO {
@@ -41,8 +42,11 @@ public class ExamDTO {
 	@Schema(description = "Exam Type")
 	private ExamTypeDTO examtype;
 
+	@Schema(description = "Article Family")
+	private ArticleFamilyDTO articleFamily;
+
 	@Schema(description = "Lock", example = "0")
-	private int lock;
+	private Integer lock;
 
 	public ExamDTO() {
 	}
@@ -53,6 +57,15 @@ public class ExamDTO {
 		this.procedure = procedure;
 		this.defaultResult = defaultResult;
 		this.examtype = examtype;
+	}
+
+	public ExamDTO(String code, String description, Integer procedure, String defaultResult, ExamTypeDTO examtype, ArticleFamilyDTO articleFamily) {
+		this.code = code;
+		this.description = description;
+		this.procedure = procedure;
+		this.defaultResult = defaultResult;
+		this.examtype = examtype;
+		this.articleFamily = articleFamily;
 	}
 
 	public String getCode() {
@@ -95,18 +108,26 @@ public class ExamDTO {
 		this.examtype = examtype;
 	}
 
-	public int getLock() {
+	public ArticleFamilyDTO getArticleFamily() {
+		return this.articleFamily;
+	}
+
+	public void setArticleFamily(ArticleFamilyDTO articleFamily) {
+		this.articleFamily = articleFamily;
+	}
+
+	public Integer getLock() {
 		return lock;
 	}
 
-	public void setLock(int lock) {
+	public void setLock(Integer lock) {
 		this.lock = lock;
 	}
 
 	@Override
 	public String toString() {
 		return "ExamDTO{" + "code='" + code + '\'' + ", description='" + description + '\'' + ", procedure=" + procedure
-			+ ", defaultResult='" + defaultResult + '\'' + ", examtype=" + examtype + '}';
+			+ ", defaultResult='" + defaultResult + '\'' + ", examtype=" + examtype + ", articleFamily=" + articleFamily + '}';
 	}
 
 }
