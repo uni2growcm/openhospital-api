@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CountryMapper extends GenericMapper<Country, CountryDTO> {
+
 	public CountryMapper() {
 		super(Country.class, CountryDTO.class);
 	}

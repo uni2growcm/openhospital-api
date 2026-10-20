@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package org.isf.reductionplan.mapper;
 
 import org.isf.reductionplan.dto.ReductionPlanDTO;
@@ -28,7 +29,28 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ReductionPlanMapper extends GenericMapper<ReductionPlan, ReductionPlanDTO> {
+
 	public ReductionPlanMapper() {
 		super(ReductionPlan.class, ReductionPlanDTO.class);
+	}
+
+	@Override
+	public ReductionPlan map2Model(ReductionPlanDTO dto) {
+		ReductionPlan model = super.map2Model(dto);
+		if (model != null) {
+			if (model.getExamReductions() != null) {
+				model.getExamReductions().forEach(item -> item.setReductionPlan(model));
+			}
+			if (model.getMedicalReductions() != null) {
+				model.getMedicalReductions().forEach(item -> item.setReductionPlan(model));
+			}
+			if (model.getOperationReductions() != null) {
+				model.getOperationReductions().forEach(item -> item.setReductionPlan(model));
+			}
+			if (model.getPriceOtherReductions() != null) {
+				model.getPriceOtherReductions().forEach(item -> item.setReductionPlan(model));
+			}
+		}
+		return model;
 	}
 }

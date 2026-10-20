@@ -119,6 +119,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/dischargetypes/**").hasAnyAuthority("dischargetypes.read")
 				.requestMatchers(HttpMethod.PUT, "/dischargetypes/**").hasAuthority("dischargetypes.update")
 				.requestMatchers(HttpMethod.DELETE, "/dischargetypes/**").hasAuthority("dischargetypes.delete")
+				// countries
+				.requestMatchers(HttpMethod.POST, "/countries/**", "/countries").hasAuthority("countries.create")
+				.requestMatchers(HttpMethod.GET, "/countries/**", "/countries").hasAnyAuthority("countries.read")
+				.requestMatchers(HttpMethod.PUT, "/countries/**", "/countries").hasAuthority("countries.update")
+				.requestMatchers(HttpMethod.DELETE, "/countries/**", "/countries").hasAuthority("countries.delete")
 				// diseases
 				.requestMatchers(HttpMethod.POST, "/diseases/**").hasAuthority("diseases.create")
 				.requestMatchers(HttpMethod.GET, "/diseases/**").hasAnyAuthority("diseases.read")
@@ -280,6 +285,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/pricelists/**").hasAnyAuthority("pricelists.read")
 				.requestMatchers(HttpMethod.PUT, "/pricelists/**").hasAuthority("pricelists.update")
 				.requestMatchers(HttpMethod.DELETE, "/pricelists/**").hasAuthority("pricelists.delete")
+				// reduction-plans
+				.requestMatchers(HttpMethod.POST, "/reduction-plans/**", "/reduction-plans").hasAuthority("reductionplans.create")
+				.requestMatchers(HttpMethod.GET, "/reduction-plans/**", "/reduction-plans").hasAnyAuthority("reductionplans.read")
+				.requestMatchers(HttpMethod.PUT, "/reduction-plans/**", "/reduction-plans").hasAuthority("reductionplans.update")
+				.requestMatchers(HttpMethod.DELETE, "/reduction-plans/**", "/reduction-plans").hasAuthority("reductionplans.delete")
 				// pricesothers
 				.requestMatchers(HttpMethod.POST, "/pricesothers/**").hasAuthority("pricesothers.create")
 				.requestMatchers(HttpMethod.GET, "/pricesothers/**").hasAnyAuthority("pricesothers.read")
@@ -299,6 +309,11 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/sms/**").hasAnyAuthority("sms.read")
 				.requestMatchers(HttpMethod.PUT, "/sms/**").hasAuthority("sms.update")
 				.requestMatchers(HttpMethod.DELETE, "/sms/**").hasAuthority("sms.delete")
+				// staff
+				.requestMatchers(HttpMethod.POST, "/staff/**").hasAuthority("staff.create")
+				.requestMatchers(HttpMethod.GET, "/staff/**").hasAnyAuthority("staff.read")
+				.requestMatchers(HttpMethod.PUT, "/staff/**").hasAuthority("staff.update")
+				.requestMatchers(HttpMethod.DELETE, "/staff/**").hasAuthority("staff.delete")
 				// suppliers
 				.requestMatchers(HttpMethod.POST, "/suppliers/**").hasAuthority("suppliers.create")
 				.requestMatchers(HttpMethod.GET, "/suppliers/**").hasAnyAuthority("suppliers.read")

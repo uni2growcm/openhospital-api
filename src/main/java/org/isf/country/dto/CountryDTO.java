@@ -22,63 +22,79 @@
 package org.isf.country.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "Class representing a country")
 public class CountryDTO {
 
-	@Schema(description = "Country id", example = "1")
-	private int id;
+	@Schema(description = "ID of the country", example = "1")
+	private Integer id;
 
-	@NotNull
-	@Schema(description = "ISO code of the country", example = "IT", maxLength = 2)
+	@NotBlank(message = "ISO code is required")
+	@Size(min = 2, max = 2, message = "ISO code must be exactly 2 characters")
+	@Pattern(regexp = "^[A-Za-z]{2}$", message = "ISO code must consist of 2 letters")
+	@Schema(description = "ISO code of the country (2 letters)", example = "CM", maxLength = 2)
 	private String isoCode;
 
-	@NotNull
-	@Schema(description = "Phone code of the country", example = "+39", maxLength = 10)
-	private String phoneCode;
-
-	@NotNull
-	@Schema(description = "Name of the country", example = "Italy", maxLength = 100)
+	@NotBlank(message = "Country name is required")
+	@Size(max = 100, message = "Country name cannot exceed 100 characters")
+	@Schema(description = "Name of the country", example = "Cameroon", maxLength = 100)
 	private String name;
 
-	@Schema(description = "Lock", example = "0")
+	@NotBlank(message = "Phone code is required")
+	@Size(max = 10, message = "Phone code cannot exceed 10 characters")
+	@Schema(description = "Phone code / dial code of the country", example = "+237", maxLength = 10)
+	private String phoneCode;
+
+	@Schema(description = "Optimistic lock version", example = "0")
 	private int lock;
 
-	public int getId() {
-		return this.id;
+	public CountryDTO() {
 	}
 
-	public void setId(int id) {
+	public CountryDTO(Integer id, String isoCode, String name, String phoneCode) {
+		this.id = id;
+		this.isoCode = isoCode;
+		this.name = name;
+		this.phoneCode = phoneCode;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
 	public String getIsoCode() {
-		return this.isoCode;
+		return isoCode;
 	}
 
 	public void setIsoCode(String isoCode) {
 		this.isoCode = isoCode;
 	}
 
-	public String getPhoneCode() {
-		return this.phoneCode;
-	}
-
-	public void setPhoneCode(String phoneCode) {
-		this.phoneCode = phoneCode;
-	}
-
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	public String getPhoneCode() {
+		return phoneCode;
+	}
+
+	public void setPhoneCode(String phoneCode) {
+		this.phoneCode = phoneCode;
+	}
+
 	public int getLock() {
-		return this.lock;
+		return lock;
 	}
 
 	public void setLock(int lock) {
