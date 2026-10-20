@@ -119,6 +119,16 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/dischargetypes/**").hasAnyAuthority("dischargetypes.read")
 				.requestMatchers(HttpMethod.PUT, "/dischargetypes/**").hasAuthority("dischargetypes.update")
 				.requestMatchers(HttpMethod.DELETE, "/dischargetypes/**").hasAuthority("dischargetypes.delete")
+				// article-families
+				.requestMatchers(HttpMethod.POST, "/article-families/**", "/article-families").hasAuthority("articlefamilies.create")
+				.requestMatchers(HttpMethod.GET, "/article-families/**", "/article-families").hasAnyAuthority("articlefamilies.read")
+				.requestMatchers(HttpMethod.PUT, "/article-families/**", "/article-families").hasAuthority("articlefamilies.update")
+				.requestMatchers(HttpMethod.DELETE, "/article-families/**", "/article-families").hasAuthority("articlefamilies.delete")
+				// countries
+				.requestMatchers(HttpMethod.POST, "/countries/**", "/countries").hasAuthority("countries.create")
+				.requestMatchers(HttpMethod.GET, "/countries/**", "/countries").hasAnyAuthority("countries.read")
+				.requestMatchers(HttpMethod.PUT, "/countries/**", "/countries").hasAuthority("countries.update")
+				.requestMatchers(HttpMethod.DELETE, "/countries/**", "/countries").hasAuthority("countries.delete")
 				// diseases
 				.requestMatchers(HttpMethod.POST, "/diseases/**").hasAuthority("diseases.create")
 				.requestMatchers(HttpMethod.GET, "/diseases/**").hasAnyAuthority("diseases.read")

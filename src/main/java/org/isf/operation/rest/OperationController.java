@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.isf.admission.manager.AdmissionBrowserManager;
 import org.isf.admission.model.Admission;
+import org.isf.articlefamily.manager.ArticleFamilyBrowserManager;
 import org.isf.opd.dto.OpdDTO;
 import org.isf.opd.mapper.OpdMapper;
 import org.isf.operation.dto.OperationDTO;
@@ -75,6 +76,8 @@ public class OperationController {
 
 	private final PatientBrowserManager patientBrowserManager;
 
+	private final ArticleFamilyBrowserManager articleFamilyBrowserManager;
+
 	private final OperationMapper mapper;
 
 	private final OpdMapper opdMapper;
@@ -86,6 +89,7 @@ public class OperationController {
 		AdmissionBrowserManager admissionManager,
 		OperationRowBrowserManager operationRowManager,
 		PatientBrowserManager patientBrowserManager,
+		ArticleFamilyBrowserManager articleFamilyBrowserManager,
 		OperationMapper mapper, OpdMapper opdMapper,
 		OperationRowMapper opRowMapper
 	) {
@@ -93,6 +97,7 @@ public class OperationController {
 		this.admissionManager = admissionManager;
 		this.operationRowManager = operationRowManager;
 		this.patientBrowserManager = patientBrowserManager;
+		this.articleFamilyBrowserManager = articleFamilyBrowserManager;
 		this.mapper = mapper;
 		this.opdMapper = opdMapper;
 		this.opRowMapper = opRowMapper;
@@ -121,7 +126,15 @@ public class OperationController {
 			));
 		}
 
-		Operation isCreatedOperation = operationManager.newOperation(mapper.map2Model(operationDTO));
+		Operation operation = mapper.map2Model(operationDTO);
+		operation.setLock(null);
+		if (operationDTO.getArticleFamily() != null && operationDTO.getArticleFamily().getId() != null && operationDTO.getArticleFamily().getId() > 0) {
+			operation.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(operationDTO.getArticleFamily().getId()));
+		} else {
+			operation.setArticleFamily(null);
+		}
+
+		Operation isCreatedOperation = operationManager.newOperation(operation);
 		if (isCreatedOperation == null) {
 			throw new OHAPIException(new OHExceptionMessage("Operation not created."));
 		}
@@ -146,6 +159,11 @@ public class OperationController {
 			throw new OHAPIException(new OHExceptionMessage("Operation not found."));
 		}
 		operation.setLock(operationDTO.getLock());
+		if (operationDTO.getArticleFamily() != null && operationDTO.getArticleFamily().getId() != null && operationDTO.getArticleFamily().getId() > 0) {
+			operation.setArticleFamily(articleFamilyBrowserManager.getArticleFamily(operationDTO.getArticleFamily().getId()));
+		} else {
+			operation.setArticleFamily(null);
+		}
 		Operation isUpdatedOperation = operationManager.updateOperation(operation);
 		if (isUpdatedOperation == null) {
 			throw new OHAPIException(new OHExceptionMessage("Operation not updated."));
