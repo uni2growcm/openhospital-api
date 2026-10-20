@@ -23,6 +23,7 @@ package org.isf.exam.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.isf.OpenHospitalApiApplication;
+import org.isf.articlefamily.manager.ArticleFamilyBrowserManager;
 import org.isf.exa.manager.ExamBrowsingManager;
 import org.isf.exa.model.Exam;
 import org.isf.exa.service.ExamRowIoOperationRepository;
@@ -82,6 +83,9 @@ class ExamControllerTest {
 
 	@MockitoBean
 	private ExamRowIoOperationRepository examRowIoOperationRepository;
+
+	@MockitoBean
+	private ArticleFamilyBrowserManager articleFamilyBrowserManager;
 
 	@Nested
 	@DisplayName("Create exam")

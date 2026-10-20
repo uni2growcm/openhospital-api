@@ -23,6 +23,7 @@ package org.isf.operation.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.isf.admission.manager.AdmissionBrowserManager;
+import org.isf.articlefamily.manager.ArticleFamilyBrowserManager;
 import org.isf.opd.mapper.OpdMapper;
 import org.isf.operation.data.OperationHelper;
 import org.isf.operation.dto.OperationDTO;
@@ -76,6 +77,9 @@ class OperationControllerTest {
 	protected PatientBrowserManager patientBrowserManager;
 
 	@Mock
+	protected ArticleFamilyBrowserManager articleFamilyBrowserManager;
+
+	@Mock
 	protected OpdMapper opdMapper;
 
 	@Mock
@@ -96,6 +100,7 @@ class OperationControllerTest {
 				admissionBrowserManager,
 				operationRowBrowserManager,
 				patientBrowserManager,
+				articleFamilyBrowserManager,
 				operationMapper,
 				opdMapper,
 				operationRowMapper
