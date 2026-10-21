@@ -22,6 +22,7 @@
 package org.isf.accounting.rest;
 
 import org.isf.accounting.TestBillItems;
+import org.isf.accounting.TestBillPayments;
 import org.isf.accounting.data.*;
 import org.isf.accounting.dto.BillDTO;
 import org.isf.accounting.dto.BillItemsDTO;
@@ -553,6 +554,88 @@ class BillControllerTest extends ControllerBaseTest {
 			.andDo(log())
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString(BillPaymentsDTOHelper.asJsonString(billPaymentsDTOList))))
+			.andReturn();
+	}
+
+	@Test
+	void when_get_searchBillsPayments_with_valid_dates_then_response_includes_patient_name_and_code() throws Exception {
+		String request = "/bills/payments?datefrom={dateFrom}&dateto={dateTo}";
+		String dateFrom = LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD_T_HH_MM_SS_SSS_Z));
+		String dateTo = LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD_T_HH_MM_SS_SSS_Z));
+
+		Bill bill = BillHelper.setup();
+		TestBillPayments testBillPayments = new TestBillPayments();
+		BillPayments billPayments = testBillPayments.setup(bill, true);
+
+		when(billManagerMock.getPayments(any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(List.of(billPayments));
+
+		this.mockMvc
+			.perform(
+				get(request, dateFrom, dateTo)
+					.contentType(MediaType.APPLICATION_JSON)
+			)
+			.andDo(log())
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString("\"patName\":\"" + bill.getPatName() + "\"")))
+			.andExpect(content().string(containsString("\"patientCode\":" + bill.getBillPatient().getCode())))
+			.andReturn();
+	}
+
+	@Test
+	void when_get_searchBillsPaymentsPageable_with_valid_dates_then_response_Page_and_OK() throws Exception {
+		String request = "/bills/payments/search?datefrom={dateFrom}&dateto={dateTo}&page={page}&size={size}";
+		String dateFrom = LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD_T_HH_MM_SS_SSS_Z));
+		String dateTo = LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD_T_HH_MM_SS_SSS_Z));
+
+		Bill bill = BillHelper.setup();
+		TestBillPayments testBillPayments = new TestBillPayments();
+		BillPayments billPayments = testBillPayments.setup(bill, true);
+
+		org.isf.utils.pagination.PageInfo pageInfo = new org.isf.utils.pagination.PageInfo();
+		pageInfo.setPage(0);
+		pageInfo.setSize(10);
+		pageInfo.setNbOfElements(1);
+		pageInfo.setTotalNbOfElements(1);
+		pageInfo.setTotalPages(1);
+		pageInfo.setHasNextPage(false);
+		pageInfo.setHasPreviousPage(false);
+
+		org.isf.utils.pagination.PagedResponse<BillPayments> pagedResponse = new org.isf.utils.pagination.PagedResponse<>();
+		pagedResponse.setData(List.of(billPayments));
+		pagedResponse.setPageInfo(pageInfo);
+
+		when(billManagerMock.getPaymentsPageable(any(LocalDateTime.class), any(LocalDateTime.class), eq(null), eq(null), eq(0), eq(10)))
+			.thenReturn(pagedResponse);
+
+		this.mockMvc
+			.perform(
+				get(request, dateFrom, dateTo, 0, 10)
+					.contentType(MediaType.APPLICATION_JSON)
+			)
+			.andDo(log())
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString("\"totalNbOfElements\":1")))
+			.andExpect(content().string(containsString("\"patName\":\"" + bill.getPatName() + "\"")))
+			.andReturn();
+	}
+
+	@Test
+	void when_get_getPaymentsUsers_then_response_List_of_usernames_and_OK() throws Exception {
+		String request = "/bills/payments/users";
+
+		List<String> users = List.of("admin", "cashier2");
+
+		when(billManagerMock.getUsers()).thenReturn(users);
+
+		this.mockMvc
+			.perform(
+				get(request)
+					.contentType(MediaType.APPLICATION_JSON)
+			)
+			.andDo(log())
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString("admin")))
+			.andExpect(content().string(containsString("cashier2")))
 			.andReturn();
 	}
 

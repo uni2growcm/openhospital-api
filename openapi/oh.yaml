@@ -9,7 +9,7 @@ info:
     url: https://github.com/informatici/openhospital-api?tab=GPL-3.0-1-ov-file#readme
   version: 0.1.0
 servers:
-- url: http://localhost
+- url: http://localhost:8080
 security:
 - bearerAuth: []
 tags:
@@ -5975,6 +5975,72 @@ paths:
                   $ref: "#/components/schemas/BillPaymentsDTO"
       security:
       - bearerAuth: []
+  /bills/payments/users:
+    get:
+      tags:
+      - Bills
+      operationId: getPaymentsUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+      security:
+      - bearerAuth: []
+  /bills/payments/search:
+    get:
+      tags:
+      - Bills
+      operationId: searchBillsPaymentsPageable
+      parameters:
+      - name: datefrom
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: dateto
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: patient_code
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: user
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageBillPaymentsDTO"
+      security:
+      - bearerAuth: []
   /bills/items:
     get:
       tags:
@@ -6881,11 +6947,11 @@ components:
           format: int32
           description: lock
           example: 0
-        opd:
-          type: boolean
         female:
           type: boolean
         male:
+          type: boolean
+        opd:
           type: boolean
         pharmacy:
           type: boolean
@@ -7691,11 +7757,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
+        fhu:
+          type: string
         yprog:
           type: integer
           format: int32
-        fhu:
-          type: string
       required:
       - admDate
       - admitted
@@ -8529,6 +8595,16 @@ components:
           type: string
           description: The current user
           example: admin
+        patName:
+          type: string
+          description: The name of the patient the bill belongs to
+          example: Rossi Mario
+          readOnly: true
+        patientCode:
+          type: integer
+          format: int32
+          description: The code of the patient the bill belongs to
+          readOnly: true
         hashCode:
           type: integer
           format: int32
@@ -9285,6 +9361,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PatientExaminationDTO"
+        pageInfo:
+          $ref: "#/components/schemas/PageInfoDTO"
+    PageBillPaymentsDTO:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillPaymentsDTO"
         pageInfo:
           $ref: "#/components/schemas/PageInfoDTO"
     PageAdmissionDTO:

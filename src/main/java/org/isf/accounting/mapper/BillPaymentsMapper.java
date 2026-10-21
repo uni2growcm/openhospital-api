@@ -21,8 +21,13 @@
  */
 package org.isf.accounting.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.isf.accounting.dto.BillPaymentsDTO;
+import org.isf.accounting.model.Bill;
 import org.isf.accounting.model.BillPayments;
+import org.isf.patient.model.Patient;
 import org.isf.shared.GenericMapper;
 import org.springframework.stereotype.Component;
 
@@ -30,5 +35,22 @@ import org.springframework.stereotype.Component;
 public class BillPaymentsMapper extends GenericMapper<BillPayments, BillPaymentsDTO> {
 	public BillPaymentsMapper() {
 		super(BillPayments.class, BillPaymentsDTO.class);
+	}
+
+	@Override
+	public BillPaymentsDTO map2DTO(BillPayments fromObj) {
+		BillPaymentsDTO dto = super.map2DTO(fromObj);
+		Bill bill = fromObj.getBill();
+		if (bill != null) {
+			dto.setPatName(bill.getPatName());
+			Patient patient = bill.getBillPatient();
+			dto.setPatientCode(patient != null ? patient.getCode() : null);
+		}
+		return dto;
+	}
+
+	@Override
+	public List<BillPaymentsDTO> map2DTOList(List<BillPayments> list) {
+		return list.stream().map(this::map2DTO).collect(Collectors.toList());
 	}
 }
