@@ -150,7 +150,7 @@ public class TypologyController {
 			}
 			return typologyMapper.map2DTO(typology);
 		} catch (OHDataIntegrityViolationException e) {
-			throw new OHAPIException(new OHExceptionMessage("Typology code already present."));
+			throw new OHAPIException(new OHExceptionMessage("errors.typology.code_exists"), HttpStatus.CONFLICT);
 		} catch (OHServiceException e) {
 			throw new OHAPIException(new OHExceptionMessage(e.getMessage()));
 		}
