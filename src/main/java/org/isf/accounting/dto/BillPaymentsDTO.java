@@ -48,6 +48,12 @@ public class BillPaymentsDTO {
 	@Schema(description = "The current user", example = "admin")
 	private String user;
 
+	@Schema(description = "The name of the patient the bill belongs to", example = "Rossi Mario", accessMode = AccessMode.READ_ONLY)
+	private String patName;
+
+	@Schema(description = "The code of the patient the bill belongs to", accessMode = AccessMode.READ_ONLY)
+	private Integer patientCode;
+
 	private volatile int hashCode;
 
 	public Integer getId() {
@@ -88,6 +94,22 @@ public class BillPaymentsDTO {
 
 	public void setUser(String user) {
 		this.user = user;
+	}
+
+	public String getPatName() {
+		return this.patName;
+	}
+
+	public void setPatName(String patName) {
+		this.patName = patName;
+	}
+
+	public Integer getPatientCode() {
+		return this.patientCode;
+	}
+
+	public void setPatientCode(Integer patientCode) {
+		this.patientCode = patientCode;
 	}
 
 	@Schema(accessMode = AccessMode.READ_ONLY)

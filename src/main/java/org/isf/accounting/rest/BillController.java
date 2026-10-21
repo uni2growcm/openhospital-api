@@ -40,8 +40,10 @@ import org.isf.patient.model.Patient;
 import org.isf.priceslist.manager.PriceListManager;
 import org.isf.priceslist.model.PriceList;
 import org.isf.shared.exceptions.OHAPIException;
+import org.isf.shared.pagination.Page;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
+import org.isf.utils.pagination.PagedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -59,6 +61,8 @@ import java.util.List;
 public class BillController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BillController.class);
+
+	protected static final String DEFAULT_PAGE_SIZE = "10";
 
 	private final BillBrowserManager billManager;
 
@@ -244,6 +248,49 @@ public class BillController {
 		}
 
 		return billPaymentsMapper.map2DTOList(payments);
+	}
+
+	/**
+	 * Retrieves a page of {@link BillPayments} for the given parameters, server-side paginated.
+	 *
+	 * @param dateFrom Start date
+	 * @param dateTo   End date
+	 * @param code     the patient code, which can be set or not.
+	 * @param page     the requested page index (0-based)
+	 * @param size     the page size
+	 * @return a page of payments along with pagination info
+	 * @throws OHServiceException When failed to get bill payments
+	 */
+	@GetMapping("/bills/payments/search")
+	public Page<BillPaymentsDTO> searchBillsPaymentsPageable(
+		@RequestParam(value = "datefrom") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") @Schema(implementation = String.class) LocalDateTime dateFrom,
+		@RequestParam(value = "dateto") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") @Schema(implementation = String.class) LocalDateTime dateTo,
+		@RequestParam(value = "patient_code", required = false) Integer code,
+		@RequestParam(value = "user", required = false) String user,
+		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		@RequestParam(value = "size", required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) throws OHServiceException {
+		LOGGER.info("Get Payments (paginated) datefrom: {}  dateTo: {} patient: {} user: {} page: {} size: {}", dateFrom, dateTo, code, user, page, size);
+
+		Patient patient = code != null ? patientManager.getPatientById(code) : null;
+		PagedResponse<BillPayments> paymentsPageable = billManager.getPaymentsPageable(dateFrom, dateTo, patient, user, page, size);
+
+		Page<BillPaymentsDTO> result = new Page<>();
+		result.setData(billPaymentsMapper.map2DTOList(paymentsPageable.getData()));
+		result.setPageInfo(billPaymentsMapper.setParameterPageInfo(paymentsPageable.getPageInfo()));
+		return result;
+	}
+
+	/**
+	 * Retrieves the distinct list of users that have recorded a bill or a bill payment.
+	 *
+	 * @return the list of usernames
+	 * @throws OHServiceException When failed to get the users
+	 */
+	@GetMapping("/bills/payments/users")
+	public List<String> getPaymentsUsers() throws OHServiceException {
+		LOGGER.info("Get payments users.");
+
+		return billManager.getUsers();
 	}
 
 	/**
