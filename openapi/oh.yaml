@@ -10051,12 +10051,12 @@ components:
     PageTypologyDTO:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
         size:
