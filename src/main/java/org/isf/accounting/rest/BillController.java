@@ -253,6 +253,16 @@ public class BillController {
 		LOGGER.info("Search bills datefrom: {} dateto: {} patient: {} guarantor: {} status: {} page: {} size: {}",
 			dateFrom, dateTo, code, guarantor, status, page, size);
 
+		if (page < 0) {
+			throw new OHAPIException(new OHExceptionMessage("Page number must not be negative."));
+		}
+		if (size <= 0) {
+			throw new OHAPIException(new OHExceptionMessage("Page size must be greater than zero."));
+		}
+		if (dateFrom != null && dateTo != null && dateFrom.isAfter(dateTo)) {
+			throw new OHAPIException(new OHExceptionMessage("Date range is invalid: datefrom must not be after dateto."));
+		}
+
 		Patient patient = code != null ? patientManager.getPatientById(code) : null;
 		User guarantorUser = guarantor != null && !guarantor.isBlank() ? userManager.getUserByName(guarantor) : null;
 
