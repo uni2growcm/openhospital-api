@@ -71,13 +71,4 @@ public class TypologyDTO {
 	public void setFamily(Family family) {
 		this.family = family;
 	}
-
-	@com.fasterxml.jackson.annotation.JsonSetter("family")
-	public void setFamilyFromJson(Object family) {
-		if (family instanceof Family f) {
-			this.family = f;
-		} else if (family != null) {
-			this.family = Family.fromString(family.toString());
-		}
-	}
 }

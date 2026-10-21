@@ -8081,14 +8081,14 @@ components:
           type: string
           description: Family of the typology
           enum:
-          - angal.typology.deliverytype
-          - angal.typology.visittype
-          - angal.typology.partnertype
-          - angal.typology.familyplanningmethodtype
-          - angal.typology.familyplanningvisittype
-          - angal.typology.hivtreatmenttype
-          - angal.typology.tuberculosisregimen
-          - angal.typology.tuberculosiscontact
+          - DELIVERYTYPE
+          - VISITTYPE
+          - PARTNERTYPE
+          - FAMILYPLANNINGMETHODTYPE
+          - FAMILYPLANNINGVISITTYPE
+          - HIVTREATMENTTYPE
+          - TUBERCULOSISREGIMEN
+          - TUBERCULOSISCONTACT
           example: VISITTYPE
       required:
       - code

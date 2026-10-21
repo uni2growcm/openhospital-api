@@ -142,4 +142,17 @@ class TypologyControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(content().string("true"));
 	}
+
+	@Test
+	void testTypologyDTOSerialization() throws Exception {
+		TypologyDTO dto = new TypologyDTO("VT1", "Visit Type 1", Family.VISITTYPE);
+		String json = objectMapper.writeValueAsString(dto);
+		org.junit.jupiter.api.Assertions.assertTrue(json.contains("\"family\":\"VISITTYPE\""));
+
+		TypologyDTO fromEnumName = objectMapper.readValue("{\"code\":\"VT1\",\"description\":\"Visit Type 1\",\"family\":\"VISITTYPE\"}", TypologyDTO.class);
+		org.junit.jupiter.api.Assertions.assertEquals(Family.VISITTYPE, fromEnumName.getFamily());
+
+		TypologyDTO fromKey = objectMapper.readValue("{\"code\":\"VT1\",\"description\":\"Visit Type 1\",\"family\":\"angal.typology.visittype\"}", TypologyDTO.class);
+		org.junit.jupiter.api.Assertions.assertEquals(Family.VISITTYPE, fromKey.getFamily());
+	}
 }
