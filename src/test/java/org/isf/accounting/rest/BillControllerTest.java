@@ -34,6 +34,7 @@ import org.isf.accounting.mapper.BillPaymentsMapper;
 import org.isf.accounting.model.Bill;
 import org.isf.accounting.model.BillItems;
 import org.isf.accounting.model.BillPayments;
+import org.isf.menu.manager.UserBrowsingManager;
 import org.isf.patient.TestPatient;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.mapper.PatientMapper;
@@ -100,6 +101,8 @@ class BillControllerTest extends ControllerBaseTest {
 	private PriceListManager priceListManagerMock;
 	@Mock
 	private PatientBrowserManager patientManagerMock;
+	@Mock
+	private UserBrowsingManager userManagerMock;
 	private MockMvc mockMvc;
 
 	private AutoCloseable closeable;
@@ -108,7 +111,7 @@ class BillControllerTest extends ControllerBaseTest {
 	void setup() {
 		closeable = MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders
-			.standaloneSetup(new BillController(billManagerMock, priceListManagerMock, patientManagerMock, billMapper, billItemsMapper, billPaymentsMapper))
+			.standaloneSetup(new BillController(billManagerMock, priceListManagerMock, patientManagerMock, userManagerMock, billMapper, billItemsMapper, billPaymentsMapper))
 			.setControllerAdvice(new OHResponseEntityExceptionHandler())
 			.build();
 

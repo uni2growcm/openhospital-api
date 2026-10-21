@@ -79,6 +79,9 @@ public class BillDTO {
 	@Schema(description = "Lock", example = "0")
 	private int lock;
 
+	@Schema(description = "Id of the linked admission, if the bill is for an inpatient (IPD); null for outpatient (OPD) bills", example = "123")
+	private Integer admissionId;
+
 	public Integer getId() {
 		return this.id;
 	}
@@ -189,5 +192,13 @@ public class BillDTO {
 
 	public void setLock(int lock) {
 		this.lock = lock;
+	}
+
+	public Integer getAdmissionId() {
+		return this.admissionId;
+	}
+
+	public void setAdmissionId(Integer admissionId) {
+		this.admissionId = admissionId;
 	}
 }

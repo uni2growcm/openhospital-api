@@ -35,11 +35,15 @@ import org.isf.accounting.mapper.BillPaymentsMapper;
 import org.isf.accounting.model.Bill;
 import org.isf.accounting.model.BillItems;
 import org.isf.accounting.model.BillPayments;
+import org.isf.menu.manager.UserBrowsingManager;
+import org.isf.menu.model.User;
 import org.isf.patient.manager.PatientBrowserManager;
 import org.isf.patient.model.Patient;
 import org.isf.priceslist.manager.PriceListManager;
 import org.isf.priceslist.model.PriceList;
 import org.isf.shared.exceptions.OHAPIException;
+import org.isf.shared.pagination.Page;
+import org.isf.shared.pagination.PageInfoDTO;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.model.OHExceptionMessage;
 import org.slf4j.Logger;
@@ -60,11 +64,15 @@ public class BillController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BillController.class);
 
+	protected static final String DEFAULT_PAGE_SIZE = "10";
+
 	private final BillBrowserManager billManager;
 
 	private final PriceListManager priceListManager;
 
 	private final PatientBrowserManager patientManager;
+
+	private final UserBrowsingManager userManager;
 
 	private final BillMapper billMapper;
 
@@ -76,6 +84,7 @@ public class BillController {
 		BillBrowserManager billManager,
 		PriceListManager priceListManager,
 		PatientBrowserManager patientManager,
+		UserBrowsingManager userManager,
 		BillMapper billMapper,
 		BillItemsMapper billItemsMapper,
 		BillPaymentsMapper billPaymentsMapper
@@ -83,6 +92,7 @@ public class BillController {
 		this.billManager = billManager;
 		this.priceListManager = priceListManager;
 		this.patientManager = patientManager;
+		this.userManager = userManager;
 		this.billMapper = billMapper;
 		this.billItemsMapper = billItemsMapper;
 		this.billPaymentsMapper = billPaymentsMapper;
@@ -215,6 +225,64 @@ public class BillController {
 		}
 
 		return billMapper.map2DTOList(bills);
+	}
+
+	/**
+	 * Retrieves a page of {@link Bill}s for the specified filters, for the Bills listing screen.
+	 *
+	 * @param dateFrom  the low date range endpoint, inclusive.
+	 * @param dateTo    the high date range endpoint, inclusive.
+	 * @param code      the patient code to filter on, which can be set or not.
+	 * @param guarantor the guarantor (cashier/user) username to filter on, which can be set or not.
+	 * @param status    the bill status to filter on (O for open, C for closed), which can be set or not.
+	 * @param page      the page number to retrieve (0-based).
+	 * @param size      the number of items per page.
+	 * @return a {@link Page} of {@link BillDTO} matching the filters.
+	 * @throws OHServiceException When failed to get bills
+	 */
+	@GetMapping("/bills/search")
+	public Page<BillDTO> searchBillsPageable(
+		@RequestParam(value = "datefrom") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") @Schema(implementation = String.class) LocalDateTime dateFrom,
+		@RequestParam(value = "dateto") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") @Schema(implementation = String.class) LocalDateTime dateTo,
+		@RequestParam(value = "patient_code", required = false) Integer code,
+		@RequestParam(value = "guarantor", required = false) String guarantor,
+		@RequestParam(value = "status", required = false) String status,
+		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		@RequestParam(value = "size", required = false, defaultValue = DEFAULT_PAGE_SIZE) int size
+	) throws OHServiceException {
+		LOGGER.info("Search bills datefrom: {} dateto: {} patient: {} guarantor: {} status: {} page: {} size: {}",
+			dateFrom, dateTo, code, guarantor, status, page, size);
+
+		if (page < 0) {
+			throw new OHAPIException(new OHExceptionMessage("Page number must not be negative."));
+		}
+		if (size <= 0) {
+			throw new OHAPIException(new OHExceptionMessage("Page size must be greater than zero."));
+		}
+		if (dateFrom != null && dateTo != null && dateFrom.isAfter(dateTo)) {
+			throw new OHAPIException(new OHExceptionMessage("Date range is invalid: datefrom must not be after dateto."));
+		}
+
+		Patient patient = code != null ? patientManager.getPatientById(code) : null;
+		User guarantorUser = guarantor != null && !guarantor.isBlank() ? userManager.getUserByName(guarantor) : null;
+
+		org.springframework.data.domain.Page<Bill> bills = billManager.getBillsWithFilters(
+			status, dateFrom, dateTo, patient, guarantorUser, page, size);
+
+		Page<BillDTO> result = new Page<>();
+		result.setData(billMapper.map2DTOList(bills.getContent()));
+
+		PageInfoDTO pageInfo = new PageInfoDTO();
+		pageInfo.setPage(bills.getNumber());
+		pageInfo.setSize(bills.getSize());
+		pageInfo.setNbOfElements(bills.getNumberOfElements());
+		pageInfo.setTotalPages(bills.getTotalPages());
+		pageInfo.setTotalNbOfElements(bills.getTotalElements());
+		pageInfo.setHasPreviousPage(bills.hasPrevious());
+		pageInfo.setHasNextPage(bills.hasNext());
+		result.setPageInfo(pageInfo);
+
+		return result;
 	}
 
 	/**
