@@ -25,6 +25,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.isf.country.dto.CountryDTO;
+import org.isf.priceslist.dto.PriceListDTO;
+import org.isf.reductionplan.dto.ReductionPlanDTO;
 
 import java.time.LocalDate;
 
@@ -46,6 +49,9 @@ public class PatientDTO {
 
 	@Schema(description = "Birth date", example = "1979-05-01", type = "string")
 	private LocalDate birthDate;
+
+	@Schema(description = "Birth place", example = "Verona", maxLength = 100)
+	private String birthPlace;
 
 	@NotNull
 	@Schema(description = "Age", example = "40")
@@ -81,6 +87,30 @@ public class PatientDTO {
 	@Schema(description = "Mother's status (D=dead, A=alive)", allowableValues = {"D", "A"}, example = "A")
 	private char mother;
 
+	@Schema(description = "Number of children", example = "2")
+	private Integer numberOfChildren;
+
+	@Schema(description = "Geographic position", example = "Inside Area", maxLength = 30)
+	private String geographicPosition;
+
+	@Schema(description = "Parents' residence", example = "Same as patient", maxLength = 255)
+	private String parentsResidence;
+
+	@Schema(description = "Means of transport used to reach the hospital", example = "Bus", maxLength = 100)
+	private String transportMeans;
+
+	@Schema(description = "Name and phone number of the Blama", example = "John Doe +393456789012", maxLength = 255)
+	private String blama;
+
+	@Schema(description = "Country of the patient")
+	private CountryDTO country;
+
+	@Schema(description = "Code of the affiliated patient", example = "2")
+	private Integer affiliatedPatientCode;
+
+	@Schema(description = "Name of the affiliated patient", example = "Mario Rossi", accessMode = AccessMode.READ_ONLY)
+	private String affiliatedPatientName;
+
 	@NotNull
 	@Schema(description = "Father's name", example = "Giuseppe", maxLength = 50)
 	private String fatherName;
@@ -101,6 +131,18 @@ public class PatientDTO {
 
 	@Schema(description = "Tax code", example = "RSSMRA79E01L781N", maxLength = 30)
 	private String taxCode;
+
+	@Schema(description = "Marital status", example = "single", maxLength = 50)
+	private String maritalStatus;
+
+	@Schema(description = "Profession", example = "farming", maxLength = 50)
+	private String profession;
+
+	@Schema(description = "Price list applied to the patient")
+	private PriceListDTO priceList;
+
+	@Schema(description = "Reduction plan applied to the patient")
+	private ReductionPlanDTO reductionPlan;
 
 	@Schema(description = "Lock", example = "0")
 	private int lock;
@@ -227,6 +269,14 @@ public class PatientDTO {
 		this.birthDate = birthDate;
 	}
 
+	public String getBirthPlace() {
+		return this.birthPlace;
+	}
+
+	public void setBirthPlace(String birthPlace) {
+		this.birthPlace = birthPlace;
+	}
+
 	public int getAge() {
 		return this.age;
 	}
@@ -291,6 +341,70 @@ public class PatientDTO {
 		this.mother = mother;
 	}
 
+	public Integer getNumberOfChildren() {
+		return this.numberOfChildren;
+	}
+
+	public void setNumberOfChildren(Integer numberOfChildren) {
+		this.numberOfChildren = numberOfChildren;
+	}
+
+	public String getGeographicPosition() {
+		return this.geographicPosition;
+	}
+
+	public void setGeographicPosition(String geographicPosition) {
+		this.geographicPosition = geographicPosition;
+	}
+
+	public String getParentsResidence() {
+		return this.parentsResidence;
+	}
+
+	public void setParentsResidence(String parentsResidence) {
+		this.parentsResidence = parentsResidence;
+	}
+
+	public String getTransportMeans() {
+		return this.transportMeans;
+	}
+
+	public void setTransportMeans(String transportMeans) {
+		this.transportMeans = transportMeans;
+	}
+
+	public String getBlama() {
+		return this.blama;
+	}
+
+	public void setBlama(String blama) {
+		this.blama = blama;
+	}
+
+	public CountryDTO getCountry() {
+		return this.country;
+	}
+
+	public void setCountry(CountryDTO country) {
+		this.country = country;
+	}
+
+	public Integer getAffiliatedPatientCode() {
+		return this.affiliatedPatientCode;
+	}
+
+	public void setAffiliatedPatientCode(Integer affiliatedPatientCode) {
+		this.affiliatedPatientCode = affiliatedPatientCode;
+	}
+
+	public String getAffiliatedPatientName() {
+		return this.affiliatedPatientName;
+	}
+
+	public void setAffiliatedPatientName(String affiliatedPatientName) {
+		this.affiliatedPatientName = affiliatedPatientName;
+	}
+
 	public char getFather() {
 		return this.father;
 	}
@@ -329,6 +443,38 @@ public class PatientDTO {
 
 	public void setTaxCode(String taxCode) {
 		this.taxCode = taxCode;
+	}
+
+	public String getMaritalStatus() {
+		return this.maritalStatus;
+	}
+
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
+	}
+
+	public String getProfession() {
+		return this.profession;
+	}
+
+	public void setProfession(String profession) {
+		this.profession = profession;
+	}
+
+	public PriceListDTO getPriceList() {
+		return this.priceList;
+	}
+
+	public void setPriceList(PriceListDTO priceList) {
+		this.priceList = priceList;
+	}
+
+	public ReductionPlanDTO getReductionPlan() {
+		return this.reductionPlan;
+	}
+
+	public void setReductionPlan(ReductionPlanDTO reductionPlan) {
+		this.reductionPlan = reductionPlan;
 	}
 
 	public PatientSTATUS getStatus() {
