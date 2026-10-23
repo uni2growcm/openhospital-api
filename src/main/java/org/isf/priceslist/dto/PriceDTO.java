@@ -23,6 +23,7 @@ package org.isf.priceslist.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Class representing a prices")
@@ -47,11 +48,15 @@ public class PriceDTO {
 	private String description;
 
 	@NotNull
+	@DecimalMin(value = "0.0", message = "Price must not be negative")
 	@Schema(description = "Price", example = "1500")
 	private Double price;
 
 	@Schema(description = "Lock", example = "0")
 	private int lock;
+
+	@Schema(description = "Whether the price is variable")
+	private boolean isVariable;
 
 	private boolean editable;
 
@@ -134,5 +139,13 @@ public class PriceDTO {
 
 	public void setLock(int lock) {
 		this.lock = lock;
+	}
+
+	public boolean isVariable() {
+		return isVariable;
+	}
+
+	public void setVariable(boolean variable) {
+		isVariable = variable;
 	}
 }
