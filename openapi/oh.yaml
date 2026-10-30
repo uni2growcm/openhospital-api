@@ -9,12 +9,9 @@ info:
     url: https://github.com/informatici/openhospital-api?tab=GPL-3.0-1-ov-file#readme
   version: 0.1.0
 servers:
-- url: http://localhost
+- url: http://localhost:8080
 security:
 - bearerAuth: []
-tags:
-- name: Plugins
-  description: Dynamic gateway to registered external plugin services
 paths:
   /wards:
     get:
@@ -517,22 +514,31 @@ paths:
                 $ref: "#/components/schemas/SupplierDTO"
       security:
       - bearerAuth: []
-  /settings/{code}:
+  /stockmovements:
+    get:
+      tags:
+      - Stock Movements
+      operationId: getMovements
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MovementDTO"
+      security:
+      - bearerAuth: []
     put:
       tags:
-      - Settings
-      operationId: updateSetting
-      parameters:
-      - name: code
-        in: path
-        required: true
-        schema:
-          type: string
+      - Stock Movements
+      operationId: updateMovement
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateSettingDTO"
+              $ref: "#/components/schemas/MovementDTO"
         required: true
       responses:
         "200":
@@ -540,7 +546,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SettingDTO"
+                $ref: "#/components/schemas/MovementDTO"
       security:
       - bearerAuth: []
   /pricesothers/{id}:
@@ -2530,20 +2536,6 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
-  /settings/reset:
-    post:
-      tags:
-      - Settings
-      operationId: resetAllSettings
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: boolean
-      security:
-      - bearerAuth: []
   /pricesothers:
     get:
       tags:
@@ -3654,22 +3646,6 @@ paths:
           description: No Content
       security:
       - bearerAuth: []
-  /stockmovements:
-    get:
-      tags:
-      - Stock Movements
-      operationId: getMovements
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MovementDTO"
-      security:
-      - bearerAuth: []
   /stockmovements/{ref}:
     get:
       tags:
@@ -3850,75 +3826,88 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
-  /settings:
-    get:
-      tags:
-      - Settings
-      operationId: getAllSettings
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SettingDTO"
-      security:
-      - bearerAuth: []
-  /settings/{id}:
-    get:
-      tags:
-      - Settings
-      operationId: getSettingById
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SettingDTO"
-      security:
-      - bearerAuth: []
-  /settings/code/{code}:
-    get:
-      tags:
-      - Settings
-      operationId: getSettingByCode
-      parameters:
-      - name: code
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SettingDTO"
-      security:
-      - bearerAuth: []
-  /reports/patientexamrequest/{patientId}:
+  /reports/pharmaceuticalStock:
     get:
       tags:
       - Reports
-      operationId: printPatientExamRequestPdf
+      operationId: printPharmaceuticalStockPdf
       parameters:
-      - name: patientId
-        in: path
+      - name: option
+        in: query
         required: true
         schema:
-          type: integer
-          format: int32
+          type: string
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      - name: filter
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      responses:
+        "200":
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalStockWard:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalStockWardPdf
+      parameters:
+      - name: wardCode
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: stockWardReportModel
+        in: query
+        required: false
+        schema:
+          type: string
+          default: OUTCOMING
+          enum:
+          - INCOMING
+          - OUTCOMING
+          - DRUGS
       responses:
         "200":
           description: OK
@@ -3929,18 +3918,190 @@ paths:
                 format: binary
       security:
       - bearerAuth: []
-  /reports/patientexamination/{examinationId}:
+  /reports/pharmaceuticalStockWardExcel:
     get:
       tags:
       - Reports
-      operationId: printPatientExaminationPdf
+      operationId: printPharmaceuticalStockWardExcel
       parameters:
-      - name: examinationId
-        in: path
+      - name: wardCode
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: medicalCode
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: medicalTypeCode
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sex
+        in: query
+        required: false
+        schema:
+          type: string
+          default: A
+      - name: ageFrom
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: ageTo
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: weightFrom
+        in: query
+        required: false
+        schema:
+          type: number
+          format: float
+          default: 0.0
+      - name: weightTo
+        in: query
+        required: false
+        schema:
+          type: number
+          format: float
+          default: 0.0
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: index
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalStockCard:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalStockCardPdf
+      parameters:
+      - name: exportFileName
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: medicalCode
+        in: query
         required: true
         schema:
           type: integer
           format: int32
+      - name: wardCode
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalOrder:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalOrderPdf
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalExpiration:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalExpirationPdf
+      parameters:
+      - name: fromDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: toDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+      security:
+      - bearerAuth: []
+  /reports/pharmaceuticalAMC:
+    get:
+      tags:
+      - Reports
+      operationId: printPharmaceuticalAMC
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
       responses:
         "200":
           description: OK
@@ -3963,7 +4124,7 @@ paths:
             application/json:
               schema:
                 type: string
-                format: byte
+                format: binary
       security:
       - bearerAuth: []
   /reports/diseases-list:
@@ -3978,93 +4139,7 @@ paths:
             application/json:
               schema:
                 type: string
-                format: byte
-      security:
-      - bearerAuth: []
-  /radiology/studies/{id}/series:
-    get:
-      tags:
-      - Radiology
-      operationId: getStudySeriesById
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SeriesResponse"
-      security:
-      - bearerAuth: []
-  /radiology/series/{id}/instances:
-    get:
-      tags:
-      - Radiology
-      operationId: getSeriesInstancesById
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/InstanceResponse"
-      security:
-      - bearerAuth: []
-  /radiology/patients/{id}/studies:
-    get:
-      tags:
-      - Radiology
-      operationId: getPatientStudiesById
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/StudyResponse"
-      security:
-      - bearerAuth: []
-  /radiology/instances/{id}/preview:
-    get:
-      tags:
-      - Radiology
-      operationId: getInstancePreview
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InstancePreviewDTO"
+                format: binary
       security:
       - bearerAuth: []
   /pricelists/prices:
@@ -4135,25 +4210,6 @@ paths:
             application/json:
               schema:
                 type: boolean
-      security:
-      - bearerAuth: []
-  /plugins:
-    get:
-      tags:
-      - Plugins
-      summary: List all registered plugins
-      description: Returns all plugins that passed the startup health check and are
-        currently available through the gateway.
-      operationId: listPlugins
-      responses:
-        "200":
-          description: Plugin list returned successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PluginDefinition"
       security:
       - bearerAuth: []
   /permissions:
@@ -4832,6 +4888,29 @@ paths:
                   $ref: "#/components/schemas/MedicalWardDTO"
       security:
       - bearerAuth: []
+  /medicalstockward/{medicalId}/ward-quantities:
+    get:
+      tags:
+      - Medical Stock Ward
+      operationId: getCurrentQuantityInAllWards
+      parameters:
+      - name: medicalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MedicalWardQuantityDTO"
+      security:
+      - bearerAuth: []
   /medicalstockward/movements/{ward_code}:
     get:
       tags:
@@ -4845,13 +4924,13 @@ paths:
           type: string
       - name: from
         in: query
-        required: true
+        required: false
         schema:
           type: string
           format: date
       - name: to
         in: query
-        required: true
+        required: false
         schema:
           type: string
           format: date
@@ -4882,13 +4961,13 @@ paths:
         required: true
         schema:
           type: string
-          format: date-time
+          format: date
       - name: to
         in: query
         required: true
         schema:
           type: string
-          format: date-time
+          format: date
       responses:
         "200":
           description: OK
@@ -5078,13 +5157,13 @@ paths:
         required: true
         schema:
           type: string
-          format: date-time
+          format: date
       - name: to
         in: query
         required: true
         schema:
           type: string
-          format: date-time
+          format: date
       responses:
         "200":
           description: OK
@@ -6488,357 +6567,6 @@ paths:
                 type: boolean
       security:
       - bearerAuth: []
-  /plugins/{id}/{path}:
-    get:
-      tags:
-      - Plugins
-      summary: Proxy a request to an external plugin
-      description: "Resolves the plugin by ID, checks authorization, then forwards\
-        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
-        \ is appended to the plugin base URL. All HTTP methods are supported."
-      operationId: proxy
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Upstream response forwarded successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "403":
-          description: Authenticated user lacks required privileges for this plugin
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "404":
-          description: Plugin not found or unavailable
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "502":
-          description: Upstream plugin returned an unexpected error
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-      security:
-      - bearerAuth: []
-    put:
-      tags:
-      - Plugins
-      summary: Proxy a request to an external plugin
-      description: "Resolves the plugin by ID, checks authorization, then forwards\
-        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
-        \ is appended to the plugin base URL. All HTTP methods are supported."
-      operationId: proxy_2
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Upstream response forwarded successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "403":
-          description: Authenticated user lacks required privileges for this plugin
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "404":
-          description: Plugin not found or unavailable
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "502":
-          description: Upstream plugin returned an unexpected error
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-      security:
-      - bearerAuth: []
-    post:
-      tags:
-      - Plugins
-      summary: Proxy a request to an external plugin
-      description: "Resolves the plugin by ID, checks authorization, then forwards\
-        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
-        \ is appended to the plugin base URL. All HTTP methods are supported."
-      operationId: proxy_1
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Upstream response forwarded successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "403":
-          description: Authenticated user lacks required privileges for this plugin
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "404":
-          description: Plugin not found or unavailable
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "502":
-          description: Upstream plugin returned an unexpected error
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-      security:
-      - bearerAuth: []
-    delete:
-      tags:
-      - Plugins
-      summary: Proxy a request to an external plugin
-      description: "Resolves the plugin by ID, checks authorization, then forwards\
-        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
-        \ is appended to the plugin base URL. All HTTP methods are supported."
-      operationId: proxy_3
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Upstream response forwarded successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "403":
-          description: Authenticated user lacks required privileges for this plugin
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "404":
-          description: Plugin not found or unavailable
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "502":
-          description: Upstream plugin returned an unexpected error
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-      security:
-      - bearerAuth: []
-    options:
-      tags:
-      - Plugins
-      summary: Proxy a request to an external plugin
-      description: "Resolves the plugin by ID, checks authorization, then forwards\
-        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
-        \ is appended to the plugin base URL. All HTTP methods are supported."
-      operationId: proxy_6
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Upstream response forwarded successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "403":
-          description: Authenticated user lacks required privileges for this plugin
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "404":
-          description: Plugin not found or unavailable
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "502":
-          description: Upstream plugin returned an unexpected error
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-      security:
-      - bearerAuth: []
-    head:
-      tags:
-      - Plugins
-      summary: Proxy a request to an external plugin
-      description: "Resolves the plugin by ID, checks authorization, then forwards\
-        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
-        \ is appended to the plugin base URL. All HTTP methods are supported."
-      operationId: proxy_5
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Upstream response forwarded successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "403":
-          description: Authenticated user lacks required privileges for this plugin
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "404":
-          description: Plugin not found or unavailable
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "502":
-          description: Upstream plugin returned an unexpected error
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-      security:
-      - bearerAuth: []
-    patch:
-      tags:
-      - Plugins
-      summary: Proxy a request to an external plugin
-      description: "Resolves the plugin by ID, checks authorization, then forwards\
-        \ the request to the plugin's upstream URL. The sub-path after /plugins/{pluginId}\
-        \ is appended to the plugin base URL. All HTTP methods are supported."
-      operationId: proxy_4
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Upstream response forwarded successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "403":
-          description: Authenticated user lacks required privileges for this plugin
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "404":
-          description: Plugin not found or unavailable
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-        "502":
-          description: Upstream plugin returned an unexpected error
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
-      security:
-      - bearerAuth: []
 components:
   schemas:
     WardDTO:
@@ -6881,13 +6609,13 @@ components:
           format: int32
           description: lock
           example: 0
-        opd:
-          type: boolean
         female:
           type: boolean
         male:
           type: boolean
         pharmacy:
+          type: boolean
+        opd:
           type: boolean
       required:
       - beds
@@ -7315,75 +7043,182 @@ components:
       required:
       - supId
       - supName
-    UpdateSettingDTO:
+    LotDTO:
       type: object
       properties:
-        value:
-          type: string
-          description: The value of the setting
-          example: "FALSE"
-    SettingDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-          description: Setting ID
-          example: 1
         code:
           type: string
-          description: Setting code
-          example: AUTOMATICLOT_IN
+          description: The lot's code
+          example: LT001
           maxLength: 50
-        category:
+        preparationDate:
           type: string
-          description: Setting category
-          enum:
-          - general
-          - telemetry
-          - security
-          - imaging
-          - accounting
-          - reports
-          - pharmacy
-          - gui
-          - application
-          - integration
-          example: application
+          description: The preparation date
+          example: 2020-06-24
+        dueDate:
+          type: string
+          description: The due date
+          example: 2021-06-24
+        cost:
+          type: number
+          description: The lot's cost
+          example: 750
+        mainStoreQuantity:
+          type: integer
+          format: int32
+          description: The lot's main store quantity
+          example: 10
+        wardsTotalQuantity:
+          type: number
+          format: double
+          description: The lot's ward total  quantity
+          example: 15
+        overallQuantity:
+          type: number
+          format: double
+          description: The lot's overall quantity
+          example: 35
+      required:
+      - code
+      - dueDate
+      - preparationDate
+    MedicalDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: The id of the medical
+          example: 1
+          maxLength: 5
+        prodCode:
+          type: string
+          description: The product code
+          example: PARA
         type:
-          type: string
-          description: value type
-          enum:
-          - bool
-          - number
-          - text
-          - select
-          example: bool
-        valueOptions:
-          type: string
-          description: Comma-separated list of possible values
-          maxLength: 500
-        defaultValue:
-          type: string
-          description: Default value
-          example: "TRUE"
-        value:
-          type: string
-          description: The value of the setting
-          example: "FALSE"
+          $ref: "#/components/schemas/MedicalTypeDTO"
+          description: The medical type
         description:
           type: string
-          description: Description
-          maxLength: 500
-        needRestart:
-          type: boolean
-          description: Whether the app needs restart after the setting has been modified
-          example: true
+          description: The description of the medical
+          example: Paracétamol
+          maxLength: 100
+        initialqty:
+          type: number
+          format: double
+          description: The initial quantity of the medical
+          example: 21
+        pcsperpck:
+          type: integer
+          format: int32
+          description: The number of pieces per packet
+          example: 100
+        inqty:
+          type: number
+          format: double
+          description: The input quantity of the medical
+          example: 340
+        outqty:
+          type: number
+          format: double
+          description: The out quantity of the medical
+          example: 8
+        minqty:
+          type: number
+          format: double
+          description: The min quantity of the medical
+          example: 15
+        lots:
+          type: array
+          description: The lots associated to the medical
+          items:
+            $ref: "#/components/schemas/LotDTO"
+        lock:
+          type: integer
+          format: int32
+          description: Lock
+          example: 0
+        deleted:
+          type: string
+          description: The if medical is deleted
+    MedicalTypeDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Code of the medical type
+          example: M
+          maxLength: 1
+        description:
+          type: string
+          description: Description of the medical type
+          example: Medical material
+          maxLength: 30
       required:
-      - category
       - code
-      - defaultValue
-      - id
+      - description
+    MovementDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: The movement code
+          example: 1
+        medical:
+          $ref: "#/components/schemas/MedicalDTO"
+          description: The related medical
+        type:
+          $ref: "#/components/schemas/MovementTypeDTO"
+          description: The movement type
+        ward:
+          $ref: "#/components/schemas/WardDTO"
+          description: The target ward
+        lot:
+          $ref: "#/components/schemas/LotDTO"
+          description: The lot
+        date:
+          type: string
+          description: The movement date
+          example: 2020-06-24
+        quantity:
+          type: integer
+          format: int32
+          description: The movement's medical quantity
+          example: 50
+        supplier:
+          $ref: "#/components/schemas/SupplierDTO"
+          description: The movement's supplier
+        refNo:
+          type: string
+          description: The movement reference
+          example: MVN152445
+      required:
+      - date
+      - medical
+      - quantity
+      - refNo
+      - type
+    MovementTypeDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Code of the movement type
+          example: D
+          maxLength: 10
+        description:
+          type: string
+          description: Description of the movement type
+          example: Damage
+          maxLength: 50
+        type:
+          type: string
+          description: Type of the movement type
+          example: "-"
+      required:
+      - code
+      - description
       - type
     PricesOthersDTO:
       type: object
@@ -7691,11 +7526,11 @@ components:
           type: string
           description: "Flag record deleted, values are 'Y' OR 'N' "
           example: "N"
+        fhu:
+          type: string
         yprog:
           type: integer
           format: int32
-        fhu:
-          type: string
       required:
       - admDate
       - admitted
@@ -8046,94 +7881,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationRowDTO"
-    MovementTypeDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Code of the movement type
-          example: D
-          maxLength: 10
-        description:
-          type: string
-          description: Description of the movement type
-          example: Damage
-          maxLength: 50
-        type:
-          type: string
-          description: Type of the movement type
-          example: "-"
-      required:
-      - code
-      - description
-      - type
-    MedicalTypeDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Code of the medical type
-          example: M
-          maxLength: 1
-        description:
-          type: string
-          description: Description of the medical type
-          example: Medical material
-          maxLength: 30
-      required:
-      - code
-      - description
-    MedicalDTO:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-          description: The id of the medical
-          example: 1
-          maxLength: 5
-        prod_code:
-          type: string
-          description: The product code
-          example: PARA
-        type:
-          $ref: "#/components/schemas/MedicalTypeDTO"
-          description: The medical type
-        description:
-          type: string
-          description: The description of the medical
-          example: Paracétamol
-          maxLength: 100
-        initialqty:
-          type: number
-          format: double
-          description: The initial quantity of the medical
-          example: 21
-        pcsperpck:
-          type: integer
-          format: int32
-          description: The number of pieces per packet
-          example: 100
-        inqty:
-          type: number
-          format: double
-          description: The input quantity of the medical
-          example: 340
-        outqty:
-          type: number
-          format: double
-          description: The out quantity of the medical
-          example: 8
-        minqty:
-          type: number
-          format: double
-          description: The min quantity of the medical
-          example: 15
-        lock:
-          type: integer
-          format: int32
-          description: Lock
-          example: 0
     MalnutritionDTO:
       type: object
       properties:
@@ -8714,72 +8461,6 @@ components:
           description: "The sms flag: true if sms need to be sent to patient, false\
             \ otherwise"
           example: false
-    LotDTO:
-      type: object
-      properties:
-        code:
-          type: string
-          description: The lot's code
-          example: LT001
-          maxLength: 50
-        preparationDate:
-          type: string
-          description: The preparation date
-          example: 2020-06-24
-        dueDate:
-          type: string
-          description: The due date
-          example: 2021-06-24
-        cost:
-          type: number
-          description: The lot's code
-          example: 750
-      required:
-      - code
-      - dueDate
-      - preparationDate
-    MovementDTO:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-          description: The movement code
-          example: 1
-        medical:
-          $ref: "#/components/schemas/MedicalDTO"
-          description: The related medical
-        type:
-          $ref: "#/components/schemas/MovementTypeDTO"
-          description: The movement type
-        ward:
-          $ref: "#/components/schemas/WardDTO"
-          description: The target ward
-        lot:
-          $ref: "#/components/schemas/LotDTO"
-          description: The lot
-        date:
-          type: string
-          description: The movement date
-          example: 2020-06-24
-        quantity:
-          type: integer
-          format: int32
-          description: The movement's medical quantity
-          example: 50
-        supplier:
-          $ref: "#/components/schemas/SupplierDTO"
-          description: The movement's supplier
-        refNo:
-          type: string
-          description: The movement reference
-          example: MVN152445
-      required:
-      - date
-      - medical
-      - quantity
-      - refNo
-      - type
     SmsDTO:
       type: object
       properties:
@@ -8848,7 +8529,10 @@ components:
           format: LocalDate
           description: The movement ward's date
           example: 2020-06-07
-        patient:
+        isPatient:
+          type: boolean
+          writeOnly: true
+        fullPatient:
           $ref: "#/components/schemas/PatientDTO"
           description: The patient in case the movement is associated to a patient
         age:
@@ -8884,6 +8568,11 @@ components:
         wardFrom:
           $ref: "#/components/schemas/WardDTO"
           description: The ward from which the movement is done
+        lot:
+          $ref: "#/components/schemas/LotDTO"
+          description: The lot of the medical concerned by the movement
+        patient:
+          type: boolean
       required:
       - date
       - description
@@ -8941,157 +8630,6 @@ components:
       required:
       - password
       - username
-    Series:
-      type: object
-      properties:
-        bodyPartExamined:
-          type: string
-        imageOrientationPatient:
-          type: string
-        manufacturer:
-          type: string
-        modality:
-          type: string
-        operatorsName:
-          type: string
-        protocolName:
-          type: string
-        seriesDescription:
-          type: string
-        instanceUID:
-          type: string
-        number:
-          type: string
-        stationName:
-          type: string
-    SeriesResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        objectType:
-          type: string
-        labels:
-          type: array
-          items:
-            type: string
-        lastUpdate:
-          type: string
-        series:
-          $ref: "#/components/schemas/Series"
-        parentStudyId:
-          type: string
-        instancesIds:
-          type: array
-          items:
-            type: string
-        expectedNumberOfInstances:
-          type: string
-        status:
-          type: string
-        stable:
-          type: boolean
-    Instance:
-      type: object
-      properties:
-        acquisitionNumber:
-          type: string
-        imageOrientationPatient:
-          type: string
-        imagePositionPatient:
-          type: string
-        creationDate:
-          type: string
-        creationTime:
-          type: string
-        instanceNumber:
-          type: string
-        instanceUID:
-          type: string
-    InstanceResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        fileSize:
-          type: integer
-          format: int32
-        fileUuid:
-          type: string
-        indexInSeries:
-          type: integer
-          format: int32
-        labels:
-          type: array
-          items:
-            type: string
-        instance:
-          $ref: "#/components/schemas/Instance"
-        parentSeriesId:
-          type: string
-        objectType:
-          type: string
-    Patient:
-      type: object
-      properties:
-        birthDate:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-        sex:
-          type: string
-    Study:
-      type: object
-      properties:
-        accessionNumber:
-          type: string
-        institutionName:
-          type: string
-        referringPhysicianName:
-          type: string
-        date:
-          type: string
-        time:
-          type: string
-        description:
-          type: string
-        id:
-          type: string
-        instanceUID:
-          type: string
-    StudyResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        objectType:
-          type: string
-        labels:
-          type: array
-          items:
-            type: string
-        lastUpdate:
-          type: string
-        study:
-          $ref: "#/components/schemas/Study"
-        parentPatientId:
-          type: string
-        patient:
-          $ref: "#/components/schemas/Patient"
-        seriesIds:
-          type: array
-          items:
-            type: string
-        stable:
-          type: boolean
-    InstancePreviewDTO:
-      type: object
-      properties:
-        data:
-          type: string
-          description: Base64 representation of the instance preview
     PriceDTO:
       type: object
       description: Class representing a prices
@@ -9136,65 +8674,6 @@ components:
       - item
       - list
       - price
-    PluginBundle:
-      type: object
-      properties:
-        label:
-          type: string
-        manifest:
-          type: string
-        type:
-          type: string
-        location:
-          type: string
-          enum:
-          - main
-          - patient
-        styles:
-          type: string
-      required:
-      - label
-      - location
-      - manifest
-      - type
-    PluginConfiguration:
-      type: object
-      properties:
-        bundle:
-          $ref: "#/components/schemas/PluginBundle"
-        permissions:
-          type: array
-          items:
-            $ref: "#/components/schemas/PluginPermission"
-    PluginDefinition:
-      type: object
-      properties:
-        id:
-          type: string
-        url:
-          type: string
-        health:
-          type: string
-        configuration:
-          $ref: "#/components/schemas/PluginConfiguration"
-    PluginPermission:
-      type: object
-      properties:
-        role:
-          type: string
-        routes:
-          type: array
-          items:
-            $ref: "#/components/schemas/PluginRoute"
-    PluginRoute:
-      type: object
-      properties:
-        path:
-          type: string
-        methods:
-          type: array
-          items:
-            type: string
     PageInfoDTO:
       type: object
       properties:
@@ -9266,8 +8745,28 @@ components:
         medical:
           $ref: "#/components/schemas/MedicalDTO"
           description: The medical
+        lot:
+          $ref: "#/components/schemas/LotDTO"
+          description: The medical lot
       required:
       - medical
+      - ward
+    MedicalWardQuantityDTO:
+      type: object
+      properties:
+        ward:
+          $ref: "#/components/schemas/WardDTO"
+          description: The ward
+        medical:
+          $ref: "#/components/schemas/MedicalDTO"
+          description: The medical
+        quantity:
+          type: integer
+          format: int32
+          description: The medical quantity in the ward
+      required:
+      - medical
+      - quantity
       - ward
     PageLabWithRowsDTO:
       type: object

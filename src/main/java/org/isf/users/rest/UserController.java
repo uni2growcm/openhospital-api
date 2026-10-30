@@ -35,6 +35,7 @@ import org.isf.permissions.mapper.PermissionMapper;
 import org.isf.permissions.model.Permission;
 import org.isf.shared.exceptions.OHAPIException;
 import org.isf.usergroups.mapper.UserGroupMapper;
+import org.isf.users.dto.PasswordDTO;
 import org.isf.users.dto.UserDTO;
 import org.isf.users.dto.UserProfileDTO;
 import org.isf.users.mapper.UserMapper;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,18 +79,22 @@ public class UserController {
 
 	private final UserBrowsingManager userManager;
 
+	private final PasswordEncoder passwordEncoder;
+
 	public UserController(
 		PermissionManager permissionManager,
 		PermissionMapper permissionMapper,
 		UserMapper userMapper,
 		UserGroupMapper userGroupMapper,
-		UserBrowsingManager userManager
+		UserBrowsingManager userManager,
+		PasswordEncoder passwordEncoder
 	) {
 		this.permissionManager = permissionManager;
 		this.permissionMapper = permissionMapper;
 		this.userMapper = userMapper;
 		this.userGroupMapper = userGroupMapper;
 		this.userManager = userManager;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	/**
@@ -250,6 +256,37 @@ public class UserController {
 		} else {
 			throw new OHAPIException(new OHExceptionMessage("User not updated."));
 		}
+	}
+
+	/**
+	 * Updates the password of the current logged in {@link User}. The current password must be provided and match the stored one.
+	 * @param passwordDTO - the current and new passwords
+	 * @return the current {@link UserProfileDTO} if the password has been updated
+	 * @throws OHServiceException When failed to update the password
+	 */
+	@PutMapping("/users/me/password")
+	public UserProfileDTO updatePassword(@Valid @RequestBody PasswordDTO passwordDTO) throws OHServiceException {
+		String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+		LOGGER.info("Updating the password of the user {}.", currentUser);
+		if (!passwordDTO.getUsername().equals(currentUser)) {
+			throw new OHAPIException(new OHExceptionMessage("You're not allowed to update this user's password."), HttpStatus.FORBIDDEN);
+		}
+		User entity = userManager.getUserByName(currentUser);
+		if (entity == null) {
+			throw new OHAPIException(new OHExceptionMessage("The specified user does not exist."), HttpStatus.NOT_FOUND);
+		}
+		if (!userManager.isPasswordCorrect(entity, passwordDTO.getOldPasswd())) {
+			throw new OHAPIException(new OHExceptionMessage("The current password is incorrect."), HttpStatus.BAD_REQUEST);
+		}
+		User user = new User();
+		user.setUserName(currentUser);
+		user.setPasswd(passwordEncoder.encode(passwordDTO.getNewPasswd()));
+		User updatedUser = userManager.updatePassword(user);
+		if (updatedUser == null) {
+			throw new OHAPIException(new OHExceptionMessage("Password not updated."));
+		}
+		LOGGER.info("Password of the user {} has been successfully updated.", currentUser);
+		return retrieveProfile(currentUser);
 	}
 
 	/**
