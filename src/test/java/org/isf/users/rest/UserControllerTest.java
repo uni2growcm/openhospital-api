@@ -46,6 +46,7 @@ import org.isf.menu.model.UserGroup;
 import org.isf.permissions.manager.PermissionManager;
 import org.isf.permissions.model.Permission;
 import org.isf.users.data.UserHelper;
+import org.isf.users.dto.PasswordDTO;
 import org.isf.users.dto.UserDTO;
 import org.isf.users.mapper.UserMapper;
 import org.isf.utils.exception.OHServiceException;
@@ -370,6 +371,90 @@ class UserControllerTest {
 
 			verify(userManager, never()).updatePassword(any());
 			verify(userManager).updateUser(any());
+		}
+	}
+
+	@Nested
+	@DisplayName("Update password")
+	class UpdatePasswordTests {
+
+		@BeforeEach
+		void setup() throws OHServiceException {
+			when(permissionManager.retrievePermissionsByUsername(any())).thenReturn(Collections.emptyList());
+		}
+
+		@Test
+		@DisplayName("Should update the current user's password")
+		@WithMockUser(username = "doctor")
+		void shouldUpdatePassword() throws Exception {
+			var user = new User("doctor", new UserGroup("doctor", "Doctor group"), "encodedPassword", "Simple user");
+			var passwordDTO = new PasswordDTO("doctor", "oldPassword", "newPassword");
+
+			when(userManager.getUserByName("doctor")).thenReturn(user);
+			when(userManager.isPasswordCorrect(user, "oldPassword")).thenReturn(true);
+			when(userManager.updatePassword(any())).thenReturn(user);
+
+			mvc.perform(
+					put("/users/me/password")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(passwordDTO))
+				)
+				.andDo(log())
+				.andExpect(status().isOk());
+
+			verify(userManager).updatePassword(any());
+		}
+
+		@Test
+		@DisplayName("Should reject an incorrect current password")
+		@WithMockUser(username = "doctor")
+		void shouldRejectIncorrectCurrentPassword() throws Exception {
+			var user = new User("doctor", new UserGroup("doctor", "Doctor group"), "encodedPassword", "Simple user");
+			var passwordDTO = new PasswordDTO("doctor", "wrongPassword", "newPassword");
+
+			when(userManager.getUserByName("doctor")).thenReturn(user);
+			when(userManager.isPasswordCorrect(user, "wrongPassword")).thenReturn(false);
+
+			mvc.perform(
+					put("/users/me/password")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(passwordDTO))
+				)
+				.andDo(log())
+				.andExpect(status().isBadRequest());
+
+			verify(userManager, never()).updatePassword(any());
+		}
+
+		@Test
+		@DisplayName("Should fail when trying to update another user's password")
+		@WithMockUser(username = "doctor")
+		void shouldFailWhenUpdatingAnotherUsersPassword() throws Exception {
+			var passwordDTO = new PasswordDTO("laboratorist", "oldPassword", "newPassword");
+
+			mvc.perform(
+					put("/users/me/password")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(passwordDTO))
+				)
+				.andDo(log())
+				.andExpect(status().isForbidden());
+
+			verify(userManager, never()).updatePassword(any());
+		}
+
+		@Test
+		@DisplayName("Should fail to update password when not authenticated")
+		void shouldFailToUpdatePasswordWhenNotAuthenticated() throws Exception {
+			var passwordDTO = new PasswordDTO("doctor", "oldPassword", "newPassword");
+
+			mvc.perform(
+					put("/users/me/password")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(passwordDTO))
+				)
+				.andDo(log())
+				.andExpect(status().isUnauthorized());
 		}
 	}
 
