@@ -214,6 +214,36 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-report-stat</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/rpt_stat</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${oh-core.dir}/rpt_stat</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-report-extra</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/rpt_extra</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${oh-core.dir}/rpt_extra</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

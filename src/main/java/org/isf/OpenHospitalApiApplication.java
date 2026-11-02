@@ -24,12 +24,14 @@ package org.isf;
 import jakarta.annotation.PostConstruct;
 
 import org.isf.generaldata.GeneralData;
+import org.isf.menu.manager.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ImportResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +44,9 @@ public class OpenHospitalApiApplication extends SpringBootServletInitializer {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@Autowired
+	private ApplicationContext applicationContext;
+
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(OpenHospitalApiApplication.class);
 		application.addListeners(new ApplicationPidFileWriter()); // OP-1113 added to control API from scripts
@@ -51,6 +56,7 @@ public class OpenHospitalApiApplication extends SpringBootServletInitializer {
 	@PostConstruct
 	public void setUp() {
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		Context.setApplicationContext(applicationContext); // needed by core classes outside Spring (e.g. DbJpaUtil for Excel reports)
 		GeneralData.getGeneralData(); // initialize core settings
 	}
 
